@@ -1,0 +1,10 @@
+{
+  "name": "dhamma-path-seed",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dev-only seed script for Dhamma Path (Architecture §0 unlock task T0.9). Writes sample teachers, content and config into a Firestore project using the Firestore REST API and the developer's already-authenticated Firebase CLI credentials — no service account key required.",
+  "type": "commonjs",
+  "scripts": {
+    "seed": "node seed.js"
+  }
+}

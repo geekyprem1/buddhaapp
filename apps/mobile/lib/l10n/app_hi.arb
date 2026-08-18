@@ -1,0 +1,53 @@
+{
+  "@@locale": "hi",
+
+  "appName": "धम्म पथ",
+  "tagline": "हर आवाज़ में शक्ति",
+
+  "continueButton": "आगे बढ़ें",
+  "retryButton": "पुनः प्रयास करें",
+
+  "languageScreenTitle": "आपकी भाषा",
+  "languageScreenSubtitle": "अपनी भाषा चुनें",
+
+  "personInfoScreenTitle": "व्यक्तिगत जानकारी",
+  "fullNameLabel": "पूरा नाम",
+  "mobileNumberLabel": "मोबाइल नंबर",
+  "mobileNumberHint": "10 अंकों का मोबाइल नंबर दर्ज करें",
+  "emailLabel": "ईमेल",
+
+  "teacherScreenTitle": "अपने गुरु चुनें",
+  "teacherScreenSubtitle": "अपने गुरु चुनें",
+  "teacherSearchHint": "गुरु खोजें (उदा. बुद्ध)...",
+  "teacherHelperText": "आप अपने अनुभव को व्यक्तिगत बनाने के लिए कई गुरु चुन सकते हैं",
+
+  "errorNameRequired": "कृपया अपना नाम दर्ज करें",
+  "errorNameInvalid": "कृपया एक मान्य नाम दर्ज करें",
+  "errorPhoneRequired": "कृपया अपना मोबाइल नंबर दर्ज करें",
+  "errorPhoneInvalid": "कृपया एक मान्य 10 अंकों का मोबाइल नंबर दर्ज करें",
+  "errorEmailInvalid": "कृपया एक मान्य ईमेल पता दर्ज करें",
+  "errorTeacherRequired": "कृपया कम से कम एक गुरु चुनें",
+
+  "loginContinueWithOtp": "OTP से आगे बढ़ें",
+  "loginContinueWithGoogle": "Google से आगे बढ़ें",
+
+  "homeWallpaper": "वॉलपेपर",
+  "homeMeditation": "ध्यान",
+  "homeRingtone": "रिंगटोन",
+  "homeSong": "गीत",
+  "homeDailyPrarthana": "दैनिक प्रार्थना",
+  "homeShareApp": "ऐप शेयर करें",
+  "homeTrendingStatus": "ट्रेंडिंग स्टेटस",
+
+  "filterAll": "सभी",
+
+  "profileTitle": "प्रोफ़ाइल",
+  "profileMyIdCard": "मेरा आईडी कार्ड",
+  "profileComingSoon": "जल्द आ रहा है",
+  "profileChangeLanguage": "भाषा बदलें",
+  "profileAboutUs": "हमारे बारे में",
+  "profileContactUs": "संपर्क करें",
+  "profilePrivacyPolicy": "गोपनीयता नीति",
+  "profileTermsConditions": "नियम और शर्तें",
+  "profileLogout": "लॉगआउट"
+}

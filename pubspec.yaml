@@ -1,0 +1,25 @@
+name: dhamma_path_workspace
+publish_to: none
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+workspace:
+  - packages/core
+  - packages/design_system
+  - apps/mobile
+
+dev_dependencies:
+  melos: ^8.3.0
+
+melos:
+  name: dhamma_path
+
+  scripts:
+    # NOTE: `melos run <script>` opens an interactive package picker on
+    # Windows in this melos 8 / pub-workspaces setup. Until that's resolved,
+    # CI and local multi-package runs use `melos exec` directly, e.g.:
+    #   melos exec --dir-exists=test -- "flutter test"
+    #   melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
+    format:
+      run: dart format --set-exit-if-changed .

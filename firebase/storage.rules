@@ -1,0 +1,70 @@
+rules_version = '2';
+
+// Dhamma Path — Cloud Storage Security Rules (Architecture §6.4, §7).
+// All content media is public-read once uploaded; only admins write it.
+// users/{uid}/** is owner-only.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return request.auth.token.role;
+    }
+
+    function isContentEditor() {
+      return isSignedIn() && role() in ['super_admin', 'content_manager'];
+    }
+
+    // Content media — public read (signed-in), admin write only.
+    // One match block per collection (Storage rules don't support alternation
+    // across a captured path segment the way Firestore rules do).
+    match /teachers/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /wallpapers/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /ringtones/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /songs/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /meditations/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /statuses/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /prarthanas/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+    match /idcards/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
+
+    // User-owned files (avatar, locally-composited exports before share).
+    match /users/{uid}/{fileName} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if isSignedIn() && request.auth.uid == uid &&
+        request.resource.size < 8 * 1024 * 1024; // 8MB cap on avatar uploads
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

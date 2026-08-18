@@ -1,0 +1,53 @@
+{
+  "@@locale": "mr",
+
+  "appName": "धम्म पथ",
+  "tagline": "प्रत्येक आवाजात शक्ती",
+
+  "continueButton": "पुढे जा",
+  "retryButton": "पुन्हा प्रयत्न करा",
+
+  "languageScreenTitle": "तुमची भाषा",
+  "languageScreenSubtitle": "तुमची भाषा निवडा",
+
+  "personInfoScreenTitle": "व्यक्तिगत माहिती",
+  "fullNameLabel": "पूर्ण नाव",
+  "mobileNumberLabel": "मोबाईल नंबर",
+  "mobileNumberHint": "10 अंकी मोबाईल नंबर टाका",
+  "emailLabel": "ईमेल",
+
+  "teacherScreenTitle": "तुमचे गुरू निवडा",
+  "teacherScreenSubtitle": "अपने गुरु चुनें",
+  "teacherSearchHint": "गुरू शोधा (उदा. बुद्ध)...",
+  "teacherHelperText": "तुमचा अनुभव वैयक्तिकृत करण्यासाठी तुम्ही अनेक गुरू निवडू शकता",
+
+  "errorNameRequired": "कृपया तुमचे नाव टाका",
+  "errorNameInvalid": "कृपया वैध नाव टाका",
+  "errorPhoneRequired": "कृपया तुमचा मोबाईल नंबर टाका",
+  "errorPhoneInvalid": "कृपया वैध 10 अंकी मोबाईल नंबर टाका",
+  "errorEmailInvalid": "कृपया वैध ईमेल पत्ता टाका",
+  "errorTeacherRequired": "कृपया किमान एक गुरू निवडा",
+
+  "loginContinueWithOtp": "OTP सह पुढे जा",
+  "loginContinueWithGoogle": "Google सह पुढे जा",
+
+  "homeWallpaper": "वॉलपेपर",
+  "homeMeditation": "ध्यान",
+  "homeRingtone": "रिंगटोन",
+  "homeSong": "गाणे",
+  "homeDailyPrarthana": "दैनिक प्रार्थना",
+  "homeShareApp": "अॅप शेअर करा",
+  "homeTrendingStatus": "ट्रेंडिंग स्टेटस",
+
+  "filterAll": "सर्व",
+
+  "profileTitle": "प्रोफाइल",
+  "profileMyIdCard": "माझे आयडी कार्ड",
+  "profileComingSoon": "लवकरच येत आहे",
+  "profileChangeLanguage": "भाषा बदला",
+  "profileAboutUs": "आमच्याबद्दल",
+  "profileContactUs": "संपर्क करा",
+  "profilePrivacyPolicy": "गोपनीयता धोरण",
+  "profileTermsConditions": "नियम आणि अटी",
+  "profileLogout": "लॉगआउट"
+}

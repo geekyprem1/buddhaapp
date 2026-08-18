@@ -1,0 +1,30 @@
+{
+  "projects": {
+    "dev": "dhamma-path-dev",
+    "prod": "dhamma-path-prod",
+    "default": "dhamma-path-dev"
+  },
+  "targets": {
+    "dhamma-path-dev": {
+      "hosting": {
+        "admin": [
+          "dhamma-path-dev-admin"
+        ],
+        "public": [
+          "dhamma-path-dev-public"
+        ]
+      }
+    },
+    "dhamma-path-prod": {
+      "hosting": {
+        "admin": [
+          "dhamma-path-prod-admin"
+        ],
+        "public": [
+          "dhamma-path-prod-public"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

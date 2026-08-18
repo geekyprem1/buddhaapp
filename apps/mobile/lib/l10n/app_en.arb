@@ -1,0 +1,53 @@
+{
+  "@@locale": "en",
+
+  "appName": "Dhamma Path",
+  "tagline": "Power in Every Voice",
+
+  "continueButton": "Continue",
+  "retryButton": "Retry",
+
+  "languageScreenTitle": "Your Language",
+  "languageScreenSubtitle": "Select your language",
+
+  "personInfoScreenTitle": "Person Information",
+  "fullNameLabel": "Full Name",
+  "mobileNumberLabel": "Mobile Number",
+  "mobileNumberHint": "Enter 10-digit mobile number",
+  "emailLabel": "Email",
+
+  "teacherScreenTitle": "Select Your Teacher",
+  "teacherScreenSubtitle": "अपने गुरु चुनें",
+  "teacherSearchHint": "Search for a Teacher (e.g. Buddha)...",
+  "teacherHelperText": "You can select multiple Teachers to personalise your experience",
+
+  "errorNameRequired": "Please enter your name",
+  "errorNameInvalid": "Please enter a valid name",
+  "errorPhoneRequired": "Please enter your mobile number",
+  "errorPhoneInvalid": "Please enter a valid 10-digit mobile number",
+  "errorEmailInvalid": "Please enter a valid email address",
+  "errorTeacherRequired": "Please select at least one teacher",
+
+  "loginContinueWithOtp": "Continue with OTP",
+  "loginContinueWithGoogle": "Continue with Google",
+
+  "homeWallpaper": "Wallpaper",
+  "homeMeditation": "Meditation",
+  "homeRingtone": "Ringtone",
+  "homeSong": "Song",
+  "homeDailyPrarthana": "Daily Prarthana",
+  "homeShareApp": "Share App",
+  "homeTrendingStatus": "Trending Status",
+
+  "filterAll": "All",
+
+  "profileTitle": "Profile",
+  "profileMyIdCard": "My ID Card",
+  "profileComingSoon": "Coming soon",
+  "profileChangeLanguage": "Change Language",
+  "profileAboutUs": "About Us",
+  "profileContactUs": "Contact Us",
+  "profilePrivacyPolicy": "Privacy Policy",
+  "profileTermsConditions": "Terms & Conditions",
+  "profileLogout": "Logout"
+}

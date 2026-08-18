@@ -1,0 +1,63 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+*.g.dart.bak
+pubspec.lock
+!pubspec_overrides.yaml
+
+# Generated code is committed intentionally? No — regenerate via build_runner.
+# (freezed/json_serializable outputs are reproducible, keep out of VCS noise
+# unless the team decides otherwise for CI simplicity.)
+
+# Flutter / Dart tool artefacts
+**/doc/api/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# Android
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+*.keystore
+
+# iOS
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+**/ios/.symlinks/
+
+# Web
+**/web/favicon.png
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+functions/lib/
+functions/node_modules/
+functions/.env
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_options*.dart
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Melos
+melos_bootstrap.log

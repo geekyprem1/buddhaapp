@@ -1,0 +1,108 @@
+{
+  "indexes": [
+    { "collectionGroup": "wallpapers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "wallpapers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "wallpapers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "wallpapers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "ringtones", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "ringtones", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "ringtones", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "songs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "songs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "songs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "meditations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "meditations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "meditations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "audio.seriesId", "order": "ASCENDING" },
+      { "fieldPath": "audio.partNumber", "order": "ASCENDING" }
+    ]},
+
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "createdAt", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "prarthanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "prarthanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "teachers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "isActive", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "categories", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "module", "order": "ASCENDING" },
+      { "fieldPath": "isActive", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "ASCENDING" }
+    ]},
+
+    { "collectionGroup": "auditLogs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "entityType", "order": "ASCENDING" },
+      { "fieldPath": "createdAt", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "users", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "language", "order": "ASCENDING" },
+      { "fieldPath": "createdAt", "order": "DESCENDING" }
+    ]}
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,69 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    name: Analyze & Test (packages)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Activate melos
+        run: dart pub global activate melos
+
+      - name: Resolve workspace dependencies
+        run: dart pub get
+
+      - name: Generate code (freezed/json_serializable/riverpod)
+        run: dart pub global run melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
+
+      - name: Analyze all packages
+        run: dart pub global run melos exec -- "dart analyze ."
+
+      - name: Format check
+        run: dart format --set-exit-if-changed packages apps 2>$null || true
+
+      - name: Test all packages
+        run: dart pub global run melos exec --dir-exists=test -- "flutter test"
+
+  build-mobile:
+    name: Build debug APK (dev flavour)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace dependencies
+        run: dart pub get
+
+      - name: Generate localisation
+        working-directory: apps/mobile
+        run: flutter gen-l10n
+
+      - name: Build dev debug APK
+        working-directory: apps/mobile
+        run: flutter build apk --flavor dev -t lib/main_dev.dart --debug
+
+  # Placeholder — enabled once apps/admin exists (M1).
+  # build-admin:
+  #   name: Build admin web
+  #   ...
+
+  # Placeholder — enabled once firebase/firestore.rules + rules tests exist (T0.7).
+  # rules-tests:
+  #   name: Firestore Security Rules tests
+  #   ...
