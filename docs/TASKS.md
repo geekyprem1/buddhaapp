@@ -37,7 +37,7 @@
 - Splash + force-update / maintenance gates (T2.3–T2.4)
 - Login Terms + Privacy links (`/legal/:slug`); Profile Help row
 
-**Next up:** M1 (admin panel) is now feature-complete — remaining work is M2 mobile leftovers (T2.46 `events/` play counters, resume position, T2.5/T2.9–T2.11, analytics), M3 real content ingestion, or M4 launch hardening.
+**Next up:** M1 (admin panel) is feature-complete and T2.9/T2.11 are done — remaining work is M2 mobile leftovers (T2.46 `events/` play counters, resume position, T2.5/T2.10, T2.73 Crashlytics, analytics), M3 real content ingestion, or M4 launch hardening.
 
 **Still open on M0**
 - T0.6 App Check enforcement
