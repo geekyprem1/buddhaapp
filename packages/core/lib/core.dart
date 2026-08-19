@@ -51,6 +51,7 @@ export 'src/repositories/user_repository.dart';
 // Services
 export 'src/services/admin_functions_service.dart';
 export 'src/services/analytics_service.dart';
+export 'src/services/auth_functions_service.dart';
 export 'src/services/auth_service.dart';
 export 'src/services/storage_service.dart';
 

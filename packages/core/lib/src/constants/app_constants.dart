@@ -33,6 +33,7 @@ abstract class AppConstants {
   static const fnSendNotification = 'sendNotification';
   static const fnExportUsersCsv = 'exportUsersCsv';
   static const fnProcessDeletionRequest = 'processDeletionRequest';
+  static const fnGuardOtpAbuse = 'guardOtpAbuse';
 
   /// Default page size for paginated content queries (Architecture §10).
   static const defaultPageSize = 20;

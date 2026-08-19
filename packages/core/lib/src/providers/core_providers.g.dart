@@ -56,6 +56,24 @@ final contactRepositoryProvider = Provider<ContactRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ContactRepositoryRef = ProviderRef<ContactRepository>;
+String _$authFunctionsServiceHash() =>
+    r'eafc39d9d0a17dafea43617474bc5eae4615b230';
+
+/// See also [authFunctionsService].
+@ProviderFor(authFunctionsService)
+final authFunctionsServiceProvider = Provider<AuthFunctionsService>.internal(
+  authFunctionsService,
+  name: r'authFunctionsServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$authFunctionsServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AuthFunctionsServiceRef = ProviderRef<AuthFunctionsService>;
 String _$teacherRepositoryHash() => r'748e973d6521fcc0f398251605dcb27d0f2d36db';
 
 /// See also [teacherRepository].

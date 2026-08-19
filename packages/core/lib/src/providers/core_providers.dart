@@ -18,6 +18,7 @@ import '../repositories/teacher_repository.dart';
 import '../repositories/user_repository.dart';
 import '../services/admin_functions_service.dart';
 import '../services/analytics_service.dart';
+import '../services/auth_functions_service.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 
@@ -33,6 +34,9 @@ UserRepository userRepository(Ref ref) => UserRepository();
 
 @Riverpod(keepAlive: true)
 ContactRepository contactRepository(Ref ref) => ContactRepository();
+
+@Riverpod(keepAlive: true)
+AuthFunctionsService authFunctionsService(Ref ref) => AuthFunctionsService();
 
 @Riverpod(keepAlive: true)
 TeacherRepository teacherRepository(Ref ref) => TeacherRepository();
