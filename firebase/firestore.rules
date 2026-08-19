@@ -183,6 +183,11 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
+    // --- OTP abuse guard (Functions only; FR-2.9, T2.11) ---
+    match /otpGuards/{phoneKey} {
+      allow read, write: if false;
+    }
+
     // --- Contact & deletion requests ---
     match /contactMessages/{msgId} {
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
