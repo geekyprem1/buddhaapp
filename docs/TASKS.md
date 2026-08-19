@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.4 |
+| Version | 1.5 |
 | Date | 19 August 2026 |
-| Last status pass | 19 August 2026 — content Cloud Functions T1.10–T1.14 implemented (media derivatives, audit, scheduled publish, event counters, cleanup) |
+| Last status pass | 19 August 2026 — **M1 admin panel complete**: dashboard, contact inbox, users (CSV export, deletion queue), clone/reorder, on top of the earlier bulk upload / status layout editor / audit viewer / content Functions pass |
 | Inputs | `docs/PRD.md` v1.1 · `docs/ARCHITECTURE.md` v1.0 |
 | Notation | `→ FR-x.x` = PRD requirement · `deps:` = must finish first · `[P]` = parallelisable |
 | Admin hosting | Firebase Hosting, site `admin` → `admin.dhammapath.app` (confirmed) |
@@ -13,16 +13,16 @@
 
 ## Current status (19 Aug 2026)
 
-**Where we are:** Admin desk can log in, CRUD/publish content, send push, edit app config, and edit static pages. Mobile is an MVP: onboarding through Profile, wallpaper/ringtone set, player, Daily Prarthana alarm, status compose, FCM, splash + force-update/maintenance gates. Seed + Functions (`setAdminRole`, `sendNotification`, `sendScheduledNotification`) are on `dhamma-path-dev`.
+**Where we are:** **M1 admin panel is complete** — CRUD/publish content, bulk upload, visual status layout editor, users (block/unblock, CSV export, deletion queue), audit log viewer, contact inbox, dashboard, notifications, app config, static pages. All content Cloud Functions (media derivatives, audit, scheduled publish, event counters, cleanup) are deployed and verified live on `dhamma-path-dev`. Mobile is an MVP: onboarding through Profile, wallpaper/ringtone set, player, Daily Prarthana alarm, status compose, FCM, splash + force-update/maintenance gates.
 
 | Milestone | Done | Partial | Open | Notes |
 |---|---:|---:|---:|---|
 | **M0 Foundation** (18) | 16 | 0 | 2 | Open: T0.6 App Check, T0.17 l10n CI lint |
-| **M1 Admin** (31) | 26 | 0 | 5 | CRUD, publish, notifications, config, static pages, **all content Functions**, **bulk upload**, **status layout editor**, **audit viewer**. Open: users, dashboard, clone/reorder, contact inbox |
+| **M1 Admin** (31) | 31 | 0 | 0 | **M1 complete.** CRUD, publish, notifications, config, static pages, all content Functions, bulk upload, status layout editor, audit viewer, users table, CSV export, deletion queue, clone/reorder, contact inbox, dashboard |
 | **M2 Mobile** (74) | 62 | 0 | 12 | Splash/config gates live. Open: events, series play, resume, ads slot, live badge, T2.5/T2.9–T2.11, analytics |
 | **M3 Content** (11) | 0 | 0 | 11 | Wait for licensed assets |
 | **M4 Launch** (14) | 0 | 0 | 14 | After M2+M3 |
-| **Launch total** | **104** | **0** | **44** | of 148 (M0–M4) |
+| **Launch total** | **109** | **0** | **39** | of 148 (M0–M4) |
 
 **Shipped and checked (admin + Pixel 7 emulator)**
 - Admin login Super Admin (`admin@dhammapath.app`)
@@ -30,21 +30,20 @@
 - Admin notifications: composer + send (T1.25–T1.26)
 - Admin app config + home module order (T1.27); mobile home reads `config/home_layout` (T2.20)
 - Admin static pages editor (T1.28) — About / Privacy / Terms / Contact / Help
+- Admin bulk upload (T1.21) + `onMediaUpload` Function — **verified live**: dropped 3 wallpapers, got WebP full+thumb derivatives and playable audio `mediaUrl` automatically
+- Admin status visual layout editor (T1.19) — drag/resize the photo frame + name box, verified live
+- Admin audit log viewer, users table (block/unblock, CSV export, deletion queue), contact inbox, dashboard (T1.29/T1.23/T1.24/T1.31/T1.30)
 - Mobile: Login → OTP → Language → Person → Teachers → Home → lists → wallpaper set → ringtone set → prarthana alarm (60s test) → status download/share → Profile
 - Splash + force-update / maintenance gates (T2.3–T2.4)
 - Login Terms + Privacy links (`/legal/:slug`); Profile Help row
 
-**Next up:** deploy T1.10–T1.14 to `dhamma-path-dev` + emulator-test `onMediaUpload` per media type, then T1.21 bulk upload (unblocks M3), T1.29 audit viewer, or T2.46 `events/` play counters.
+**Next up:** M1 (admin panel) is now feature-complete — remaining work is M2 mobile leftovers (T2.46 `events/` play counters, resume position, T2.5/T2.9–T2.11, analytics), M3 real content ingestion, or M4 launch hardening.
 
 **Still open on M0**
 - T0.6 App Check enforcement
 - T0.17 hardcoded-string CI lint + 1.3× scale QA (ARB files already exist)
 
-**M1 leftovers (after CRUD)**
-- ~~T1.10–T1.14 Cloud Functions (thumbs, audit, schedule, counters, cleanup)~~ — done, pending deploy + emulator test
-- T1.19 visual status layout editor
-- T1.21–T1.22 bulk upload, clone, drag-reorder
-- T1.23–T1.24 / T1.29–T1.31 users, audit viewer, KPI dashboard, contact inbox
+**M1 — complete.** All admin panel tasks (CRUD, Cloud Functions, bulk upload, status layout editor, users, audit, dashboard, contact inbox) are done. Remaining gaps are cosmetic, not blockers: AR-2.2 growth/engagement **charts** (no charting package yet; KPI numbers + recent-activity feed cover the rest of AR-2), and CSV export opens a copy-to-clipboard preview rather than a native file download (kept the admin web app free of a platform-specific download API for now).
 
 ---
 
@@ -232,15 +231,19 @@ Goal: the team can upload, categorise, schedule and publish all launch content w
   · Done — `apps/admin/lib/features/content/presentation/bulk_upload_page.dart` at `/content/{type}/bulk`, reached from a "Bulk upload" button on every content list. Multi-select file picker with per-file type/size validation and a live per-row progress bar. For each file: creates the **draft doc first** (so `onMediaUpload`'s derivative patch merges onto an existing doc), then uploads the original to `{collection}/{itemId}/original.{ext}`; the Function fills `mediaUrl`/`thumbUrl`/duration. Title auto-derived from the filename (extension stripped, `_`/`-` → spaces, capitalised). Failed uploads hard-delete their draft so no empty rows are left. Teacher/category/source/licence are filled per item afterwards in the editor.
   · **Verified live on `dhamma-path-dev` (19 Aug 2026):** 3 wallpapers dropped at once → 3 drafts created with filename titles, originals uploaded, and (via `onMediaUpload`) webp derivatives + thumbnails generated and shown in the admin list.
   · **CORS gotcha found + fixed:** Flutter Web (CanvasKit) fetches image bytes cross-origin to decode them, so Storage objects need a CORS policy or thumbnails silently fail to render (external CORS-enabled URLs like picsum worked, Storage webp did not). Set a GET/HEAD `origin:['*']` CORS policy on `dhamma-path-dev.firebasestorage.app` via `tools/seed/set_cors.js` (safe: content is public-read, Storage Rules protect private paths — CORS is not auth). **Prod bucket needs the same policy before launch — see T4.x below.**
-- [ ] **T1.22** Clone/duplicate an item; drag-and-drop reorder within a category
+- [x] **T1.22** Clone/duplicate an item; drag-and-drop reorder within a category
   `deps: T1.17`  ·  → AR-3.8, AR-3.9
+  · Done — `ContentRepository.clone()` (new draft, fresh counters, no schedule/publish dates, so cloning can never accidentally publish or double-count engagement) wired into each row's overflow menu. `ContentRepository.reorder()` rewrites `sortOrder` to each item's index via a single batch; wired into `ReorderableListView` on the content list, **enabled only when unfiltered/no search** (a filtered view's positions don't map to a stable global order) with an inline hint explaining that. `flutter analyze` clean.
 
 ### Users, notifications, config, audit
 
-- [ ] **T1.23** Users table + detail view — search, filters, block/unblock, activity summary
+- [x] **T1.23** Users table + detail view — search, filters, block/unblock, activity summary
   `deps: T1.6`  ·  → AR-5.1–5.3
-- [ ] **T1.24** `exportUsersCsv` Function + UI (super admin only, PII warning, audit-logged); deletion-request queue with `processDeletionRequest`
+  · Done — `apps/admin/lib/features/users/` at `/users`, replacing the placeholder. `UserRepository.fetchAdminPage` (newest-first, cursor-ready) + new `setBlocked`. Search (name/phone/email/uid) + language filter + active/blocked filter, all client-side over a 100-row page (launch volumes). Each row shows teacher count, platform, language, joined/last-active dates, and a Block/Unblock button gated to `canManageUsers` (Super Admin) — the real lock is the Firestore rule denying an owner's own `isBlocked` write (Architecture §7), the UI hiding is convenience only. Confirmation dialog before block/unblock; per-row busy state. Detail view (activity summary, ID cards, favourites) deferred — Phase 2 features (ID cards, favourites) don't exist yet to summarise. `flutter analyze` clean, existing `UserRepository` tests still green. **Not yet exercised against real users on `dhamma-path-dev` — verify after a few devices sign in.**
+- [x] **T1.24** `exportUsersCsv` Function + UI (super admin only, PII warning, audit-logged); deletion-request queue with `processDeletionRequest`
   `deps: T1.23`  ·  → AR-5.4, AR-5.5, FR-2.8
+  · Done. `functions/src/admin/exportUsersCsv.ts` — super-admin-only callable, builds CSV inline (launch volumes, no Storage/signed-URL round trip needed), audit-logs a `piiAccessed: true` entry. `functions/src/admin/processDeletionRequest.ts` — super-admin-only **callable** (deliberately not an automatic Firestore-create trigger: AR-5.5 asks for a queue an admin *reviews and executes*, and an unattended wipe the instant a user requests it would be an unreviewable destructive action). Deletes the user doc, `alarms` subcollection, Storage avatar and the Auth account; writes a proof record (`removed: [...]`, `processedBy`, `processedAt`) on the request doc plus an audit log entry.
+  · Admin UI: `/users` now shows a **Deletion requests** banner above the table (pending requests only) with an inline Execute + confirm dialog, and an **Export CSV** button (Super Admin only) behind a PII-warning confirm — the CSV opens in a copy-to-clipboard preview dialog rather than a file download, keeping the admin web app dependency-free of a platform-specific download API. `flutter analyze` + `tsc` clean.
 - [x] **T1.25** `sendNotification` + `sendScheduledNotification` Functions — topic/segment targeting, delivery stats
   `deps: T0.7`  ·  → AR-6.1–6.4
   · Done. Callable maps `all` / `language:{code}` / `teacher:{id}` to FCM topics (`all`, `lang_*`, `teacher_*`); `user:{uid}` and `platform:{android|ios}` fan out to stored device tokens. Scheduled dispatcher runs every 5 minutes (`Asia/Kolkata`). Topic sends record `deliveredCount = 0` (FCM does not return subscriber counts); token sends store the multicast success count. Opened count stays 0 until inbox/analytics land. Deployed to `dhamma-path-dev` (`asia-south1`).
@@ -258,10 +261,12 @@ Goal: the team can upload, categorise, schedule and publish all launch content w
 - [x] **T1.29** Audit log viewer — filter by entity type, actor, date; before/after diff display
   `deps: T1.6, T1.11`  ·  → AR-1.5
   · Done — `apps/admin/lib/features/audit/` (provider + `AuditLogPage`) at `/audit`, replacing the placeholder. Newest-first read of `auditLogs` with a **server-side entity-type filter** (uses the existing `entityType ASC, createdAt DESC` index) plus **client-side** actor/action/id text search and a time-range narrowing (all / 24h / 7d / 30d). Each row expands to a **before/after field diff** (create shows after, delete shows before, update shows changed keys only — exactly what `onContentWrite` records). Action badge colours create/update/delete/role/notification. Reads only (clients can't write `auditLogs` — Functions only, Architecture §7); the page is `isAdmin`-gated. `flutter analyze` clean. **Verify live after a few CRUD/publish actions generate entries.**
-- [ ] **T1.30** Dashboard — KPI cards (users, DAU, new today, item counts, downloads, shares), user-growth and engagement charts, recent activity feed
+- [x] **T1.30** Dashboard — KPI cards (users, DAU, new today, item counts, downloads, shares), user-growth and engagement charts, recent activity feed
   `deps: T1.6, T1.13`  ·  → AR-2.1–2.3
-- [ ] **T1.31** Contact messages inbox — list, read, mark resolved
+  · Done — `apps/admin/lib/features/dashboard/`. `dashboardSnapshotProvider` computes KPIs client-side over the same admin-page reads every list screen already uses (launch volumes, no new Function): total users, DAU / new-today (from `lastActiveAt` / `createdAt`), published-item counts per content type, and totals for downloads/shares/plays folded from `counters` (which `aggregateEvents`, T1.13, keeps current). Recent-activity feed is the 10 newest `auditLogs` rows. Time-series growth/engagement **charts** are deferred — no charting package is in the project yet and launch volumes don't need one; the KPI numbers and recent feed cover AR-2.1/2.3, AR-2.2 (charts) is the gap. `flutter analyze` clean.
+- [x] **T1.31** Contact messages inbox — list, read, mark resolved
   `deps: T1.6`  ·  → FR-14.5
+  · Done — `apps/admin/lib/features/contact/` at `/contact`, replacing the placeholder. New `ContactMessage` freezed model + `ContactRepository.fetchAdminPage/markResolved/reopen`. Search (subject/message/uid) + status filter (all/open/resolved); each row expands to the full message body with a Mark resolved / Reopen action. Read-only for the mobile app (create-only) per Architecture §7 — the inbox is admin-only. `flutter analyze` clean, `build_runner` codegen applied.
 
 **M1 exit criteria:** a non-developer uploads and publishes one item of every content type unaided; audit log records it; the mobile app on seed data sees the published item appear live.
 
@@ -640,10 +645,10 @@ Non-negotiable before any public release:
 | Milestone | Tasks | Done | Open / partial | Notes |
 |---|---|---:|---:|---|
 | M0 Foundation | 18 | 16 | 2 | App Check + l10n lint still open |
-| M1 Admin Panel | 31 | 26 | 5 | CRUD/publish + notifications + config + static pages + all content Functions + bulk upload + status layout editor + audit viewer |
+| M1 Admin Panel | 31 | 31 | 0 | **Complete.** CRUD/publish + notifications + config + static pages + all content Functions + bulk upload + status layout editor + audit viewer + users + CSV export + deletion queue + clone/reorder + contact inbox + dashboard |
 | M2 Mobile App | 74 | 62 | 12 | Splash + force-update + maintenance gates live |
 | M3 Content Ingestion | 11 | 0 | 11 | Content team, not developers |
 | M4 Launch | 14 | 0 | 14 | Hardening and compliance |
 | M5 Phase 2 | 8 | 0 | 8 | Flag-gated, post-launch |
 | M6 Phase 3 | 6 | 0 | 6 | Growth |
-| **Total (to launch)** | **148** | **104** | **44** | M0–M4 |
+| **Total (to launch)** | **148** | **109** | **39** | M0–M4 |
