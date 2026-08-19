@@ -44,6 +44,27 @@ void main() {
     });
   });
 
+  group('FieldValidators.emailRequired', () {
+    test('rejects empty', () {
+      expect(FieldValidators.emailRequired(''), 'error_email_required');
+    });
+    test('rejects malformed email', () {
+      expect(FieldValidators.emailRequired('nope'), 'error_email_invalid');
+    });
+    test('accepts a valid email', () {
+      expect(FieldValidators.emailRequired('admin@dhammapath.app'), isNull);
+    });
+  });
+
+  group('FieldValidators.passwordRequired', () {
+    test('rejects empty', () {
+      expect(FieldValidators.passwordRequired(''), 'error_password_required');
+    });
+    test('accepts any non-empty password', () {
+      expect(FieldValidators.passwordRequired('secret'), isNull);
+    });
+  });
+
   group('FieldValidators.licenceRequired', () {
     test('rejects empty licence — copyright is the top launch risk', () {
       expect(FieldValidators.licenceRequired(''), 'error_licence_required');

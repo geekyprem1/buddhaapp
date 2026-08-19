@@ -96,4 +96,44 @@ abstract class AppTheme {
       ),
     );
   }
+
+  /// Desktop-dense variant of [light] for the admin panel (AR-8.1).
+  /// Same tokens, tighter radii and left-aligned chrome so tables fit.
+  static ThemeData admin() {
+    final base = light();
+    return base.copyWith(
+      visualDensity: VisualDensity.standard,
+      appBarTheme: base.appBarTheme.copyWith(
+        centerTitle: false,
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: AppColors.surface,
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: AppColors.divider),
+        ),
+        margin: EdgeInsets.zero,
+      ),
+      navigationRailTheme: const NavigationRailThemeData(
+        backgroundColor: AppColors.surface,
+        selectedIconTheme: IconThemeData(color: AppColors.primary),
+        selectedLabelTextStyle: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedIconTheme: IconThemeData(color: AppColors.textSecondary),
+        indicatorColor: AppColors.disabled,
+      ),
+      dataTableTheme: const DataTableThemeData(
+        headingRowColor: WidgetStatePropertyAll(AppColors.background),
+        headingTextStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimary,
+        ),
+      ),
+    );
+  }
 }

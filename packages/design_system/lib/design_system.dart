@@ -14,4 +14,5 @@ export 'src/widgets/content_card.dart';
 export 'src/widgets/empty_error_states.dart';
 export 'src/widgets/loading_shimmer.dart';
 export 'src/widgets/primary_pill_button.dart';
+export 'src/widgets/simple_html.dart';
 export 'src/widgets/teacher_filter_chip_row.dart';

@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../utils/timestamp_converter.dart';
+import 'localised_text.dart';
 
 part 'content_type_metas.freezed.dart';
 part 'content_type_metas.g.dart';
@@ -33,6 +34,14 @@ class AudioMeta with _$AudioMeta {
 
     /// `beginner` | `intermediate` — meditation only.
     String? level,
+    int? trimStartSec,
+    int? trimEndSec,
+    String? album,
+    LocalisedText? lyrics,
+
+    /// Suggested clock time for a prarthana, e.g. `06:00`.
+    String? recommendedTime,
+    LocalisedText? description,
   }) = _AudioMeta;
 
   factory AudioMeta.fromJson(Map<String, dynamic> json) =>

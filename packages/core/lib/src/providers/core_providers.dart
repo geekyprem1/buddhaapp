@@ -6,10 +6,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../constants/firestore_collections.dart';
 import '../models/app_user.dart';
 import '../models/teacher.dart';
+import '../repositories/admin_user_repository.dart';
+import '../repositories/audit_repository.dart';
+import '../repositories/category_repository.dart';
+import '../repositories/config_repository.dart';
 import '../repositories/content_repository.dart';
+import '../repositories/notification_repository.dart';
+import '../repositories/static_page_repository.dart';
 import '../repositories/teacher_repository.dart';
 import '../repositories/user_repository.dart';
+import '../services/admin_functions_service.dart';
+import '../services/analytics_service.dart';
 import '../services/auth_service.dart';
+import '../services/storage_service.dart';
 
 part 'core_providers.g.dart';
 
@@ -23,6 +32,35 @@ UserRepository userRepository(Ref ref) => UserRepository();
 
 @Riverpod(keepAlive: true)
 TeacherRepository teacherRepository(Ref ref) => TeacherRepository();
+
+@Riverpod(keepAlive: true)
+CategoryRepository categoryRepository(Ref ref) => CategoryRepository();
+
+@Riverpod(keepAlive: true)
+ConfigRepository configRepository(Ref ref) => ConfigRepository();
+
+@Riverpod(keepAlive: true)
+StaticPageRepository staticPageRepository(Ref ref) => StaticPageRepository();
+
+@Riverpod(keepAlive: true)
+AuditRepository auditRepository(Ref ref) => AuditRepository();
+
+@Riverpod(keepAlive: true)
+AdminUserRepository adminUserRepository(Ref ref) => AdminUserRepository();
+
+@Riverpod(keepAlive: true)
+NotificationRepository notificationRepository(Ref ref) =>
+    NotificationRepository();
+
+@Riverpod(keepAlive: true)
+StorageService storageService(Ref ref) => StorageService();
+
+@Riverpod(keepAlive: true)
+AnalyticsService analyticsService(Ref ref) => AnalyticsService();
+
+@Riverpod(keepAlive: true)
+AdminFunctionsService adminFunctionsService(Ref ref) =>
+    AdminFunctionsService();
 
 /// One [ContentRepository] instance per collection name, cached for the
 /// lifetime of the app (Architecture §11 generic content module).

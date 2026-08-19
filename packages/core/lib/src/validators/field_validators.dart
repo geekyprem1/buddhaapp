@@ -39,6 +39,21 @@ abstract class FieldValidators {
     return null;
   }
 
+  /// Admin login requires an email (AR-1.1).
+  static String? emailRequired(String? value) {
+    final v = value?.trim() ?? '';
+    if (v.isEmpty) return 'error_email_required';
+    if (!_emailPattern.hasMatch(v)) return 'error_email_invalid';
+    return null;
+  }
+
+  /// Login-time password check. Length rules live on the Auth project;
+  /// here we only reject a blank field so existing accounts still work.
+  static String? passwordRequired(String? value) {
+    if (value == null || value.isEmpty) return 'error_password_required';
+    return null;
+  }
+
   /// At least one non-empty translation is required for admin-authored
   /// localised titles (PRD AR-3.2). Individual languages may be blank.
   static String? localisedTitleRequired({

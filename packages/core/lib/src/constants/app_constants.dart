@@ -25,6 +25,13 @@ abstract class AppConstants {
   static const adminRoleContentManager = 'content_manager';
   static const adminRoleModerator = 'moderator';
 
+  /// All Cloud Functions are pinned here (Architecture §8).
+  static const functionsRegion = 'asia-south1';
+
+  /// Callable Function names.
+  static const fnSetAdminRole = 'setAdminRole';
+  static const fnSendNotification = 'sendNotification';
+
   /// Default page size for paginated content queries (Architecture §10).
   static const defaultPageSize = 20;
 

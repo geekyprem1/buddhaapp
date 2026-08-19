@@ -28,6 +28,18 @@ _$AudioMetaImpl _$$AudioMetaImplFromJson(Map json) => _$AudioMetaImpl(
       seriesId: json['seriesId'] as String?,
       partNumber: (json['partNumber'] as num?)?.toInt(),
       level: json['level'] as String?,
+      trimStartSec: (json['trimStartSec'] as num?)?.toInt(),
+      trimEndSec: (json['trimEndSec'] as num?)?.toInt(),
+      album: json['album'] as String?,
+      lyrics: json['lyrics'] == null
+          ? null
+          : LocalisedText.fromJson(
+              Map<String, dynamic>.from(json['lyrics'] as Map)),
+      recommendedTime: json['recommendedTime'] as String?,
+      description: json['description'] == null
+          ? null
+          : LocalisedText.fromJson(
+              Map<String, dynamic>.from(json['description'] as Map)),
     );
 
 Map<String, dynamic> _$$AudioMetaImplToJson(_$AudioMetaImpl instance) =>
@@ -37,6 +49,12 @@ Map<String, dynamic> _$$AudioMetaImplToJson(_$AudioMetaImpl instance) =>
       'seriesId': instance.seriesId,
       'partNumber': instance.partNumber,
       'level': instance.level,
+      'trimStartSec': instance.trimStartSec,
+      'trimEndSec': instance.trimEndSec,
+      'album': instance.album,
+      'lyrics': instance.lyrics?.toJson(),
+      'recommendedTime': instance.recommendedTime,
+      'description': instance.description?.toJson(),
     };
 
 _$LayoutRectImpl _$$LayoutRectImplFromJson(Map json) => _$LayoutRectImpl(

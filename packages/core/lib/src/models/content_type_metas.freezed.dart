@@ -238,6 +238,14 @@ mixin _$AudioMeta {
 
   /// `beginner` | `intermediate` — meditation only.
   String? get level => throw _privateConstructorUsedError;
+  int? get trimStartSec => throw _privateConstructorUsedError;
+  int? get trimEndSec => throw _privateConstructorUsedError;
+  String? get album => throw _privateConstructorUsedError;
+  LocalisedText? get lyrics => throw _privateConstructorUsedError;
+
+  /// Suggested clock time for a prarthana, e.g. `06:00`.
+  String? get recommendedTime => throw _privateConstructorUsedError;
+  LocalisedText? get description => throw _privateConstructorUsedError;
 
   /// Serializes this AudioMeta to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -259,7 +267,16 @@ abstract class $AudioMetaCopyWith<$Res> {
       String? waveformUrl,
       String? seriesId,
       int? partNumber,
-      String? level});
+      String? level,
+      int? trimStartSec,
+      int? trimEndSec,
+      String? album,
+      LocalisedText? lyrics,
+      String? recommendedTime,
+      LocalisedText? description});
+
+  $LocalisedTextCopyWith<$Res>? get lyrics;
+  $LocalisedTextCopyWith<$Res>? get description;
 }
 
 /// @nodoc
@@ -282,6 +299,12 @@ class _$AudioMetaCopyWithImpl<$Res, $Val extends AudioMeta>
     Object? seriesId = freezed,
     Object? partNumber = freezed,
     Object? level = freezed,
+    Object? trimStartSec = freezed,
+    Object? trimEndSec = freezed,
+    Object? album = freezed,
+    Object? lyrics = freezed,
+    Object? recommendedTime = freezed,
+    Object? description = freezed,
   }) {
     return _then(_value.copyWith(
       durationSec: freezed == durationSec
@@ -304,7 +327,59 @@ class _$AudioMetaCopyWithImpl<$Res, $Val extends AudioMeta>
           ? _value.level
           : level // ignore: cast_nullable_to_non_nullable
               as String?,
+      trimStartSec: freezed == trimStartSec
+          ? _value.trimStartSec
+          : trimStartSec // ignore: cast_nullable_to_non_nullable
+              as int?,
+      trimEndSec: freezed == trimEndSec
+          ? _value.trimEndSec
+          : trimEndSec // ignore: cast_nullable_to_non_nullable
+              as int?,
+      album: freezed == album
+          ? _value.album
+          : album // ignore: cast_nullable_to_non_nullable
+              as String?,
+      lyrics: freezed == lyrics
+          ? _value.lyrics
+          : lyrics // ignore: cast_nullable_to_non_nullable
+              as LocalisedText?,
+      recommendedTime: freezed == recommendedTime
+          ? _value.recommendedTime
+          : recommendedTime // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as LocalisedText?,
     ) as $Val);
+  }
+
+  /// Create a copy of AudioMeta
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LocalisedTextCopyWith<$Res>? get lyrics {
+    if (_value.lyrics == null) {
+      return null;
+    }
+
+    return $LocalisedTextCopyWith<$Res>(_value.lyrics!, (value) {
+      return _then(_value.copyWith(lyrics: value) as $Val);
+    });
+  }
+
+  /// Create a copy of AudioMeta
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LocalisedTextCopyWith<$Res>? get description {
+    if (_value.description == null) {
+      return null;
+    }
+
+    return $LocalisedTextCopyWith<$Res>(_value.description!, (value) {
+      return _then(_value.copyWith(description: value) as $Val);
+    });
   }
 }
 
@@ -321,7 +396,18 @@ abstract class _$$AudioMetaImplCopyWith<$Res>
       String? waveformUrl,
       String? seriesId,
       int? partNumber,
-      String? level});
+      String? level,
+      int? trimStartSec,
+      int? trimEndSec,
+      String? album,
+      LocalisedText? lyrics,
+      String? recommendedTime,
+      LocalisedText? description});
+
+  @override
+  $LocalisedTextCopyWith<$Res>? get lyrics;
+  @override
+  $LocalisedTextCopyWith<$Res>? get description;
 }
 
 /// @nodoc
@@ -342,6 +428,12 @@ class __$$AudioMetaImplCopyWithImpl<$Res>
     Object? seriesId = freezed,
     Object? partNumber = freezed,
     Object? level = freezed,
+    Object? trimStartSec = freezed,
+    Object? trimEndSec = freezed,
+    Object? album = freezed,
+    Object? lyrics = freezed,
+    Object? recommendedTime = freezed,
+    Object? description = freezed,
   }) {
     return _then(_$AudioMetaImpl(
       durationSec: freezed == durationSec
@@ -364,6 +456,30 @@ class __$$AudioMetaImplCopyWithImpl<$Res>
           ? _value.level
           : level // ignore: cast_nullable_to_non_nullable
               as String?,
+      trimStartSec: freezed == trimStartSec
+          ? _value.trimStartSec
+          : trimStartSec // ignore: cast_nullable_to_non_nullable
+              as int?,
+      trimEndSec: freezed == trimEndSec
+          ? _value.trimEndSec
+          : trimEndSec // ignore: cast_nullable_to_non_nullable
+              as int?,
+      album: freezed == album
+          ? _value.album
+          : album // ignore: cast_nullable_to_non_nullable
+              as String?,
+      lyrics: freezed == lyrics
+          ? _value.lyrics
+          : lyrics // ignore: cast_nullable_to_non_nullable
+              as LocalisedText?,
+      recommendedTime: freezed == recommendedTime
+          ? _value.recommendedTime
+          : recommendedTime // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as LocalisedText?,
     ));
   }
 }
@@ -376,7 +492,13 @@ class _$AudioMetaImpl implements _AudioMeta {
       this.waveformUrl,
       this.seriesId,
       this.partNumber,
-      this.level});
+      this.level,
+      this.trimStartSec,
+      this.trimEndSec,
+      this.album,
+      this.lyrics,
+      this.recommendedTime,
+      this.description});
 
   factory _$AudioMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$AudioMetaImplFromJson(json);
@@ -395,10 +517,24 @@ class _$AudioMetaImpl implements _AudioMeta {
   /// `beginner` | `intermediate` — meditation only.
   @override
   final String? level;
+  @override
+  final int? trimStartSec;
+  @override
+  final int? trimEndSec;
+  @override
+  final String? album;
+  @override
+  final LocalisedText? lyrics;
+
+  /// Suggested clock time for a prarthana, e.g. `06:00`.
+  @override
+  final String? recommendedTime;
+  @override
+  final LocalisedText? description;
 
   @override
   String toString() {
-    return 'AudioMeta(durationSec: $durationSec, waveformUrl: $waveformUrl, seriesId: $seriesId, partNumber: $partNumber, level: $level)';
+    return 'AudioMeta(durationSec: $durationSec, waveformUrl: $waveformUrl, seriesId: $seriesId, partNumber: $partNumber, level: $level, trimStartSec: $trimStartSec, trimEndSec: $trimEndSec, album: $album, lyrics: $lyrics, recommendedTime: $recommendedTime, description: $description)';
   }
 
   @override
@@ -414,13 +550,34 @@ class _$AudioMetaImpl implements _AudioMeta {
                 other.seriesId == seriesId) &&
             (identical(other.partNumber, partNumber) ||
                 other.partNumber == partNumber) &&
-            (identical(other.level, level) || other.level == level));
+            (identical(other.level, level) || other.level == level) &&
+            (identical(other.trimStartSec, trimStartSec) ||
+                other.trimStartSec == trimStartSec) &&
+            (identical(other.trimEndSec, trimEndSec) ||
+                other.trimEndSec == trimEndSec) &&
+            (identical(other.album, album) || other.album == album) &&
+            (identical(other.lyrics, lyrics) || other.lyrics == lyrics) &&
+            (identical(other.recommendedTime, recommendedTime) ||
+                other.recommendedTime == recommendedTime) &&
+            (identical(other.description, description) ||
+                other.description == description));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, durationSec, waveformUrl, seriesId, partNumber, level);
+      runtimeType,
+      durationSec,
+      waveformUrl,
+      seriesId,
+      partNumber,
+      level,
+      trimStartSec,
+      trimEndSec,
+      album,
+      lyrics,
+      recommendedTime,
+      description);
 
   /// Create a copy of AudioMeta
   /// with the given fields replaced by the non-null parameter values.
@@ -444,7 +601,13 @@ abstract class _AudioMeta implements AudioMeta {
       final String? waveformUrl,
       final String? seriesId,
       final int? partNumber,
-      final String? level}) = _$AudioMetaImpl;
+      final String? level,
+      final int? trimStartSec,
+      final int? trimEndSec,
+      final String? album,
+      final LocalisedText? lyrics,
+      final String? recommendedTime,
+      final LocalisedText? description}) = _$AudioMetaImpl;
 
   factory _AudioMeta.fromJson(Map<String, dynamic> json) =
       _$AudioMetaImpl.fromJson;
@@ -463,6 +626,20 @@ abstract class _AudioMeta implements AudioMeta {
   /// `beginner` | `intermediate` — meditation only.
   @override
   String? get level;
+  @override
+  int? get trimStartSec;
+  @override
+  int? get trimEndSec;
+  @override
+  String? get album;
+  @override
+  LocalisedText? get lyrics;
+
+  /// Suggested clock time for a prarthana, e.g. `06:00`.
+  @override
+  String? get recommendedTime;
+  @override
+  LocalisedText? get description;
 
   /// Create a copy of AudioMeta
   /// with the given fields replaced by the non-null parameter values.

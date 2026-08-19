@@ -27,6 +27,24 @@ class TeacherRepository {
         );
   }
 
+  Stream<List<Teacher>> watchAll() {
+    return _teachers.orderBy('sortOrder').snapshots().map(
+      (snap) => snap.docs
+          .map((d) => Teacher.fromJson({...d.data(), 'id': d.id}))
+          .toList(),
+    );
+  }
+
+  Future<Teacher?> getById(String id) async {
+    final snap = await _teachers.doc(id).get();
+    if (!snap.exists) return null;
+    return Teacher.fromJson({...snap.data()!, 'id': id});
+  }
+
+  Future<void> createWithId(Teacher teacher) {
+    return _teachers.doc(teacher.id).set(teacher.toJson()..remove('id'));
+  }
+
   Future<List<Teacher>> getActiveTeachers() async {
     final snap = await _teachers
         .where('isActive', isEqualTo: true)

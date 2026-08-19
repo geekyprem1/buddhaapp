@@ -59,6 +59,41 @@ class AuthService {
     return _auth.signInWithCredential(credential);
   }
 
+  /// Admin-panel login (AR-1.1). The mobile app never calls this.
+  Future<UserCredential> signInWithEmail({
+    required String email,
+    required String password,
+  }) {
+    return _auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
+  /// Forced re-auth for destructive admin actions (AR-1.4).
+  Future<void> reauthenticateWithPassword(String password) async {
+    final user = _auth.currentUser;
+    if (user == null || user.email == null) {
+      throw FirebaseAuthException(
+        code: 'user-mismatch',
+        message: 'No signed-in email account to re-authenticate.',
+      );
+    }
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: password,
+    );
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  Future<IdTokenResult> getIdTokenResult({bool forceRefresh = false}) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No signed-in user.',
+      );
+    }
+    return user.getIdTokenResult(forceRefresh);
+  }
+
   Future<void> signOut() => _auth.signOut();
 
   /// FR-2.8 — actual data deletion happens via the `processDeletionRequest`

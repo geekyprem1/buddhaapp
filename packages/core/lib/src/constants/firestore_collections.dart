@@ -65,4 +65,15 @@ abstract class StaticPageSlugs {
   static const terms = 'terms';
   static const contact = 'contact';
   static const help = 'help';
+
+  static const all = <String>[about, privacy, terms, contact, help];
+
+  static String label(String slug) => switch (slug) {
+    about => 'About',
+    privacy => 'Privacy Policy',
+    terms => 'Terms & Conditions',
+    contact => 'Contact',
+    help => 'Help',
+    _ => slug,
+  };
 }

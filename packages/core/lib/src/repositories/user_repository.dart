@@ -98,4 +98,55 @@ class UserRepository {
   Future<void> touchLastActive(String uid) {
     return _users.doc(uid).update({'lastActiveAt': DateTime.now()});
   }
+
+  Future<void> updateDisplayName(String uid, String name) {
+    return _users.doc(uid).update({'name': name});
+  }
+
+  Future<void> updatePhotoUrl(String uid, String photoUrl) {
+    return _users.doc(uid).update({'photoUrl': photoUrl});
+  }
+
+  /// Profile language change — does **not** rewind onboarding.
+  Future<void> setPreferredLanguage(String uid, String languageCode) {
+    return _users.doc(uid).update({'language': languageCode});
+  }
+
+  Future<void> updateProfile(
+    String uid, {
+    String? name,
+    String? email,
+  }) {
+    return _users.doc(uid).update({
+      if (name != null) 'name': name,
+      if (email != null) 'email': email,
+    });
+  }
+
+  Future<void> setNotificationPrefs(String uid, NotificationPrefs prefs) {
+    return _users.doc(uid).update({'notificationPrefs': prefs.toJson()});
+  }
+
+  Future<void> addFcmToken(String uid, String token) {
+    return _users.doc(uid).update({
+      'fcmTokens': FieldValue.arrayUnion([token]),
+    });
+  }
+
+  Future<void> removeFcmToken(String uid, String token) {
+    return _users.doc(uid).update({
+      'fcmTokens': FieldValue.arrayRemove([token]),
+    });
+  }
+
+  Future<void> submitDeletionRequest(String uid) {
+    return _firestore
+        .collection(FirestoreCollections.deletionRequests)
+        .doc(uid)
+        .set({
+      'uid': uid,
+      'requestedAt': DateTime.now(),
+      'status': 'pending',
+    });
+  }
 }

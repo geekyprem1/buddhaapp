@@ -56,6 +56,164 @@ final teacherRepositoryProvider = Provider<TeacherRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TeacherRepositoryRef = ProviderRef<TeacherRepository>;
+String _$categoryRepositoryHash() =>
+    r'456a5ad6317a837626b1ef88e128af8350acdc1f';
+
+/// See also [categoryRepository].
+@ProviderFor(categoryRepository)
+final categoryRepositoryProvider = Provider<CategoryRepository>.internal(
+  categoryRepository,
+  name: r'categoryRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$categoryRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CategoryRepositoryRef = ProviderRef<CategoryRepository>;
+String _$configRepositoryHash() => r'0b6347736a58283f6f2c0714fadf2dc72f58e1d9';
+
+/// See also [configRepository].
+@ProviderFor(configRepository)
+final configRepositoryProvider = Provider<ConfigRepository>.internal(
+  configRepository,
+  name: r'configRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$configRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ConfigRepositoryRef = ProviderRef<ConfigRepository>;
+String _$staticPageRepositoryHash() =>
+    r'fd9f0554f106b1b54904bffdd490a46c619b49ea';
+
+/// See also [staticPageRepository].
+@ProviderFor(staticPageRepository)
+final staticPageRepositoryProvider = Provider<StaticPageRepository>.internal(
+  staticPageRepository,
+  name: r'staticPageRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$staticPageRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef StaticPageRepositoryRef = ProviderRef<StaticPageRepository>;
+String _$auditRepositoryHash() => r'639b13ecb6de71027780dcc57ccef7f6d55fd344';
+
+/// See also [auditRepository].
+@ProviderFor(auditRepository)
+final auditRepositoryProvider = Provider<AuditRepository>.internal(
+  auditRepository,
+  name: r'auditRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$auditRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AuditRepositoryRef = ProviderRef<AuditRepository>;
+String _$adminUserRepositoryHash() =>
+    r'747244f4ff71b15cd11374babe1e3734ed5f93fe';
+
+/// See also [adminUserRepository].
+@ProviderFor(adminUserRepository)
+final adminUserRepositoryProvider = Provider<AdminUserRepository>.internal(
+  adminUserRepository,
+  name: r'adminUserRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$adminUserRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AdminUserRepositoryRef = ProviderRef<AdminUserRepository>;
+String _$notificationRepositoryHash() =>
+    r'b7c1d0e4f8a2c6e0b4d8f2a6c0e4b8d2f6a0c4e8';
+
+/// See also [notificationRepository].
+@ProviderFor(notificationRepository)
+final notificationRepositoryProvider = Provider<NotificationRepository>.internal(
+  notificationRepository,
+  name: r'notificationRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$notificationRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef NotificationRepositoryRef = ProviderRef<NotificationRepository>;
+String _$storageServiceHash() => r'854f2a661c1ed819f52f5f4152789c0472f080d2';
+
+/// See also [storageService].
+@ProviderFor(storageService)
+final storageServiceProvider = Provider<StorageService>.internal(
+  storageService,
+  name: r'storageServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$storageServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef StorageServiceRef = ProviderRef<StorageService>;
+String _$analyticsServiceHash() => r'4a5a858cbd9df41fdf786e6a41c621f8957a7b13';
+
+/// See also [analyticsService].
+@ProviderFor(analyticsService)
+final analyticsServiceProvider = Provider<AnalyticsService>.internal(
+  analyticsService,
+  name: r'analyticsServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$analyticsServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AnalyticsServiceRef = ProviderRef<AnalyticsService>;
+String _$adminFunctionsServiceHash() =>
+    r'6e8a403c0c6d94ad79956f218fa021dbffd94147';
+
+/// See also [adminFunctionsService].
+@ProviderFor(adminFunctionsService)
+final adminFunctionsServiceProvider = Provider<AdminFunctionsService>.internal(
+  adminFunctionsService,
+  name: r'adminFunctionsServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$adminFunctionsServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AdminFunctionsServiceRef = ProviderRef<AdminFunctionsService>;
 String _$contentRepositoryHash() => r'30861485e0e2f75b5da412d11c67db173881854d';
 
 /// Copied from Dart SDK
