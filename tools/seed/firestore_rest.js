@@ -23,13 +23,48 @@ function getAccessToken() {
     shell: isWindows,
   });
   const parsed = JSON.parse(raw);
-  const token = parsed?.result?.[0]?.tokens?.access_token;
-  if (!token) {
+  const tokens = parsed?.result?.[0]?.tokens;
+  if (!tokens?.access_token && !tokens?.refresh_token) {
     throw new Error(
       'Could not obtain a Firebase CLI access token. Run `firebase login` first.',
     );
   }
-  return token;
+  const expiresAt = Number(tokens.expires_at || 0);
+  if (tokens.access_token && expiresAt > Date.now() + 60_000) {
+    return tokens.access_token;
+  }
+  if (!tokens.refresh_token) {
+    throw new Error(
+      'Firebase CLI access token expired. Run `firebase login --reauth`.',
+    );
+  }
+  return refreshFirebaseCliToken(tokens.refresh_token);
+}
+
+/** Firebase CLI's public OAuth client — same values as firebase-tools. */
+function refreshFirebaseCliToken(refreshToken) {
+  const body = new URLSearchParams({
+    client_id:
+      '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+    client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+    refresh_token: refreshToken,
+    grant_type: 'refresh_token',
+  }).toString();
+  const raw = execFileSync(
+    process.execPath,
+    [
+      '-e',
+      `const https=require('https');const b=${JSON.stringify(body)};const r=https.request({hostname:'oauth2.googleapis.com',path:'/token',method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(b)}},s=>{let d='';s.on('data',c=>d+=c);s.on('end',()=>process.stdout.write(d));});r.write(b);r.end();`,
+    ],
+    { encoding: 'utf8' },
+  );
+  const json = JSON.parse(raw);
+  if (!json.access_token) {
+    throw new Error(
+      'Firebase token refresh failed. Run `firebase login --reauth`.',
+    );
+  }
+  return json.access_token;
 }
 
 /** Converts a plain JS value into a Firestore REST API "Value" object. */

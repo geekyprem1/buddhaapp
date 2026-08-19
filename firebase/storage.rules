@@ -54,6 +54,10 @@ service firebase.storage {
       allow read: if isSignedIn();
       allow write: if isContentEditor();
     }
+    match /notifications/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
 
     // User-owned files (avatar, locally-composited exports before share).
     match /users/{uid}/{fileName} {

@@ -36,6 +36,7 @@ against production.
 | `statuses` | 1 | with a status layout (photo frame + name text rects) |
 | `prarthanas` | 1 | |
 | `config/app_config` | 1 | all Phase 2 flags off |
+| `config/home_layout` | 1 | default home module order |
 
 All media URLs are placeholder images (`picsum.photos`) and a sample public
 audio file — **not licensed content**. Every seeded content item carries

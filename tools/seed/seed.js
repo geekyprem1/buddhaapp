@@ -33,8 +33,10 @@ if (projectId === 'dhamma-path-prod') {
 // real licensed content during M3 content ingestion.
 const PLACEHOLDER_IMG = (seed, w = 800, h = 1200) =>
   `https://picsum.photos/seed/${seed}/${w}/${h}`;
+const PLACEHOLDER_STATUS =
+  'https://placehold.co/1080x1350/8B1A1A/FDF3E0/png?text=Namo+Buddhay';
 const PLACEHOLDER_AUDIO =
-  'https://storage.googleapis.com/firebase-app-check-public/samples/sample.mp3';
+  'https://dl.espressif.com/dl/audio/gs-16b-2c-44100hz.mp3';
 
 const now = () => new Date();
 
@@ -208,11 +210,11 @@ const statuses = [
   contentItem({
     id: 'st_001', type: 'status', teacherIds: ['buddha'], categoryId: 'cat_status_festival',
     title: { en: 'Dhyan', hi: 'ध्यान', mr: 'ध्यान' },
-    mediaUrl: PLACEHOLDER_IMG('st1', 1080, 1350), thumbUrl: PLACEHOLDER_IMG('st1', 400, 500),
+    mediaUrl: PLACEHOLDER_STATUS, thumbUrl: PLACEHOLDER_STATUS,
     extra: {
       statusMeta: {
         photoFrame: { x: 0.62, y: 0.7, w: 0.22, h: 0.22 },
-        nameText: { x: 0.06, y: 0.92, w: 0.6, align: 'left', font: 'Poppins', size: 0.045, color: '#1F1F1F', weight: 700 },
+        nameText: { x: 0.06, y: 0.88, w: 0.55, align: 'left', font: 'Poppins', size: 0.045, color: '#FDF3E0', weight: 700 },
         watermark: true,
         festivalDate: null,
       },
@@ -283,10 +285,82 @@ async function main() {
   await db.setDocument('config', 'app_config', appConfig);
   console.log('  config/app_config');
 
+  const homeLayout = {
+    modules: [
+      { id: 'wallpaper', visible: true },
+      { id: 'meditation', visible: true },
+      { id: 'ringtone', visible: true },
+      { id: 'song', visible: true },
+      { id: 'prarthana', visible: true },
+      { id: 'status', visible: true },
+    ],
+    updatedAt: now(),
+  };
+  await db.setDocument('config', 'home_layout', homeLayout);
+  console.log('  config/home_layout');
+
+  const staticPages = [
+    {
+      id: 'about',
+      title: { en: 'About Us', hi: 'हमारे बारे में', mr: 'आमच्याबद्दल' },
+      body: {
+        en: 'Dhamma Path brings Buddhist wallpapers, ringtones, songs, meditation and daily prarthana into one respectful app.',
+        hi: 'धम्म पथ बौद्ध वॉलपेपर, रिंगटोन, गीत, ध्यान और दैनिक प्रार्थना को एक सम्मानजनक ऐप में लाता है।',
+        mr: 'धम्म पथ बौद्ध वॉलपेपर, रिंगटोन, गाणी, ध्यान आणि दैनिक प्रार्थना एका सन्माननीय अॅपमध्ये आणतो.',
+      },
+      updatedAt: now(),
+    },
+    {
+      id: 'privacy',
+      title: { en: 'Privacy Policy', hi: 'गोपनीयता नीति', mr: 'गोपनीयता धोरण' },
+      body: {
+        en: 'We store only what is needed to run your account: name, phone or email, language, selected teachers and alarms.',
+        hi: 'हम केवल खाता चलाने के लिए ज़रूरी जानकारी रखते हैं।',
+        mr: 'आम्ही खाते चालवण्यासाठी लागणारी माहिती ठेवतो.',
+      },
+      updatedAt: now(),
+    },
+    {
+      id: 'terms',
+      title: { en: 'Terms & Conditions', hi: 'नियम और शर्तें', mr: 'नियम आणि अटी' },
+      body: {
+        en: 'Use Dhamma Path respectfully. Content is for personal devotion.',
+        hi: 'धम्म पथ का सम्मान के साथ उपयोग करें।',
+        mr: 'धम्म पथाचा आदराने वापर करा.',
+      },
+      updatedAt: now(),
+    },
+    {
+      id: 'contact',
+      title: { en: 'Contact', hi: 'संपर्क', mr: 'संपर्क' },
+      body: {
+        en: '<p>Use Contact Us in the app Profile to send us a message.</p>',
+        hi: '<p>संदेश भेजने के लिए ऐप प्रोफ़ाइल में संपर्क करें का उपयोग करें।</p>',
+        mr: '<p>संदेश पाठवण्यासाठी अॅप प्रोफाइलमधील संपर्क वापरा.</p>',
+      },
+      updatedAt: now(),
+    },
+    {
+      id: 'help',
+      title: { en: 'Help', hi: 'सहायता', mr: 'मदत' },
+      body: {
+        en: '<h2>Daily Prarthana</h2><p>Set a time in the app. Allow exact alarms if Android asks.</p><h2>Ringtones</h2><p>Android needs Write Settings permission to change the default tone.</p>',
+        hi: '<h2>दैनिक प्रार्थना</h2><p>ऐप में समय सेट करें।</p>',
+        mr: '<h2>दैनिक प्रार्थना</h2><p>अॅपमध्ये वेळ सेट करा.</p>',
+      },
+      updatedAt: now(),
+    },
+  ];
+  for (const page of staticPages) {
+    const { id, ...fields } = page;
+    await db.setDocument('staticPages', id, fields);
+    console.log(`  staticPages/${id}`);
+  }
+
   console.log('\nSeed complete.');
   console.log(
     `Wrote ${teachers.length} teachers, ${categories.length} categories, ` +
-      `${wallpapers.length + ringtones.length + songs.length + meditations.length + statuses.length + prarthanas.length} content items, 1 config doc.`,
+      `${wallpapers.length + ringtones.length + songs.length + meditations.length + statuses.length + prarthanas.length} content items, 2 config docs.`,
   );
 }
 

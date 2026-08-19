@@ -66,6 +66,20 @@
 
     { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
       { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
       { "fieldPath": "createdAt", "order": "DESCENDING" }
     ]},
@@ -102,6 +116,60 @@
     { "collectionGroup": "users", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "language", "order": "ASCENDING" },
       { "fieldPath": "createdAt", "order": "DESCENDING" }
+    ]},
+
+    { "collectionGroup": "notifications", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "scheduledAt", "order": "ASCENDING" }
+    ]},
+
+    { "collectionGroup": "wallpapers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "wallpapers", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "ringtones", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "ringtones", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "songs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "songs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "meditations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "meditations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "prarthanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "prarthanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
     ]}
   ],
   "fieldOverrides": []

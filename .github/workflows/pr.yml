@@ -58,10 +58,26 @@ jobs:
         working-directory: apps/mobile
         run: flutter build apk --flavor dev -t lib/main_dev.dart --debug
 
-  # Placeholder — enabled once apps/admin exists (M1).
-  # build-admin:
-  #   name: Build admin web
-  #   ...
+  build-admin:
+    name: Build admin web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace dependencies
+        run: dart pub get
+
+      - name: Generate code
+        run: dart pub global activate melos ; dart pub global run melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
+
+      - name: Build admin web (dev)
+        working-directory: apps/admin
+        run: flutter build web -t lib/main_dev.dart --release
 
   # Placeholder — enabled once firebase/firestore.rules + rules tests exist (T0.7).
   # rules-tests:
