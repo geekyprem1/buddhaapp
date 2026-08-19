@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:core/core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -21,6 +22,16 @@ class AuthController extends _$AuthController {
   Future<bool> sendOtp(String phoneNumber) async {
     state = const AsyncLoading();
     final completer = Completer<bool>();
+
+    // Server-side per-number rate limit (FR-2.9, T2.11) — checked before
+    // Firebase Phone Auth even starts, since Phone Auth itself has no
+    // per-number throttling hook of its own.
+    try {
+      await ref.read(authFunctionsServiceProvider).guardOtpAbuse(phoneNumber);
+    } on FirebaseFunctionsException catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return false;
+    }
 
     try {
       await ref

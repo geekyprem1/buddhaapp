@@ -6,23 +6,6 @@ part of 'profile_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$contactRepositoryHash() => r'97a1fe443c3035343f23774e933277eff7c9ae8f';
-
-/// See also [contactRepository].
-@ProviderFor(contactRepository)
-final contactRepositoryProvider = Provider<ContactRepository>.internal(
-  contactRepository,
-  name: r'contactRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$contactRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ContactRepositoryRef = ProviderRef<ContactRepository>;
 String _$packageInfoHash() => r'f1c17d5174896e536210506ee5ade32f9766a6b9';
 
 /// See also [packageInfo].

@@ -15,8 +15,8 @@ part 'profile_providers.g.dart';
 const playStoreUrl =
     'https://play.google.com/store/apps/details?id=app.dhammapath';
 
-@Riverpod(keepAlive: true)
-ContactRepository contactRepository(Ref ref) => ContactRepository();
+// contactRepositoryProvider now lives in `core` (shared with the admin
+// inbox, T1.31) — no local duplicate needed.
 
 @riverpod
 Future<PackageInfo> packageInfo(Ref ref) => PackageInfo.fromPlatform();

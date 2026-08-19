@@ -6,16 +6,15 @@ part of 'app_bootstrap.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appBootstrapHash() => r'd4e5f60718293a4b5c6d7e8f9012a3b4c5d6e7f8';
+String _$appBootstrapHash() => r'fc5b6c919c6ba425d8ff4cf2a5de6ef7356c67d1';
 
 /// See also [appBootstrap].
 @ProviderFor(appBootstrap)
 final appBootstrapProvider = FutureProvider<AppBootstrap>.internal(
   appBootstrap,
   name: r'appBootstrapProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$appBootstrapHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$appBootstrapHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

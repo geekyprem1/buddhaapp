@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -212,6 +213,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   String _mapAuthError(Object? error) {
+    // FR-2.9 — the `guardOtpAbuse` rate-limit throws this before Phone Auth
+    // even starts; its message already tells the user how long to wait.
+    if (error is FirebaseFunctionsException) {
+      if (error.code == 'resource-exhausted') {
+        return error.message ?? 'Too many attempts. Please try again later.';
+      }
+      return 'Something went wrong. Please try again.';
+    }
     // FR-2.7 — surface actionable messages for the common Firebase Auth
     // failure codes rather than a single generic string.
     if (error is FirebaseAuthException) {

@@ -6,16 +6,15 @@ part of 'home_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$homeLayoutHash() => r'c3d4e5f60718293a4b5c6d7e8f9012a3b4c5d6e7';
+String _$homeLayoutHash() => r'ea9f15c180ea392f8a3ff60eb4c0e5055403c0dd';
 
 /// See also [homeLayout].
 @ProviderFor(homeLayout)
 final homeLayoutProvider = AutoDisposeStreamProvider<HomeLayout>.internal(
   homeLayout,
   name: r'homeLayoutProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$homeLayoutHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$homeLayoutHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
