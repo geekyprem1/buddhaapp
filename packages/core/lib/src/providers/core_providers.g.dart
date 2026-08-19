@@ -39,6 +39,23 @@ final userRepositoryProvider = Provider<UserRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UserRepositoryRef = ProviderRef<UserRepository>;
+String _$contactRepositoryHash() => r'97a1fe443c3035343f23774e933277eff7c9ae8f';
+
+/// See also [contactRepository].
+@ProviderFor(contactRepository)
+final contactRepositoryProvider = Provider<ContactRepository>.internal(
+  contactRepository,
+  name: r'contactRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$contactRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ContactRepositoryRef = ProviderRef<ContactRepository>;
 String _$teacherRepositoryHash() => r'748e973d6521fcc0f398251605dcb27d0f2d36db';
 
 /// See also [teacherRepository].
@@ -145,11 +162,12 @@ final adminUserRepositoryProvider = Provider<AdminUserRepository>.internal(
 // ignore: unused_element
 typedef AdminUserRepositoryRef = ProviderRef<AdminUserRepository>;
 String _$notificationRepositoryHash() =>
-    r'b7c1d0e4f8a2c6e0b4d8f2a6c0e4b8d2f6a0c4e8';
+    r'65ddb4ec00ee2df2d3ef0d4dca56d54588663626';
 
 /// See also [notificationRepository].
 @ProviderFor(notificationRepository)
-final notificationRepositoryProvider = Provider<NotificationRepository>.internal(
+final notificationRepositoryProvider =
+    Provider<NotificationRepository>.internal(
   notificationRepository,
   name: r'notificationRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')

@@ -78,6 +78,28 @@ class AdminFunctionsService {
       messageId: data['messageId'] as String?,
     );
   }
+
+  /// Export every `users/` row as CSV (super admin only, PII-access
+  /// audit-logged, T1.24 / AR-5.4). Launch volumes return inline — no
+  /// signed-URL round trip.
+  Future<String> exportUsersCsv() async {
+    final callable = _functions.httpsCallable(AppConstants.fnExportUsersCsv);
+    final result = await callable.call<Map<Object?, Object?>>();
+    final data = Map<String, dynamic>.from(result.data);
+    return data['csv'] as String? ?? '';
+  }
+
+  /// Execute a queued deletion request (super admin only, audit-logged,
+  /// T1.24 / AR-5.5 / FR-2.8). Reviewed-then-executed, not an automatic
+  /// trigger — see `functions/src/admin/processDeletionRequest.ts`.
+  Future<List<String>> processDeletionRequest(String uid) async {
+    final callable = _functions.httpsCallable(
+      AppConstants.fnProcessDeletionRequest,
+    );
+    final result = await callable.call<Map<Object?, Object?>>({'uid': uid});
+    final data = Map<String, dynamic>.from(result.data);
+    return (data['removed'] as List<dynamic>? ?? []).cast<String>();
+  }
 }
 
 class SendNotificationResult {

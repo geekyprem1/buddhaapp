@@ -31,6 +31,8 @@ abstract class AppConstants {
   /// Callable Function names.
   static const fnSetAdminRole = 'setAdminRole';
   static const fnSendNotification = 'sendNotification';
+  static const fnExportUsersCsv = 'exportUsersCsv';
+  static const fnProcessDeletionRequest = 'processDeletionRequest';
 
   /// Default page size for paginated content queries (Architecture §10).
   static const defaultPageSize = 20;

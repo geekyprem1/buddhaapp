@@ -10,6 +10,7 @@ import '../repositories/admin_user_repository.dart';
 import '../repositories/audit_repository.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/config_repository.dart';
+import '../repositories/contact_repository.dart';
 import '../repositories/content_repository.dart';
 import '../repositories/notification_repository.dart';
 import '../repositories/static_page_repository.dart';
@@ -29,6 +30,9 @@ AuthService authService(Ref ref) => AuthService();
 
 @Riverpod(keepAlive: true)
 UserRepository userRepository(Ref ref) => UserRepository();
+
+@Riverpod(keepAlive: true)
+ContactRepository contactRepository(Ref ref) => ContactRepository();
 
 @Riverpod(keepAlive: true)
 TeacherRepository teacherRepository(Ref ref) => TeacherRepository();

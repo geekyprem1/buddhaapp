@@ -17,6 +17,7 @@ export 'src/models/app_config.dart';
 export 'src/models/app_user.dart';
 export 'src/models/audit_log.dart';
 export 'src/models/category.dart';
+export 'src/models/contact_message.dart';
 export 'src/models/content_counters.dart';
 export 'src/models/content_item.dart';
 export 'src/models/content_type_metas.dart';

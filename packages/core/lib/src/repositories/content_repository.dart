@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../constants/app_constants.dart';
+import '../models/content_counters.dart';
 import '../models/content_item.dart';
 
 /// Generic, type-parameterised repository over any of the six content
@@ -132,6 +133,42 @@ class ContentRepository {
       ..remove('counters')
       ..['updatedAt'] = DateTime.now();
     return _collection.doc(item.id).update(data);
+  }
+
+  /// Duplicates an item as a new draft (T1.22, AR-3.8). Copies every field
+  /// except identity/state — the clone always starts as an unpublished
+  /// draft with fresh counters and no scheduling, so cloning can never
+  /// accidentally publish or double-count engagement.
+  Future<String> clone(ContentItem source) {
+    final newId = _collection.doc().id;
+    final cloned = source.copyWith(
+      id: newId,
+      status: ContentStatus.draft,
+      counters: const ContentCounters(),
+      publishAt: null,
+      expireAt: null,
+      deletedAt: null,
+    );
+    final data = cloned.toJson()
+      ..remove('id')
+      ..['createdAt'] = DateTime.now()
+      ..['updatedAt'] = DateTime.now();
+    return _collection.doc(newId).set(data).then((_) => newId);
+  }
+
+  /// Reorders items within a category/list by rewriting `sortOrder` to each
+  /// item's index in [orderedIds] (T1.22, AR-3.9), highest first (matches the
+  /// existing `sortOrder DESCENDING` list query).
+  Future<void> reorder(List<String> orderedIds) async {
+    final batch = _collection.firestore.batch();
+    final n = orderedIds.length;
+    for (var i = 0; i < n; i++) {
+      batch.update(_collection.doc(orderedIds[i]), {
+        'sortOrder': n - i,
+        'updatedAt': DateTime.now(),
+      });
+    }
+    await batch.commit();
   }
 
   Future<void> setStatus(String id, String status) {

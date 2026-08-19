@@ -149,4 +149,37 @@ class UserRepository {
       'status': 'pending',
     });
   }
+
+  /// Admin deletion-request queue (T1.24, AR-5.5). Each doc id is the
+  /// requesting user's uid.
+  Future<List<Map<String, dynamic>>> fetchDeletionRequests() async {
+    final snap = await _firestore
+        .collection(FirestoreCollections.deletionRequests)
+        .orderBy('requestedAt', descending: true)
+        .get();
+    return snap.docs.map((d) => {...d.data(), 'uid': d.id}).toList();
+  }
+
+  // --- Admin panel (AR-5.1–5.3, T1.23) ---
+
+  /// Newest-first page for the admin users table. Cursor pagination via
+  /// [startAfter] (the last document of the previous page).
+  Future<List<AppUser>> fetchAdminPage({
+    int pageSize = 100,
+    DocumentSnapshot<Map<String, dynamic>>? startAfter,
+  }) async {
+    var query = _users.orderBy('createdAt', descending: true).limit(pageSize);
+    if (startAfter != null) query = query.startAfterDocument(startAfter);
+    final snap = await query.get();
+    return snap.docs
+        .map((d) => AppUser.fromJson({...d.data(), 'uid': d.id}))
+        .toList();
+  }
+
+  /// Block or unblock a user (AR-5.3). Security rules restrict flipping
+  /// `isBlocked` to admin roles — the owner's own writes are rejected if they
+  /// touch this field (Architecture §7).
+  Future<void> setBlocked(String uid, bool blocked) {
+    return _users.doc(uid).update({'isBlocked': blocked});
+  }
 }
