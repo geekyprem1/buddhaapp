@@ -74,6 +74,23 @@ final authFunctionsServiceProvider = Provider<AuthFunctionsService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthFunctionsServiceRef = ProviderRef<AuthFunctionsService>;
+String _$eventsRepositoryHash() => r'f11d54646eb0f533c20a5ce8d251f1bc4509af78';
+
+/// See also [eventsRepository].
+@ProviderFor(eventsRepository)
+final eventsRepositoryProvider = Provider<EventsRepository>.internal(
+  eventsRepository,
+  name: r'eventsRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$eventsRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EventsRepositoryRef = ProviderRef<EventsRepository>;
 String _$teacherRepositoryHash() => r'748e973d6521fcc0f398251605dcb27d0f2d36db';
 
 /// See also [teacherRepository].

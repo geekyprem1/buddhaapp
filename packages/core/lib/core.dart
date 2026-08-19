@@ -43,6 +43,7 @@ export 'src/repositories/category_repository.dart';
 export 'src/repositories/config_repository.dart';
 export 'src/repositories/contact_repository.dart';
 export 'src/repositories/content_repository.dart';
+export 'src/repositories/events_repository.dart';
 export 'src/repositories/notification_repository.dart';
 export 'src/repositories/static_page_repository.dart';
 export 'src/repositories/teacher_repository.dart';

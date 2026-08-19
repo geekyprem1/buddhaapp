@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../constants/firestore_collections.dart';
 import '../models/app_user.dart';
+import '../models/content_item.dart';
 import '../models/teacher.dart';
 import '../repositories/admin_user_repository.dart';
 import '../repositories/audit_repository.dart';
@@ -12,6 +13,7 @@ import '../repositories/category_repository.dart';
 import '../repositories/config_repository.dart';
 import '../repositories/contact_repository.dart';
 import '../repositories/content_repository.dart';
+import '../repositories/events_repository.dart';
 import '../repositories/notification_repository.dart';
 import '../repositories/static_page_repository.dart';
 import '../repositories/teacher_repository.dart';
@@ -37,6 +39,9 @@ ContactRepository contactRepository(Ref ref) => ContactRepository();
 
 @Riverpod(keepAlive: true)
 AuthFunctionsService authFunctionsService(Ref ref) => AuthFunctionsService();
+
+@Riverpod(keepAlive: true)
+EventsRepository eventsRepository(Ref ref) => EventsRepository();
 
 @Riverpod(keepAlive: true)
 TeacherRepository teacherRepository(Ref ref) => TeacherRepository();
@@ -116,4 +121,16 @@ abstract class ContentCollections {
   static const meditations = FirestoreCollections.meditations;
   static const statuses = FirestoreCollections.statuses;
   static const prarthanas = FirestoreCollections.prarthanas;
+
+  /// Maps a [ContentType] value to its Firestore collection name. Returns
+  /// `null` for an unknown type.
+  static String? forType(String type) => switch (type) {
+    ContentType.wallpaper => wallpapers,
+    ContentType.ringtone => ringtones,
+    ContentType.song => songs,
+    ContentType.meditation => meditations,
+    ContentType.status => statuses,
+    ContentType.prarthana => prarthanas,
+    _ => null,
+  };
 }
