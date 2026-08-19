@@ -113,6 +113,11 @@ abstract class AdminStrings {
   static const confirmArchiveBody =
       'It will leave every published list in the app within a few seconds.';
 
+  static const clone = 'Clone';
+  static const cloned = 'Cloned as a new draft.';
+  static const reorderHint =
+      'Drag rows to reorder. Sort order updates immediately and clears '
+      'when search or a status filter is active.';
   static const bulkUpload = 'Bulk upload';
   static const bulkChooseFiles = 'Choose files';
   static const bulkHint =
@@ -164,6 +169,61 @@ abstract class AdminStrings {
   static const auditAfter = 'After';
   static const auditNoChange = 'No field-level detail recorded.';
   static const auditRefresh = 'Refresh';
+
+  static const usersSearchHint = 'Search name, phone, email or uid';
+  static const usersLanguage = 'Language';
+  static const usersAllLanguages = 'All languages';
+  static const usersStatus = 'Status';
+  static const usersAllStatus = 'All';
+  static const usersActiveOnly = 'Active';
+  static const usersBlockedOnly = 'Blocked';
+  static const usersEmpty = 'No users match these filters.';
+  static const usersBlock = 'Block';
+  static const usersUnblock = 'Unblock';
+  static const usersBlockedBadge = 'Blocked';
+  static const usersConfirmBlockTitle = 'Block this user?';
+  static const usersConfirmBlockBody =
+      'A blocked user is denied by security rules on every read and write, '
+      'including signing in again. They keep no access until unblocked.';
+  static const usersConfirmUnblockTitle = 'Unblock this user?';
+  static const usersConfirmUnblockBody =
+      'The user regains normal access immediately.';
+  static const usersBlockFailed = 'Could not update this user.';
+  static const usersTeachers = 'Teachers';
+  static const usersPlatform = 'Platform';
+  static const usersJoined = 'Joined';
+  static const usersLastActive = 'Last active';
+  static const usersNoName = '(no name)';
+  static const usersNever = 'Never';
+  static const usersExportCsv = 'Export CSV';
+  static const usersExportPiiWarning =
+      'This downloads every user\'s name, phone, email and device info as a '
+      'CSV file. Handle it as sensitive personal data.';
+  static const usersExportConfirm = 'Download CSV';
+  static const usersExportFailed = 'Could not export users.';
+  static const usersDeletionQueue = 'Deletion requests';
+  static const usersDeletionEmpty = 'No pending deletion requests.';
+  static const usersDeletionExecute = 'Execute deletion';
+  static const usersDeletionConfirmTitle = 'Permanently delete this user?';
+  static const usersDeletionConfirmBody =
+      'This removes the user document, alarms, avatar and sign-in account. '
+      'This cannot be undone.';
+  static const usersDeletionDone = 'Deletion executed.';
+  static const usersDeletionFailed = 'Could not execute this deletion.';
+  static const usersDeletionCompleted = 'Completed';
+  static const usersDeletionPending = 'Pending';
+  static const usersDeletionRequestedAt = 'Requested';
+
+  static const contactSearchHint = 'Search subject, message or uid';
+  static const contactAllStatus = 'All';
+  static const contactOpenOnly = 'Open';
+  static const contactResolvedOnly = 'Resolved';
+  static const contactEmpty = 'No contact messages match these filters.';
+  static const contactMarkResolved = 'Mark resolved';
+  static const contactReopen = 'Reopen';
+  static const contactResolvedBadge = 'Resolved';
+  static const contactFrom = 'From';
+  static const contactActionFailed = 'Could not update this message.';
 
   static const composeNotification = 'Compose';
   static const saveDraft = 'Save draft';

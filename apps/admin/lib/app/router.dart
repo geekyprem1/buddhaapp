@@ -10,6 +10,7 @@ import '../features/auth/presentation/splash_page.dart';
 import '../features/audit/presentation/audit_log_page.dart';
 import '../features/categories/presentation/categories_list_page.dart';
 import '../features/categories/presentation/category_form_page.dart';
+import '../features/contact/presentation/contact_inbox_page.dart';
 import '../features/content/application/content_type_config.dart';
 import '../features/content/presentation/bulk_upload_page.dart';
 import '../features/content/presentation/content_form_page.dart';
@@ -21,13 +22,12 @@ import '../features/notifications/presentation/notification_composer_page.dart';
 import '../features/notifications/presentation/notifications_list_page.dart';
 import '../features/pages/presentation/page_editor_page.dart';
 import '../features/pages/presentation/pages_list_page.dart';
-import '../features/placeholder/presentation/module_placeholder_page.dart';
+import '../features/users/presentation/users_list_page.dart';
 import '../features/teachers/presentation/teacher_form_page.dart';
 import '../features/teachers/presentation/teachers_list_page.dart';
 import '../widgets/idle_timeout_listener.dart';
 import 'admin_access.dart';
 import 'admin_shell.dart';
-import 'admin_strings.dart';
 
 part 'router.g.dart';
 
@@ -116,6 +116,10 @@ GoRouter adminRouter(Ref ref) {
           ),
           ..._contentRoutes(),
           GoRoute(
+            path: AdminRoutes.users,
+            builder: (context, state) => const UsersListPage(),
+          ),
+          GoRoute(
             path: AdminRoutes.notifications,
             builder: (context, state) => const NotificationsListPage(),
             routes: [
@@ -140,6 +144,10 @@ GoRouter adminRouter(Ref ref) {
             builder: (context, state) => const AuditLogPage(),
           ),
           GoRoute(
+            path: AdminRoutes.contact,
+            builder: (context, state) => const ContactInboxPage(),
+          ),
+          GoRoute(
             path: AdminRoutes.pages,
             builder: (context, state) => const PagesListPage(),
             routes: [
@@ -151,7 +159,6 @@ GoRouter adminRouter(Ref ref) {
               ),
             ],
           ),
-          ..._placeholderRoutes(),
         ],
       ),
     ],
@@ -189,20 +196,6 @@ List<GoRoute> _contentRoutes() {
             ),
           ),
         ],
-      ),
-  ];
-}
-
-List<GoRoute> _placeholderRoutes() {
-  const items = <(String, String)>[
-    (AdminRoutes.users, AdminStrings.users),
-    (AdminRoutes.contact, AdminStrings.contact),
-  ];
-  return [
-    for (final item in items)
-      GoRoute(
-        path: item.$1,
-        builder: (context, state) => ModulePlaceholderPage(title: item.$2),
       ),
   ];
 }

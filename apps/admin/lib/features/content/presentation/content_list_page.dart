@@ -51,6 +51,29 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
     ref.invalidate(adminContentListProvider(config.collection));
   }
 
+  Future<void> _clone(ContentItem item) async {
+    await ref.read(contentRepositoryProvider(config.collection)).clone(item);
+    ref.invalidate(adminContentListProvider(config.collection));
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text(AdminStrings.cloned)));
+    }
+  }
+
+  Future<void> _reorder(
+    List<ContentItem> rows,
+    int oldIndex,
+    int newIndex,
+  ) async {
+    final reordered = [...rows];
+    final moved = reordered.removeAt(oldIndex);
+    reordered.insert(newIndex, moved);
+    await ref
+        .read(contentRepositoryProvider(config.collection))
+        .reorder(reordered.map((e) => e.id).toList());
+    ref.invalidate(adminContentListProvider(config.collection));
+  }
+
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(adminContentListProvider(config.collection));
@@ -80,6 +103,9 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
             return item.title.resolve('en').toLowerCase().contains(q) ||
                 item.id.toLowerCase().contains(q);
           }).toList();
+          // Drag-reorder only makes sense over the full, unfiltered list —
+          // otherwise "row 2" doesn't map to a stable sortOrder position.
+          final reorderable = _status == null && _query.isEmpty;
           return Column(
             children: [
               Padding(
@@ -112,31 +138,70 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                           ),
                       ],
                     ),
+                    if (reorderable && rows.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        AdminStrings.reorderHint,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
               Expanded(
                 child: rows.isEmpty
                     ? const EmptyState(message: AdminStrings.emptyList)
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
-                        itemCount: rows.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final item = rows[i];
-                          return _ContentRow(
-                            item: item,
-                            onOpen: () =>
-                                context.go('${config.route}/${item.id}'),
-                            onPublish: () =>
-                                _setStatus(item, ContentStatus.published),
-                            onUnpublish: () =>
-                                _setStatus(item, ContentStatus.unpublished),
-                            onArchive: () => _archive(item),
-                            onRestore: () => _restore(item),
-                          );
-                        },
-                      ),
+                    : reorderable
+                        ? ReorderableListView.builder(
+                            padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                            itemCount: rows.length,
+                            onReorderItem: (oldIndex, newIndex) =>
+                                _reorder(rows, oldIndex, newIndex),
+                            itemBuilder: (context, i) {
+                              final item = rows[i];
+                              return Padding(
+                                key: ValueKey(item.id),
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: _ContentRow(
+                                  item: item,
+                                  onOpen: () =>
+                                      context.go('${config.route}/${item.id}'),
+                                  onPublish: () =>
+                                      _setStatus(item, ContentStatus.published),
+                                  onUnpublish: () => _setStatus(
+                                    item,
+                                    ContentStatus.unpublished,
+                                  ),
+                                  onArchive: () => _archive(item),
+                                  onRestore: () => _restore(item),
+                                  onClone: () => _clone(item),
+                                ),
+                              );
+                            },
+                          )
+                        : ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                            itemCount: rows.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 8),
+                            itemBuilder: (context, i) {
+                              final item = rows[i];
+                              return _ContentRow(
+                                item: item,
+                                onOpen: () =>
+                                    context.go('${config.route}/${item.id}'),
+                                onPublish: () =>
+                                    _setStatus(item, ContentStatus.published),
+                                onUnpublish: () =>
+                                    _setStatus(item, ContentStatus.unpublished),
+                                onArchive: () => _archive(item),
+                                onRestore: () => _restore(item),
+                                onClone: () => _clone(item),
+                              );
+                            },
+                          ),
               ),
             ],
           );
@@ -154,6 +219,7 @@ class _ContentRow extends StatelessWidget {
     required this.onUnpublish,
     required this.onArchive,
     required this.onRestore,
+    required this.onClone,
   });
 
   final ContentItem item;
@@ -162,6 +228,7 @@ class _ContentRow extends StatelessWidget {
   final VoidCallback onUnpublish;
   final VoidCallback onArchive;
   final VoidCallback onRestore;
+  final VoidCallback onClone;
 
   @override
   Widget build(BuildContext context) {
@@ -196,6 +263,8 @@ class _ContentRow extends StatelessWidget {
                 onArchive();
               case 'restore':
                 onRestore();
+              case 'clone':
+                onClone();
             }
           },
           itemBuilder: (context) => [
@@ -209,6 +278,10 @@ class _ContentRow extends StatelessWidget {
                 value: 'unpublish',
                 child: Text(AdminStrings.unpublish),
               ),
+            const PopupMenuItem(
+              value: 'clone',
+              child: Text(AdminStrings.clone),
+            ),
             if (item.status != ContentStatus.archived)
               const PopupMenuItem(
                 value: 'archive',
