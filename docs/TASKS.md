@@ -19,10 +19,10 @@
 |---|---:|---:|---:|---|
 | **M0 Foundation** (18) | 16 | 0 | 2 | Open: T0.6 App Check, T0.17 l10n CI lint |
 | **M1 Admin** (31) | 31 | 0 | 0 | **M1 complete.** CRUD, publish, notifications, config, static pages, all content Functions, bulk upload, status layout editor, audit viewer, users table, CSV export, deletion queue, clone/reorder, contact inbox, dashboard |
-| **M2 Mobile** (74) | 62 | 0 | 12 | Splash/config gates live. Open: events, series play, resume, ads slot, live badge, T2.5/T2.9–T2.11, analytics |
+| **M2 Mobile** (74) | 64 | 0 | 10 | Splash/config gates live; **onUserCreate/Delete + guardOtpAbuse done**. Open: events, series play, resume, ads slot, live badge, T2.5/T2.10, analytics |
 | **M3 Content** (11) | 0 | 0 | 11 | Wait for licensed assets |
 | **M4 Launch** (14) | 0 | 0 | 14 | After M2+M3 |
-| **Launch total** | **109** | **0** | **39** | of 148 (M0–M4) |
+| **Launch total** | **111** | **0** | **37** | of 148 (M0–M4) |
 
 **Shipped and checked (admin + Pixel 7 emulator)**
 - Admin login Super Admin (`admin@dhammapath.app`)
@@ -307,14 +307,15 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
 - [x] **T2.8** Google Sign-In flow
   `deps: T2.6`  ·  → FR-2.3
   · Done using `google_sign_in` 7.x's `GoogleSignIn.instance.authenticate()` API. Debug-keystore SHA-1 (`EE:EC:31:...`) is now registered against both the dev and prod Firebase Android apps and `google-services.json` re-downloaded with the resulting OAuth client. Still untested on a real device/emulator.
-- [ ] **T2.9** `onUserCreate` Function — seed `users/{uid}` (auth method, device info, FCM token, `onboardingStep: 'language'`), subscribe to the `all` topic
+- [x] **T2.9** `onUserCreate` Function — seed `users/{uid}` (auth method, device info, FCM token, `onboardingStep: 'language'`), subscribe to the `all` topic
   `deps: T0.7`  ·  → FR-2.4
-  · Client-side safety net done instead (`UserRepository.ensureUserDocument`, called from `AuthController`). The Cloud Function itself is still pending (needs `functions/` to be scaffolded).
+  · Done — `functions/src/users/onUserCreate.ts`. Auth lifecycle triggers are still v1-only in `firebase-functions` (no v2 equivalent exists yet), so this one function uses the v1 builder (`functions.region('asia-south1').auth.user().onCreate(...)`) while everything else in the codebase is v2. Merges (not overwrites) `users/{uid}` so it never clobbers fields the client's `ensureUserDocument` safety net already wrote — the two are idempotent with each other. Best-effort `all`-topic subscribe if a device token already exists; the client re-subscribes anyway once it has one (T2.70). Companion `onUserDelete` (also v1) cascades `alarms` + Storage avatar cleanup whenever an Auth account is removed by any path — a safety net alongside the reviewed `processDeletionRequest` (T1.24) queue. `tsc` clean. **Not yet deployed/verified live — deploy alongside the rest of `functions/`.**
 - [ ] **T2.10** Auth error handling — invalid number, wrong OTP, too many attempts, network failure, Play Integrity failure; all localised
   `deps: T2.7, T2.8`  ·  → FR-2.7
   · Partial — a generic error snackbar exists; error-code-specific localised messages not yet implemented.
-- [ ] **T2.11** `guardOtpAbuse` — per-number OTP rate limiting behind App Check
+- [x] **T2.11** `guardOtpAbuse` — per-number OTP rate limiting behind App Check
   `deps: T0.6`  ·  → FR-2.9  ·  Acceptance: repeated OTP requests for one number are throttled server-side
+  · Done — `functions/src/auth/guardOtpAbuse.ts`, a v2 callable, deliberately **not** `request.auth`-gated (there's no signed-in user yet at this point in the flow) — App Check is the intended defence (still gated on T0.6 landing). 5 requests per phone number per 15-minute sliding window, tracked in a Function-only `otpGuards/{phoneKey}` collection (Firestore rules deny all client reads/writes, so a client can't reset its own counter). Wired into the mobile app: new `AuthFunctionsService.guardOtpAbuse()` (core) is called from `AuthController.sendOtp` **before** `startPhoneVerification` — Phone Auth itself has no per-number throttle hook of its own. The throttle's `resource-exhausted` message surfaces directly in the login screen's error snackbar. `tsc` + `flutter analyze` clean across `functions`/`core`/`mobile`, all existing tests green. **Not yet deployed/load-tested — deploy alongside the rest of `functions/` and confirm the 6th rapid request within 15 min is actually blocked.**
 
 ### Onboarding
 
@@ -646,9 +647,9 @@ Non-negotiable before any public release:
 |---|---|---:|---:|---|
 | M0 Foundation | 18 | 16 | 2 | App Check + l10n lint still open |
 | M1 Admin Panel | 31 | 31 | 0 | **Complete.** CRUD/publish + notifications + config + static pages + all content Functions + bulk upload + status layout editor + audit viewer + users + CSV export + deletion queue + clone/reorder + contact inbox + dashboard |
-| M2 Mobile App | 74 | 62 | 12 | Splash + force-update + maintenance gates live |
+| M2 Mobile App | 74 | 64 | 10 | Splash + force-update + maintenance gates live; onUserCreate/Delete + guardOtpAbuse done |
 | M3 Content Ingestion | 11 | 0 | 11 | Content team, not developers |
 | M4 Launch | 14 | 0 | 14 | Hardening and compliance |
 | M5 Phase 2 | 8 | 0 | 8 | Flag-gated, post-launch |
 | M6 Phase 3 | 6 | 0 | 6 | Growth |
-| **Total (to launch)** | **148** | **109** | **39** | M0–M4 |
+| **Total (to launch)** | **148** | **111** | **37** | M0–M4 |
