@@ -14,6 +14,7 @@ class AudioListTile extends StatelessWidget {
     required this.language,
     this.trailing,
     this.onTap,
+    this.isPlaying = false,
     super.key,
   });
 
@@ -21,6 +22,7 @@ class AudioListTile extends StatelessWidget {
   final String language;
   final Widget? trailing;
   final VoidCallback? onTap;
+  final bool isPlaying;
 
   String get _subtitle {
     final artist = (item.artist == null || item.artist!.trim().isEmpty)
@@ -60,9 +62,11 @@ class AudioListTile extends StatelessWidget {
                   )
                 else
                   const ColoredBox(color: AppColors.disabled),
-                const Center(
+                Center(
                   child: Icon(
-                    Icons.play_circle_fill,
+                    isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_fill,
                     color: Colors.white,
                     size: 28,
                   ),

@@ -6,7 +6,7 @@ part of 'router.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appRouterHash() => r'3abf2365aeffe8307f3dcb201df0ae1f19a2a470';
+String _$appRouterHash() => r'a734b9ec1f85b92e7534f0a51f19e7a07b45bc80';
 
 /// Single-place auth/onboarding gate (Architecture §9.1, PRD D2 — login is
 /// mandatory, there is no guest browsing path). Every screen relies on this

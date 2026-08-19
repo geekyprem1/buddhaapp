@@ -143,6 +143,55 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: AppSpacing.lg),
+              Text.rich(
+                TextSpan(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: l10n?.loginLegalPrefix ??
+                          'By continuing you agree to the ',
+                    ),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.baseline,
+                      baseline: TextBaseline.alphabetic,
+                      child: InkWell(
+                        onTap: () => context.push(
+                          '${AppRoutes.legal}/${StaticPageSlugs.terms}',
+                        ),
+                        child: Text(
+                          l10n?.profileTermsConditions ?? 'Terms',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    TextSpan(text: l10n?.loginLegalAnd ?? ' and '),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.baseline,
+                      baseline: TextBaseline.alphabetic,
+                      child: InkWell(
+                        onTap: () => context.push(
+                          '${AppRoutes.legal}/${StaticPageSlugs.privacy}',
+                        ),
+                        child: Text(
+                          l10n?.profilePrivacyPolicy ?? 'Privacy Policy',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const TextSpan(text: '.'),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),

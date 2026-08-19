@@ -79,6 +79,15 @@ class AppLocalizationsMr extends AppLocalizations {
   String get loginContinueWithGoogle => 'Google सह पुढे जा';
 
   @override
+  String get loginLegalPrefix => 'पुढे जाऊन तुम्ही ';
+
+  @override
+  String get loginLegalAnd => ' आणि ';
+
+  @override
+  String get profileHelp => 'मदत';
+
+  @override
   String get homeWallpaper => 'वॉलपेपर';
 
   @override
@@ -128,4 +137,304 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get profileLogout => 'लॉगआउट';
+
+  @override
+  String get profileEdit => 'प्रोफाइल संपादित करा';
+
+  @override
+  String get profileMyTeachers => 'माझे गुरू';
+
+  @override
+  String get profileSave => 'जतन करा';
+
+  @override
+  String get profileNotifications => 'सूचना';
+
+  @override
+  String get profileRateUs => 'रेट करा';
+
+  @override
+  String get profileVersion => 'आवृत्ती';
+
+  @override
+  String get profileLogoutConfirm => 'धम्म पथमधून साइन आउट करायचे?';
+
+  @override
+  String get profileDeleteAccount => 'खाते हटवा';
+
+  @override
+  String get profileDeleteBody =>
+      'हे तुमचे खाते, अलार्म आणि प्रोफाइल हटवण्याची विनंती करेल. हे परत घेता येणार नाही.';
+
+  @override
+  String get profileDeleteContinue => 'पुढे जा';
+
+  @override
+  String get profileDeleteConfirmTitle => 'खात्री आहे?';
+
+  @override
+  String get profileDeleteConfirmBody =>
+      'विनंती पाठवून साइन आउट करण्यासाठी पुन्हा हटवा दाबा.';
+
+  @override
+  String get contactSubject => 'विषय';
+
+  @override
+  String get contactMessage => 'संदेश';
+
+  @override
+  String get contactSend => 'पाठवा';
+
+  @override
+  String get contactSent => 'संदेश पाठवला.';
+
+  @override
+  String get contactFailed => 'संदेश पाठवता आला नाही.';
+
+  @override
+  String get notifPermissionTitle => 'जोडून राहा';
+
+  @override
+  String get notifPermissionBody =>
+      'दैनिक प्रार्थना आणि धम्म अपडेटसाठी सूचनांना परवानगी द्या.';
+
+  @override
+  String get notifPermissionAllow => 'परवानगी द्या';
+
+  @override
+  String get setWallpaperTitle => 'वॉलपेपर सेट करा';
+
+  @override
+  String get setWallpaperHome => 'होम स्क्रीन';
+
+  @override
+  String get setWallpaperLock => 'लॉक स्क्रीन';
+
+  @override
+  String get setWallpaperBoth => 'होम आणि लॉक';
+
+  @override
+  String get wallpaperSetSuccess => 'वॉलपेपर सेट झाला.';
+
+  @override
+  String get wallpaperSetFailed => 'वॉलपेपर सेट होऊ शकला नाही.';
+
+  @override
+  String get savedToGallery => 'गॅलरीत जतन केले.';
+
+  @override
+  String get download => 'डाउनलोड';
+
+  @override
+  String get share => 'शेअर';
+
+  @override
+  String get help => 'मदत';
+
+  @override
+  String get set => 'सेट';
+
+  @override
+  String get ringtoneEmpty => 'अजून रिंगटोन नाहीत.';
+
+  @override
+  String get setRingtoneTitle => 'सेट करा';
+
+  @override
+  String get setRingtoneKind => 'रिंगटोन';
+
+  @override
+  String get setAlarmKind => 'अलार्म';
+
+  @override
+  String get setNotificationKind => 'नोटिफिकेशन';
+
+  @override
+  String ringtoneSetSuccess(String kind) {
+    return '$kind सेट झाला.';
+  }
+
+  @override
+  String get ringtoneSetFailed => 'टोन सेट होऊ शकला नाही.';
+
+  @override
+  String get ringtoneDownloadFailed => 'ऑडिओ डाउनलोड होऊ शकला नाही.';
+
+  @override
+  String get ringtoneSaved => 'डिव्हाइसवर जतन केले.';
+
+  @override
+  String get ringtonePermissionTitle => 'सिस्टम सेटिंग परवानगी';
+
+  @override
+  String get ringtonePermissionBody =>
+      'रिंगटोन, अलार्म किंवा नोटिफिकेशन सेट करण्यासाठी Android ला सिस्टम सेटिंग बदलण्याची परवानगी हवी. आम्ही हे फक्त तुम्ही निवडलेल्या टोनसाठी वापरतो.';
+
+  @override
+  String get ringtonePermissionAllow => 'सेटिंग उघडा';
+
+  @override
+  String get ringtonePermissionNotNow => 'आत्ता नाही';
+
+  @override
+  String get ringtonePermissionDenied =>
+      'परवानगी अजून बंद आहे. चालू करण्यासाठी मदत उघडा.';
+
+  @override
+  String get ringtoneHelpTitle => 'रिंगटोन कसा सेट करायचा';
+
+  @override
+  String get ringtoneHelpIntro =>
+      'Android एकदा “सिस्टम सेटिंग बदला” परवानगी मागतो. त्याशिवाय अॅप टोन सेट करू शकत नाही.';
+
+  @override
+  String get ringtoneHelpStep1 =>
+      'रिंगटोनवर सेट दाबा, नंतर रिंगटोन, अलार्म किंवा नोटिफिकेशन निवडा.';
+
+  @override
+  String get ringtoneHelpStep2 => 'विचारले तर सेटिंग उघडा दाबा.';
+
+  @override
+  String get ringtoneHelpStep3 => 'धम्म पथचा स्विच चालू करा.';
+
+  @override
+  String get ringtoneHelpStep4 => 'इथे परत या — आम्ही टोन आपोआप सेट करू.';
+
+  @override
+  String get ringtoneHelpOpenSettings => 'सिस्टम सेटिंग उघडा';
+
+  @override
+  String get sleepTimerTitle => 'स्लीप टायमर';
+
+  @override
+  String get sleepTimerOff => 'बंद';
+
+  @override
+  String sleepTimerMinutes(int minutes) {
+    return '$minutes मिनिटे';
+  }
+
+  @override
+  String sleepTimerRemaining(String time) {
+    return '$time नंतर थांबेल';
+  }
+
+  @override
+  String get prarthanaAdd => 'जोडा';
+
+  @override
+  String get prarthanaEmpty => 'अजून प्रार्थना सेट नाही. जोडा दाबा.';
+
+  @override
+  String get prarthanaLoadFailed => 'अलार्म लोड होऊ शकले नाहीत.';
+
+  @override
+  String get prarthanaDelete => 'हटवा';
+
+  @override
+  String get prarthanaTimeLabel => 'वेळ';
+
+  @override
+  String get prarthanaEveryday => 'रोज';
+
+  @override
+  String get prarthanaSongLabel => 'प्रार्थना गाणे';
+
+  @override
+  String get prarthanaNoSelection => 'प्रार्थना निवडलेली नाही';
+
+  @override
+  String get prarthanaChooseSong => 'प्रार्थना निवडा';
+
+  @override
+  String get prarthanaNoSongs => 'अजून प्रार्थना नाहीत.';
+
+  @override
+  String get prarthanaSetCta => 'प्रार्थना सेट करा';
+
+  @override
+  String get prarthanaNeedSong => 'आधी प्रार्थना निवडा.';
+
+  @override
+  String get prarthanaNeedDays => 'किमान एक दिवस निवडा.';
+
+  @override
+  String get prarthanaSetSuccess => 'प्रार्थना सेट झाली.';
+
+  @override
+  String get prarthanaSetFailed => 'प्रार्थना सेट होऊ शकली नाही.';
+
+  @override
+  String get prarthanaBatteryTitle => 'अलार्म विश्वासार्ह ठेवा';
+
+  @override
+  String get prarthanaBatteryBody =>
+      'काही फोन बॅकग्राउंड अलार्म बंद करतात. धम्म पथला बॅटरी ऑप्टिमायझेशनमधून सूट द्या.';
+
+  @override
+  String get prarthanaHelpTitle => 'दैनिक प्रार्थना कशी चालते';
+
+  @override
+  String get prarthanaHelpIntro =>
+      'अलार्म या फोनवर राहतो आणि ऑफलाइन, रीबूटनंतर आणि अॅप बंद असतानाही वाजतो.';
+
+  @override
+  String get prarthanaHelpStep1 => 'वेळ, दिवस आणि प्रार्थना गाणे निवडा.';
+
+  @override
+  String get prarthanaHelpStep2 =>
+      'Android विचारले तर exact alarm आणि नोटिफिकेशनची परवानगी द्या.';
+
+  @override
+  String get prarthanaHelpStep3 => 'धम्म पथसाठी बॅटरी ऑप्टिमायझेशन बंद करा.';
+
+  @override
+  String get prarthanaHelpStep4 =>
+      'वाजल्यावर Stop किंवा 10 मिनिटे Snooze. अॅप बंद असले तरी चालेल.';
+
+  @override
+  String get prarthanaHelpBattery => 'बॅटरी सेटिंग उघडा';
+
+  @override
+  String get prarthanaHelpExact => 'Exact-alarm सेटिंग उघडा';
+
+  @override
+  String get prarthanaTest60 => '60 सेकंदात टेस्ट अलार्म';
+
+  @override
+  String get prarthanaTestArmed => '60 सेकंदात टेस्ट अलार्म.';
+
+  @override
+  String get statusEmpty => 'अजून स्टेटस नाहीत.';
+
+  @override
+  String get statusTapName => 'नाव जोडण्यासाठी टॅप करा';
+
+  @override
+  String get statusEditName => 'तुमचे नाव';
+
+  @override
+  String get statusPickGallery => 'गॅलरी';
+
+  @override
+  String get statusPickCamera => 'कॅमेरा';
+
+  @override
+  String get statusExportFailed => 'स्टेटस एक्सपोर्ट होऊ शकला नाही.';
+
+  @override
+  String get forceUpdateTitle => 'अपडेट आवश्यक आहे';
+
+  @override
+  String get forceUpdateBody => 'पुढे जाण्यासाठी धम्म पथाची नवीन आवृत्ती हवी.';
+
+  @override
+  String get forceUpdateButton => 'अपडेट करा';
+
+  @override
+  String get maintenanceTitle => 'आम्ही लवकरच परत येऊ';
+
+  @override
+  String get maintenanceFallback =>
+      'धम्म पथ देखभाल चालू आहे. कृपया नंतर पुन्हा प्रयत्न करा.';
 }

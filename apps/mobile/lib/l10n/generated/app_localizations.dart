@@ -238,6 +238,24 @@ abstract class AppLocalizations {
   /// **'Continue with Google'**
   String get loginContinueWithGoogle;
 
+  /// No description provided for @loginLegalPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing you agree to the '**
+  String get loginLegalPrefix;
+
+  /// No description provided for @loginLegalAnd.
+  ///
+  /// In en, this message translates to:
+  /// **' and '**
+  String get loginLegalAnd;
+
+  /// No description provided for @profileHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get profileHelp;
+
   /// No description provided for @homeWallpaper.
   ///
   /// In en, this message translates to:
@@ -339,6 +357,570 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logout'**
   String get profileLogout;
+
+  /// No description provided for @profileEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get profileEdit;
+
+  /// No description provided for @profileMyTeachers.
+  ///
+  /// In en, this message translates to:
+  /// **'My Teachers'**
+  String get profileMyTeachers;
+
+  /// No description provided for @profileSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get profileSave;
+
+  /// No description provided for @profileNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get profileNotifications;
+
+  /// No description provided for @profileRateUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Us'**
+  String get profileRateUs;
+
+  /// No description provided for @profileVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get profileVersion;
+
+  /// No description provided for @profileLogoutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out of Dhamma Path?'**
+  String get profileLogoutConfirm;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This requests deletion of your account, alarms and profile. This cannot be undone.'**
+  String get profileDeleteBody;
+
+  /// No description provided for @profileDeleteContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get profileDeleteContinue;
+
+  /// No description provided for @profileDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get profileDeleteConfirmTitle;
+
+  /// No description provided for @profileDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Delete again to send the request and sign out.'**
+  String get profileDeleteConfirmBody;
+
+  /// No description provided for @contactSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get contactSubject;
+
+  /// No description provided for @contactMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get contactMessage;
+
+  /// No description provided for @contactSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get contactSend;
+
+  /// No description provided for @contactSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Message sent.'**
+  String get contactSent;
+
+  /// No description provided for @contactFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the message.'**
+  String get contactFailed;
+
+  /// No description provided for @notifPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay in the loop'**
+  String get notifPermissionTitle;
+
+  /// No description provided for @notifPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications for Daily Prarthana reminders and Dhamma updates.'**
+  String get notifPermissionBody;
+
+  /// No description provided for @notifPermissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get notifPermissionAllow;
+
+  /// No description provided for @setWallpaperTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set wallpaper'**
+  String get setWallpaperTitle;
+
+  /// No description provided for @setWallpaperHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen'**
+  String get setWallpaperHome;
+
+  /// No description provided for @setWallpaperLock.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock screen'**
+  String get setWallpaperLock;
+
+  /// No description provided for @setWallpaperBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Home and lock'**
+  String get setWallpaperBoth;
+
+  /// No description provided for @wallpaperSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallpaper set.'**
+  String get wallpaperSetSuccess;
+
+  /// No description provided for @wallpaperSetFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set wallpaper.'**
+  String get wallpaperSetFailed;
+
+  /// No description provided for @savedToGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to gallery.'**
+  String get savedToGallery;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @help.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get help;
+
+  /// No description provided for @set.
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get set;
+
+  /// No description provided for @ringtoneEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No ringtones yet.'**
+  String get ringtoneEmpty;
+
+  /// No description provided for @setRingtoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as'**
+  String get setRingtoneTitle;
+
+  /// No description provided for @setRingtoneKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Ringtone'**
+  String get setRingtoneKind;
+
+  /// No description provided for @setAlarmKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm'**
+  String get setAlarmKind;
+
+  /// No description provided for @setNotificationKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get setNotificationKind;
+
+  /// No description provided for @ringtoneSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as {kind}.'**
+  String ringtoneSetSuccess(String kind);
+
+  /// No description provided for @ringtoneSetFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set the tone.'**
+  String get ringtoneSetFailed;
+
+  /// No description provided for @ringtoneDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not download the audio.'**
+  String get ringtoneDownloadFailed;
+
+  /// No description provided for @ringtoneSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your device.'**
+  String get ringtoneSaved;
+
+  /// No description provided for @ringtonePermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow system settings'**
+  String get ringtonePermissionTitle;
+
+  /// No description provided for @ringtonePermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To set a ringtone, alarm or notification sound, Android needs permission to change system settings. We only use this to set the sound you chose.'**
+  String get ringtonePermissionBody;
+
+  /// No description provided for @ringtonePermissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get ringtonePermissionAllow;
+
+  /// No description provided for @ringtonePermissionNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get ringtonePermissionNotNow;
+
+  /// No description provided for @ringtonePermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission is still off. Open Help to turn it on.'**
+  String get ringtonePermissionDenied;
+
+  /// No description provided for @ringtoneHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to set a ringtone'**
+  String get ringtoneHelpTitle;
+
+  /// No description provided for @ringtoneHelpIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Android asks for a one-time “modify system settings” permission. The app cannot set the sound without it.'**
+  String get ringtoneHelpIntro;
+
+  /// No description provided for @ringtoneHelpStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Set on a ringtone, then pick Ringtone, Alarm or Notification.'**
+  String get ringtoneHelpStep1;
+
+  /// No description provided for @ringtoneHelpStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'If asked, tap Open settings.'**
+  String get ringtoneHelpStep2;
+
+  /// No description provided for @ringtoneHelpStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on the switch for Dhamma Path.'**
+  String get ringtoneHelpStep3;
+
+  /// No description provided for @ringtoneHelpStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Return here — we finish setting the sound automatically.'**
+  String get ringtoneHelpStep4;
+
+  /// No description provided for @ringtoneHelpOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open system settings'**
+  String get ringtoneHelpOpenSettings;
+
+  /// No description provided for @sleepTimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep timer'**
+  String get sleepTimerTitle;
+
+  /// No description provided for @sleepTimerOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get sleepTimerOff;
+
+  /// No description provided for @sleepTimerMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String sleepTimerMinutes(int minutes);
+
+  /// No description provided for @sleepTimerRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep in {time}'**
+  String sleepTimerRemaining(String time);
+
+  /// No description provided for @prarthanaAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get prarthanaAdd;
+
+  /// No description provided for @prarthanaEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No prarthana set yet. Tap Add to schedule one.'**
+  String get prarthanaEmpty;
+
+  /// No description provided for @prarthanaLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load alarms.'**
+  String get prarthanaLoadFailed;
+
+  /// No description provided for @prarthanaDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get prarthanaDelete;
+
+  /// No description provided for @prarthanaTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get prarthanaTimeLabel;
+
+  /// No description provided for @prarthanaEveryday.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyday'**
+  String get prarthanaEveryday;
+
+  /// No description provided for @prarthanaSongLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Prarthana Song'**
+  String get prarthanaSongLabel;
+
+  /// No description provided for @prarthanaNoSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'No Prarthana selected'**
+  String get prarthanaNoSelection;
+
+  /// No description provided for @prarthanaChooseSong.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose prarthana'**
+  String get prarthanaChooseSong;
+
+  /// No description provided for @prarthanaNoSongs.
+  ///
+  /// In en, this message translates to:
+  /// **'No prarthanas yet.'**
+  String get prarthanaNoSongs;
+
+  /// No description provided for @prarthanaSetCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Prarthana'**
+  String get prarthanaSetCta;
+
+  /// No description provided for @prarthanaNeedSong.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a prarthana first.'**
+  String get prarthanaNeedSong;
+
+  /// No description provided for @prarthanaNeedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least one day.'**
+  String get prarthanaNeedDays;
+
+  /// No description provided for @prarthanaSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Prarthana set.'**
+  String get prarthanaSetSuccess;
+
+  /// No description provided for @prarthanaSetFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set the prarthana.'**
+  String get prarthanaSetFailed;
+
+  /// No description provided for @prarthanaBatteryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the alarm reliable'**
+  String get prarthanaBatteryTitle;
+
+  /// No description provided for @prarthanaBatteryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Some phones stop background alarms. Allow Dhamma Path to ignore battery optimisation.'**
+  String get prarthanaBatteryBody;
+
+  /// No description provided for @prarthanaHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How Daily Prarthana works'**
+  String get prarthanaHelpTitle;
+
+  /// No description provided for @prarthanaHelpIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The alarm is stored on this phone and plays even offline, after reboot, and if the app is closed.'**
+  String get prarthanaHelpIntro;
+
+  /// No description provided for @prarthanaHelpStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a time, the days it should repeat, and a prarthana song.'**
+  String get prarthanaHelpStep1;
+
+  /// No description provided for @prarthanaHelpStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow exact alarms and notifications if Android asks.'**
+  String get prarthanaHelpStep2;
+
+  /// No description provided for @prarthanaHelpStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off battery optimisation for Dhamma Path so the alarm is not killed.'**
+  String get prarthanaHelpStep3;
+
+  /// No description provided for @prarthanaHelpStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'When it rings, Stop or Snooze 10 minutes. It works with the app closed.'**
+  String get prarthanaHelpStep4;
+
+  /// No description provided for @prarthanaHelpBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'Open battery settings'**
+  String get prarthanaHelpBattery;
+
+  /// No description provided for @prarthanaHelpExact.
+  ///
+  /// In en, this message translates to:
+  /// **'Open exact-alarm settings'**
+  String get prarthanaHelpExact;
+
+  /// No description provided for @prarthanaTest60.
+  ///
+  /// In en, this message translates to:
+  /// **'Test alarm in 60 seconds'**
+  String get prarthanaTest60;
+
+  /// No description provided for @prarthanaTestArmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Test alarm in 60 seconds.'**
+  String get prarthanaTestArmed;
+
+  /// No description provided for @statusEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No statuses yet.'**
+  String get statusEmpty;
+
+  /// No description provided for @statusTapName.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add name'**
+  String get statusTapName;
+
+  /// No description provided for @statusEditName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get statusEditName;
+
+  /// No description provided for @statusPickGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get statusPickGallery;
+
+  /// No description provided for @statusPickCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get statusPickCamera;
+
+  /// No description provided for @statusExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not export the status.'**
+  String get statusExportFailed;
+
+  /// No description provided for @forceUpdateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get forceUpdateTitle;
+
+  /// No description provided for @forceUpdateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A newer version of Dhamma Path is required to continue.'**
+  String get forceUpdateBody;
+
+  /// No description provided for @forceUpdateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get forceUpdateButton;
+
+  /// No description provided for @maintenanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We will be back shortly'**
+  String get maintenanceTitle;
+
+  /// No description provided for @maintenanceFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhamma Path is under maintenance. Please try again later.'**
+  String get maintenanceFallback;
 }
 
 class _AppLocalizationsDelegate
