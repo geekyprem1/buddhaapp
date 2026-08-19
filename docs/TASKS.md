@@ -19,10 +19,10 @@
 |---|---:|---:|---:|---|
 | **M0 Foundation** (18) | 16 | 0 | 2 | Open: T0.6 App Check, T0.17 l10n CI lint |
 | **M1 Admin** (31) | 31 | 0 | 0 | **M1 complete.** CRUD, publish, notifications, config, static pages, all content Functions, bulk upload, status layout editor, audit viewer, users table, CSV export, deletion queue, clone/reorder, contact inbox, dashboard |
-| **M2 Mobile** (74) | 64 | 0 | 10 | Splash/config gates live; **onUserCreate/Delete + guardOtpAbuse done**. Open: events, series play, resume, ads slot, live badge, T2.5/T2.10, analytics |
+| **M2 Mobile** (74) | 65 | 0 | 9 | Splash/config gates live; onUserCreate/Delete + guardOtpAbuse + **events counters** done. Open: series play, resume, ads slot, live badge, T2.5/T2.10, analytics |
 | **M3 Content** (11) | 0 | 0 | 11 | Wait for licensed assets |
 | **M4 Launch** (14) | 0 | 0 | 14 | After M2+M3 |
-| **Launch total** | **111** | **0** | **37** | of 148 (M0–M4) |
+| **Launch total** | **112** | **0** | **36** | of 148 (M0–M4) |
 
 **Shipped and checked (admin + Pixel 7 emulator)**
 - Admin login Super Admin (`admin@dhammapath.app`)
@@ -437,8 +437,9 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
 - [x] **T2.45** Queue from the current filtered list so next/previous behave as the user expects
   `deps: T2.44`  ·  → FR-9.3
   · Done — play starts with the visible filtered page as the queue.
-- [ ] **T2.46** Emit `song_play` / `song_complete` events into `events/` for Function-side counter aggregation
+- [x] **T2.46** Emit `song_play` / `song_complete` events into `events/` for Function-side counter aggregation
   `deps: T2.44, T1.13`  ·  → FR-9.10
+  · Done — new shared `EventsRepository` (core) with a `ContentEventType {view,download,share,play}` enum whose names match the Function's `EVENT_TYPE_TO_COUNTER` map. Write-only into `events/`, fire-and-forget at every call site (a failed counter event never blocks or surfaces in the UI). Wired: **play** counted on *completion* in `DhammaAudioHandler._onComplete` (FR-9.10 "completed play" — songs/meditations/prarthanas; ringtone previews excluded), **download**/**share** on wallpaper detail and status export. `aggregateEvents` (T1.13) folds these into each doc's `counters` every 5 min, which is what finally lights up the dashboard's downloads/shares/plays numbers. Added `ContentCollections.forType()` to map a `ContentType` to its collection. `flutter analyze` clean across core/mobile, all tests green. **Not yet verified live end-to-end (play a song → wait ≤5 min → counter increments → dashboard reflects it) — do that after deploying `functions/`.**
 
 ### Meditation
 
@@ -647,9 +648,9 @@ Non-negotiable before any public release:
 |---|---|---:|---:|---|
 | M0 Foundation | 18 | 16 | 2 | App Check + l10n lint still open |
 | M1 Admin Panel | 31 | 31 | 0 | **Complete.** CRUD/publish + notifications + config + static pages + all content Functions + bulk upload + status layout editor + audit viewer + users + CSV export + deletion queue + clone/reorder + contact inbox + dashboard |
-| M2 Mobile App | 74 | 64 | 10 | Splash + force-update + maintenance gates live; onUserCreate/Delete + guardOtpAbuse done |
+| M2 Mobile App | 74 | 65 | 9 | Splash + gates live; onUserCreate/Delete + guardOtpAbuse + events counters done |
 | M3 Content Ingestion | 11 | 0 | 11 | Content team, not developers |
 | M4 Launch | 14 | 0 | 14 | Hardening and compliance |
 | M5 Phase 2 | 8 | 0 | 8 | Flag-gated, post-launch |
 | M6 Phase 3 | 6 | 0 | 6 | Growth |
-| **Total (to launch)** | **148** | **111** | **37** | M0–M4 |
+| **Total (to launch)** | **148** | **112** | **36** | M0–M4 |
