@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart';
@@ -96,6 +97,7 @@ class StatusExport {
     final file = await composeToTemp(item);
     await _ref.read(wallpaperServiceProvider).saveFileToGallery(file.path);
     await _ref.read(analyticsServiceProvider).statusDownload(id: item.id);
+    _recordEvent(item.id, ContentEventType.download);
   }
 
   Future<void> share(ContentItem item) async {
@@ -114,6 +116,22 @@ class StatusExport {
           id: item.id,
           channel: channel,
         );
+    _recordEvent(item.id, ContentEventType.share);
+  }
+
+  /// Fire-and-forget counter event (FR-12.5/12.11) — `aggregateEvents` folds
+  /// it into `statuses/{id}.counters`. Never blocks the export flow.
+  void _recordEvent(String itemId, ContentEventType type) {
+    unawaited(
+      _ref
+          .read(eventsRepositoryProvider)
+          .record(
+            collection: ContentCollections.statuses,
+            itemId: itemId,
+            type: type,
+          )
+          .catchError((_) {}),
+    );
   }
 }
 

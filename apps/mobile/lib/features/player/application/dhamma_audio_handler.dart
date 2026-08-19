@@ -21,6 +21,7 @@ class DhammaAudioHandler extends BaseAudioHandler
   }
 
   final AudioPlayer _player = AudioPlayer();
+  final EventsRepository _events = EventsRepository();
   var _retrying = false;
 
   late final SleepTimer sleepTimer = SleepTimer(
@@ -80,6 +81,10 @@ class DhammaAudioHandler extends BaseAudioHandler
   }
 
   Future<void> _onComplete() async {
+    // FR-9.10 — count a *completed* play. Fire-and-forget into `events/`;
+    // `aggregateEvents` folds it into the content doc's `counters.plays`.
+    _recordPlay(mediaItem.value);
+
     if (_player.loopMode == LoopMode.one) {
       await _player.seek(Duration.zero);
       await _player.play();
@@ -97,6 +102,24 @@ class DhammaAudioHandler extends BaseAudioHandler
     } else {
       await stop();
     }
+  }
+
+  void _recordPlay(MediaItem? item) {
+    if (item == null) return;
+    final type = contentTypeOf(item);
+    final collection = type == null ? null : ContentCollections.forType(type);
+    if (collection == null) return;
+    // Ringtone previews aren't "plays" in the FR-9.10 sense — skip them.
+    if (type == ContentType.ringtone) return;
+    unawaited(
+      _events
+          .record(
+            collection: collection,
+            itemId: item.id,
+            type: ContentEventType.play,
+          )
+          .catchError((_) {}),
+    );
   }
 
   @override

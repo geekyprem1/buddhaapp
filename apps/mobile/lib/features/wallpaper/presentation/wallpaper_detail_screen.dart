@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +61,16 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
         SnackBar(content: Text(l10n?.savedToGallery ?? 'Saved to gallery.')),
       );
       await ref.read(analyticsServiceProvider).wallpaperDownload(id: _item.id);
+      unawaited(
+        ref
+            .read(eventsRepositoryProvider)
+            .record(
+              collection: ContentCollections.wallpapers,
+              itemId: _item.id,
+              type: ContentEventType.download,
+            )
+            .catchError((_) {}),
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,6 +93,16 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
             url: url,
             title: _item.title.resolve(language),
           );
+      unawaited(
+        ref
+            .read(eventsRepositoryProvider)
+            .record(
+              collection: ContentCollections.wallpapers,
+              itemId: _item.id,
+              type: ContentEventType.share,
+            )
+            .catchError((_) {}),
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
