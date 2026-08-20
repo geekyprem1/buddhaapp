@@ -58,148 +58,171 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Now playing')),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          children: [
-            const Spacer(),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: media.artUri == null
-                    ? const ColoredBox(
-                        color: AppColors.disabled,
-                        child: Icon(Icons.music_note, size: 72),
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: media.artUri.toString(),
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            Text(
-              media.title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              media.artist ?? 'Anonymous',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            if (buffering) const LinearProgressIndicator(),
-            Slider(
-              value: _sliderValue(position, duration),
-              onChanged: duration.inMilliseconds == 0
-                  ? null
-                  : (v) => handler.seek(
-                      Duration(
-                        milliseconds: (v * duration.inMilliseconds).round(),
+      appBar: AppBar(
+        title: const Text('Now playing', overflow: TextOverflow.ellipsis),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final artMax = (constraints.maxHeight * 0.42).clamp(160.0, 360.0);
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: artMax),
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: media.artUri == null
+                              ? const ColoredBox(
+                                  color: AppColors.disabled,
+                                  child: Icon(Icons.music_note, size: 72),
+                                )
+                              : CachedNetworkImage(
+                                  imageUrl: media.artUri.toString(),
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
                     ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(_fmt(position)),
-                Text(_fmt(duration)),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  tooltip: 'Previous',
-                  onPressed: handler.skipToPrevious,
-                  icon: const Icon(Icons.skip_previous, size: 36),
-                ),
-                IconButton(
-                  tooltip: 'Back 10 seconds',
-                  onPressed: handler.skipBack,
-                  icon: const Icon(Icons.replay_10, size: 28),
-                ),
-                IconButton(
-                  tooltip: playing ? 'Pause' : 'Play',
-                  onPressed: () => playing ? handler.pause() : handler.play(),
-                  icon: Icon(
-                    playing
-                        ? Icons.pause_circle_filled
-                        : Icons.play_circle_fill,
-                    size: 72,
-                    color: AppColors.primary,
                   ),
-                ),
-                IconButton(
-                  tooltip: 'Forward 10 seconds',
-                  onPressed: handler.skipForward,
-                  icon: const Icon(Icons.forward_10, size: 28),
-                ),
-                IconButton(
-                  tooltip: 'Next',
-                  onPressed: handler.skipToNext,
-                  icon: const Icon(Icons.skip_next, size: 36),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  tooltip: 'Shuffle',
-                  onPressed: handler.toggleShuffle,
-                  icon: Icon(
-                    Icons.shuffle,
-                    color: shuffle ? AppColors.primary : AppColors.textSecondary,
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    media.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.lg),
-                IconButton(
-                  tooltip: 'Repeat',
-                  onPressed: handler.cycleRepeat,
-                  icon: Icon(
-                    repeat == AudioServiceRepeatMode.one
-                        ? Icons.repeat_one
-                        : Icons.repeat,
-                    color: repeat == AudioServiceRepeatMode.none
-                        ? AppColors.textSecondary
-                        : AppColors.primary,
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    media.artist ?? 'Anonymous',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                   ),
-                ),
-                if (showSleep) ...[
-                  const SizedBox(width: AppSpacing.lg),
-                  IconButton(
-                    tooltip: l10n?.sleepTimerTitle ?? 'Sleep timer',
-                    onPressed: () => showSleepTimerSheet(context, ref),
-                    icon: Icon(
-                      Icons.bedtime_outlined,
-                      color: sleepLeft != null
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                  const SizedBox(height: AppSpacing.lg),
+                  if (buffering) const LinearProgressIndicator(),
+                  Slider(
+                    value: _sliderValue(position, duration),
+                    onChanged: duration.inMilliseconds == 0
+                        ? null
+                        : (v) => handler.seek(
+                              Duration(
+                                milliseconds:
+                                    (v * duration.inMilliseconds).round(),
+                              ),
+                            ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(_fmt(position)),
+                      Text(_fmt(duration)),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        tooltip: 'Previous',
+                        onPressed: handler.skipToPrevious,
+                        icon: const Icon(Icons.skip_previous, size: 32),
+                      ),
+                      IconButton(
+                        tooltip: 'Back 10 seconds',
+                        onPressed: handler.skipBack,
+                        icon: const Icon(Icons.replay_10, size: 26),
+                      ),
+                      IconButton(
+                        tooltip: playing ? 'Pause' : 'Play',
+                        onPressed: () =>
+                            playing ? handler.pause() : handler.play(),
+                        icon: Icon(
+                          playing
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
+                          size: 64,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Forward 10 seconds',
+                        onPressed: handler.skipForward,
+                        icon: const Icon(Icons.forward_10, size: 26),
+                      ),
+                      IconButton(
+                        tooltip: 'Next',
+                        onPressed: handler.skipToNext,
+                        icon: const Icon(Icons.skip_next, size: 32),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        tooltip: 'Shuffle',
+                        onPressed: handler.toggleShuffle,
+                        icon: Icon(
+                          Icons.shuffle,
+                          color: shuffle
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.lg),
+                      IconButton(
+                        tooltip: 'Repeat',
+                        onPressed: handler.cycleRepeat,
+                        icon: Icon(
+                          repeat == AudioServiceRepeatMode.one
+                              ? Icons.repeat_one
+                              : Icons.repeat,
+                          color: repeat == AudioServiceRepeatMode.none
+                              ? AppColors.textSecondary
+                              : AppColors.primary,
+                        ),
+                      ),
+                      if (showSleep) ...[
+                        const SizedBox(width: AppSpacing.lg),
+                        IconButton(
+                          tooltip: l10n?.sleepTimerTitle ?? 'Sleep timer',
+                          onPressed: () => showSleepTimerSheet(context, ref),
+                          icon: Icon(
+                            Icons.bedtime_outlined,
+                            color: sleepLeft != null
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  if (showSleep && sleepLeft != null)
+                    Text(
+                      l10n?.sleepTimerRemaining(_fmt(sleepLeft)) ??
+                          'Sleep in ${_fmt(sleepLeft)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.primary,
+                          ),
                     ),
-                  ),
                 ],
-              ],
-            ),
-            if (showSleep && sleepLeft != null)
-              Text(
-                l10n?.sleepTimerRemaining(_fmt(sleepLeft)) ??
-                    'Sleep in ${_fmt(sleepLeft)}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primary,
-                    ),
               ),
-            const Spacer(),
-          ],
-        ),
+            ),
+          );
+        },
       ),
     );
   }

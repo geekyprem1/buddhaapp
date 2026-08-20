@@ -161,6 +161,24 @@ final staticPageRepositoryProvider = Provider<StaticPageRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StaticPageRepositoryRef = ProviderRef<StaticPageRepository>;
+String _$progressRepositoryHash() =>
+    r'7dc38f88d45bc160f5cd5fa1f95c6b66628e981c';
+
+/// See also [progressRepository].
+@ProviderFor(progressRepository)
+final progressRepositoryProvider = Provider<ProgressRepository>.internal(
+  progressRepository,
+  name: r'progressRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$progressRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ProgressRepositoryRef = ProviderRef<ProgressRepository>;
 String _$auditRepositoryHash() => r'639b13ecb6de71027780dcc57ccef7f6d55fd344';
 
 /// See also [auditRepository].

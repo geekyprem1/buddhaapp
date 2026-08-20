@@ -64,6 +64,22 @@ flutter run --flavor dev -t lib/main_dev.dart
 
 Talks to live `dhamma-path-dev` unless you later wire `USE_EMULATOR`.
 
+### App Check (T0.6)
+
+The mobile **dev** flavour uses the App Check **debug** provider. First
+run prints a debug token in logcat (`D DebugAppCheckProvider`). Register
+it in Firebase Console → App Check → Apps → Manage debug tokens.
+
+The admin panel on `localhost` sets `FIREBASE_APPCHECK_DEBUG_TOKEN` in
+`apps/admin/web/index.html`. Register that token the same way.
+
+Production / release builds use Play Integrity (Android) and reCAPTCHA
+Enterprise (admin web, pass `--dart-define=RECAPTCHA_SITE_KEY=…`).
+
+**Enforcement is a Console step**, not code: App Check → APIs →
+Firestore / Storage → Enforce. Do this on `dhamma-path-dev` only after
+debug tokens are registered, or every request will be rejected.
+
 ## Admin panel
 
 ```powershell

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/notifications/application/fcm_coordinator.dart';
 import '../features/player/presentation/mini_player.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'offline_banner.dart';
 import 'router.dart';
 
 /// Root widget for Dhamma Path. Wraps the app in the shared theme,
@@ -18,8 +19,7 @@ class DhammaPathApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(fcmCoordinatorProvider);
     final router = ref.watch(appRouterProvider);
-    final language =
-        ref.watch(currentAppUserProvider).valueOrNull?.language;
+    final language = ref.watch(currentAppUserProvider).valueOrNull?.language;
     return MaterialApp.router(
       title: 'Dhamma Path',
       debugShowCheckedModeBanner: false,
@@ -32,6 +32,7 @@ class DhammaPathApp extends ConsumerWidget {
       builder: (context, child) {
         return Column(
           children: [
+            const OfflineBanner(),
             Expanded(child: child ?? const SizedBox.shrink()),
             const MiniPlayer(),
           ],

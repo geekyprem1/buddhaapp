@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/generated/app_localizations.dart';
 import '../application/auth_controller.dart';
+import '../application/auth_error_messages.dart';
 
 /// OTP verification screen (PRD FR-2.2) — 6-digit code entry, 60s resend
 /// timer, change-number link.
@@ -60,20 +63,22 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
     ref.listen(authControllerProvider, (previous, next) {
-      if (next.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid code. Please try again.')),
-        );
-      }
+      if (!next.hasError) return;
+      final failure = classifyAuthError(next.error!);
+      if (!failure.shouldShow) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authErrorMessage(l10n, failure))),
+      );
     });
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Verify OTP')),
+      appBar: AppBar(title: Text(l10n?.otpScreenTitle ?? 'Verify OTP')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -81,7 +86,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Enter the code sent to ${widget.phoneNumber}',
+                l10n?.otpEnterCode(widget.phoneNumber) ??
+                    'Enter the code sent to ${widget.phoneNumber}',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -98,23 +104,26 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
               PrimaryPillButton(
-                label: 'Verify',
+                label: l10n?.otpVerify ?? 'Verify',
                 isLoading: isLoading,
                 onPressed: _verify,
               ),
               const SizedBox(height: AppSpacing.md),
               Center(
                 child: _secondsRemaining > 0
-                    ? Text('Resend code in ${_secondsRemaining}s')
+                    ? Text(
+                        l10n?.otpResendIn(_secondsRemaining) ??
+                            'Resend code in ${_secondsRemaining}s',
+                      )
                     : TextButton(
                         onPressed: _resend,
-                        child: const Text('Resend code'),
+                        child: Text(l10n?.otpResend ?? 'Resend code'),
                       ),
               ),
               Center(
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Change number'),
+                  child: Text(l10n?.otpChangeNumber ?? 'Change number'),
                 ),
               ),
             ],

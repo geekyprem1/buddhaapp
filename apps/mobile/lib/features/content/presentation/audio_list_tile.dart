@@ -83,6 +83,8 @@ class AudioListTile extends StatelessWidget {
         ),
         subtitle: Text(
           _subtitle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.textSecondary,
               ),

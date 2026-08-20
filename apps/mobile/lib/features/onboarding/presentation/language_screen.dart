@@ -142,10 +142,14 @@ class _LanguageCard extends StatelessWidget {
                   children: [
                     Text(
                       option.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     Text(
                       option.native,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],

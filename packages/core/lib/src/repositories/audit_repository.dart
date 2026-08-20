@@ -3,12 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../constants/app_constants.dart';
 import '../constants/firestore_collections.dart';
 import '../models/audit_log.dart';
+import '../utils/repo_guard.dart';
 
 /// Reads `auditLogs/{logId}`. Clients can never write this collection —
 /// Architecture §7 reserves writes for Cloud Functions.
-class AuditRepository {
+class AuditRepository with RepoGuard {
   AuditRepository({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -40,7 +41,9 @@ class AuditRepository {
     if (startAfter != null) {
       query = query.startAfterDocument(startAfter);
     }
-    final snap = await query.get();
-    return snap.docs.map(_fromDoc).toList();
+    return guardedRead('audit.fetchPage', () async {
+      final snap = await query.get();
+      return snap.docs.map(_fromDoc).toList();
+    });
   }
 }

@@ -30,6 +30,9 @@ export 'src/models/teacher.dart';
 // Utils
 export 'src/utils/alarm_schedule.dart';
 export 'src/utils/app_version.dart';
+export 'src/utils/auth_error.dart';
+export 'src/utils/repo_guard.dart';
+export 'src/utils/retry.dart';
 export 'src/utils/timestamp_converter.dart';
 
 // Validators
@@ -45,6 +48,7 @@ export 'src/repositories/contact_repository.dart';
 export 'src/repositories/content_repository.dart';
 export 'src/repositories/events_repository.dart';
 export 'src/repositories/notification_repository.dart';
+export 'src/repositories/progress_repository.dart';
 export 'src/repositories/static_page_repository.dart';
 export 'src/repositories/teacher_repository.dart';
 export 'src/repositories/user_repository.dart';
@@ -52,6 +56,7 @@ export 'src/repositories/user_repository.dart';
 // Services
 export 'src/services/admin_functions_service.dart';
 export 'src/services/analytics_service.dart';
+export 'src/services/error_reporter.dart';
 export 'src/services/auth_functions_service.dart';
 export 'src/services/auth_service.dart';
 export 'src/services/storage_service.dart';

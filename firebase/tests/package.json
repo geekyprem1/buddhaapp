@@ -1,0 +1,13 @@
+{
+  "name": "dhamma-path-rules-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "mocha firestore.rules.test.mjs --timeout 20000"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^11.0.0",
+    "mocha": "^10.8.2"
+  }
+}

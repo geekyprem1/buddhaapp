@@ -21,9 +21,14 @@ class ForceUpdateScreen extends ConsumerWidget {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Column(
-              children: [
-                const Spacer(),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: AppSpacing.xl),
                 const Icon(
                   Icons.system_update_alt,
                   size: 72,
@@ -55,7 +60,7 @@ class ForceUpdateScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
-                const Spacer(),
+                const SizedBox(height: AppSpacing.xl),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -63,7 +68,11 @@ class ForceUpdateScreen extends ConsumerWidget {
                     child: Text(l10n?.forceUpdateButton ?? 'Update'),
                   ),
                 ),
-              ],
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),

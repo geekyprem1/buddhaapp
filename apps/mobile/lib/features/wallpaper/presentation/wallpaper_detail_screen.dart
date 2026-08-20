@@ -119,7 +119,11 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text(_item.title.resolve(language)),
+        title: Text(
+          _item.title.resolve(language),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       body: Column(
         children: [
@@ -168,7 +172,12 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
                                 imageUrl: _imageUrl!,
                                 itemId: _item.id,
                               ),
-                      child: Text(l10n?.setWallpaperTitle ?? 'Set wallpaper'),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          l10n?.setWallpaperTitle ?? 'Set wallpaper',
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),

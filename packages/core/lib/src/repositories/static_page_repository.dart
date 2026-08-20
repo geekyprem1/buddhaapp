@@ -2,11 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../constants/firestore_collections.dart';
 import '../models/static_page.dart';
+import '../utils/repo_guard.dart';
 
 /// Reads/writes `staticPages/{slug}` (PRD FR-14.4, AR-7.2).
-class StaticPageRepository {
+class StaticPageRepository with RepoGuard {
   StaticPageRepository({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -17,29 +18,37 @@ class StaticPageRepository {
     return StaticPage.fromJson({...doc.data()!, 'slug': doc.id});
   }
 
-  Future<StaticPage?> get(String slug) async {
-    final snap = await _pages.doc(slug).get();
-    if (!snap.exists) return null;
-    return _fromDoc(snap);
-  }
-
-  Stream<StaticPage?> watch(String slug) {
-    return _pages.doc(slug).snapshots().map((snap) {
+  Future<StaticPage?> get(String slug) {
+    return guardedRead('staticPages.get', () async {
+      final snap = await _pages.doc(slug).get();
       if (!snap.exists) return null;
       return _fromDoc(snap);
     });
   }
 
+  Stream<StaticPage?> watch(String slug) {
+    return guardedStream(
+      'staticPages.watch',
+      _pages.doc(slug).snapshots().map((snap) {
+        if (!snap.exists) return null;
+        return _fromDoc(snap);
+      }),
+    );
+  }
+
   Stream<List<StaticPage>> watchAll() {
-    return _pages.snapshots().map(
-      (snap) => snap.docs.map(_fromDoc).toList(),
+    return guardedStream(
+      'staticPages.watchAll',
+      _pages.snapshots().map((snap) => snap.docs.map(_fromDoc).toList()),
     );
   }
 
   Future<void> upsert(StaticPage page) {
-    final data = page.toJson()
-      ..remove('slug')
-      ..['updatedAt'] = DateTime.now();
-    return _pages.doc(page.slug).set(data, SetOptions(merge: true));
+    return guardedWrite('staticPages.upsert', () {
+      final data = page.toJson()
+        ..remove('slug')
+        ..['updatedAt'] = DateTime.now();
+      return _pages.doc(page.slug).set(data, SetOptions(merge: true));
+    });
   }
 }

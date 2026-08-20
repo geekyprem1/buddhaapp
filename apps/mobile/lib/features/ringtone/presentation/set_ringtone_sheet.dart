@@ -133,10 +133,13 @@ Future<void> applyRingtoneKind({
       }
       return;
     }
+    await ErrorReporter.instance
+        .record(e, StackTrace.current, reason: 'ringtone.set');
     messenger.showSnackBar(
       SnackBar(content: Text(_setErrorMessage(e, l10n))),
     );
-  } catch (e) {
+  } catch (e, st) {
+    await ErrorReporter.instance.record(e, st, reason: 'ringtone.set');
     messenger.showSnackBar(
       SnackBar(content: Text(_setErrorMessage(e, l10n))),
     );
@@ -161,6 +164,11 @@ Future<void> completePendingRingtoneSet({
           result: 'denied',
         );
     if (!context.mounted) return;
+    await ErrorReporter.instance.record(
+      StateError('write_settings_denied'),
+      StackTrace.current,
+      reason: 'ringtone.permission_denied',
+    );
     messenger.showSnackBar(
       SnackBar(
         content: Text(
@@ -186,8 +194,9 @@ Future<void> completePendingRingtoneSet({
         ),
       ),
     );
-  } catch (e) {
+  } catch (e, st) {
     ref.read(pendingRingtoneProvider.notifier).clear();
+    await ErrorReporter.instance.record(e, st, reason: 'ringtone.set');
     if (!context.mounted) return;
     messenger.showSnackBar(
       SnackBar(content: Text(_setErrorMessage(e, l10n))),

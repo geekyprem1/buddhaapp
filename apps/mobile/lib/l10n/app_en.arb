@@ -163,6 +163,34 @@
   "statusPickCamera": "Camera",
   "statusExportFailed": "Could not export the status.",
 
+  "otpScreenTitle": "Verify OTP",
+  "otpEnterCode": "Enter the code sent to {phone}",
+  "@otpEnterCode": {
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+  "otpVerify": "Verify",
+  "otpResendIn": "Resend code in {seconds}s",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "otpResend": "Resend code",
+  "otpChangeNumber": "Change number",
+
+  "authErrorInvalidPhone": "That phone number looks invalid.",
+  "authErrorInvalidOtp": "Invalid code. Please try again.",
+  "authErrorSessionExpired": "That code expired. Request a new one.",
+  "authErrorTooManyAttempts": "Too many attempts. Please try again later.",
+  "authErrorNetwork": "Network error. Check your connection and retry.",
+  "authErrorPlayIntegrity": "App verification failed. Please try again.",
+  "authErrorUserDisabled": "This account has been disabled.",
+  "authErrorGeneric": "Something went wrong. Please try again.",
+  "offlineBanner": "You are offline. Some actions may fail.",
+  "errorLoadFailed": "Could not load content.",
+
   "forceUpdateTitle": "Update required",
   "forceUpdateBody": "A newer version of Dhamma Path is required to continue.",
   "forceUpdateButton": "Update",

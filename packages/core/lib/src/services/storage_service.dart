@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../utils/repo_guard.dart';
+
 /// Cloud Storage layout from Architecture §6.4. Keep path construction
 /// here so admin uploads and Functions agree on every key.
 abstract class StoragePaths {
@@ -37,10 +39,10 @@ class StorageUpload {
 
   /// 0.0–1.0. Emits 0 while the total size is still unknown.
   Stream<double> get progress => _task.snapshotEvents.map((snap) {
-    final total = snap.totalBytes;
-    if (total <= 0) return 0.0;
-    return snap.bytesTransferred / total;
-  });
+        final total = snap.totalBytes;
+        if (total <= 0) return 0.0;
+        return snap.bytesTransferred / total;
+      });
 
   Future<String> whenComplete() async {
     final snap = await _task;
@@ -51,9 +53,9 @@ class StorageUpload {
 }
 
 /// Resumable upload / delete / signed URL wrapper (TASKS T0.14).
-class StorageService {
+class StorageService with RepoGuard {
   StorageService({FirebaseStorage? storage})
-    : _storage = storage ?? FirebaseStorage.instance;
+      : _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseStorage _storage;
 
@@ -71,15 +73,20 @@ class StorageService {
   }
 
   Future<String> getDownloadUrl(String path) {
-    return _storage.ref(path).getDownloadURL();
+    return guardedRead(
+      'storage.getDownloadUrl',
+      () => _storage.ref(path).getDownloadURL(),
+    );
   }
 
-  Future<void> delete(String path) async {
-    try {
-      await _storage.ref(path).delete();
-    } on FirebaseException catch (e) {
-      if (e.code == 'object-not-found') return;
-      rethrow;
-    }
+  Future<void> delete(String path) {
+    return guardedWrite('storage.delete', () async {
+      try {
+        await _storage.ref(path).delete();
+      } on FirebaseException catch (e) {
+        if (e.code == 'object-not-found') return;
+        rethrow;
+      }
+    });
   }
 }

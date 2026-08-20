@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../constants/firestore_collections.dart';
+import '../services/error_reporter.dart';
 
 /// Counter event types. Names match the `EVENT_TYPE_TO_COUNTER` map in
 /// `functions/src/lib/content.ts` — `aggregateEvents` folds these into each
@@ -13,7 +14,7 @@ enum ContentEventType { view, download, share, play }
 /// create-only for signed-in users; no read/update/delete.
 class EventsRepository {
   EventsRepository({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -23,12 +24,20 @@ class EventsRepository {
     required String collection,
     required String itemId,
     required ContentEventType type,
-  }) {
-    return _firestore.collection(FirestoreCollections.events).add({
-      'collection': collection,
-      'itemId': itemId,
-      'type': type.name,
-      'createdAt': DateTime.now(),
-    });
+  }) async {
+    try {
+      await _firestore.collection(FirestoreCollections.events).add({
+        'collection': collection,
+        'itemId': itemId,
+        'type': type.name,
+        'createdAt': DateTime.now(),
+      });
+    } catch (error, stack) {
+      await ErrorReporter.instance.record(
+        error,
+        stack,
+        reason: 'events.record',
+      );
+    }
   }
 }

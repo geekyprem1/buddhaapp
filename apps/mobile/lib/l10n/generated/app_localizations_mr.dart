@@ -423,6 +423,62 @@ class AppLocalizationsMr extends AppLocalizations {
   String get statusExportFailed => 'स्टेटस एक्सपोर्ट होऊ शकला नाही.';
 
   @override
+  String get otpScreenTitle => 'OTP सत्यापित करा';
+
+  @override
+  String otpEnterCode(String phone) {
+    return '$phone वर पाठवलेला कोड टाका';
+  }
+
+  @override
+  String get otpVerify => 'सत्यापित करा';
+
+  @override
+  String otpResendIn(int seconds) {
+    return '$seconds सेकंदात पुन्हा पाठवा';
+  }
+
+  @override
+  String get otpResend => 'कोड पुन्हा पाठवा';
+
+  @override
+  String get otpChangeNumber => 'नंबर बदला';
+
+  @override
+  String get authErrorInvalidPhone => 'हा फोन नंबर चुकीचा वाटतो.';
+
+  @override
+  String get authErrorInvalidOtp => 'चुकीचा कोड. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get authErrorSessionExpired => 'कोड कालबाह्य झाला. नवीन कोड मागा.';
+
+  @override
+  String get authErrorTooManyAttempts =>
+      'खूप वेळा प्रयत्न झाले. नंतर पुन्हा प्रयत्न करा.';
+
+  @override
+  String get authErrorNetwork =>
+      'नेटवर्क त्रुटी. कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.';
+
+  @override
+  String get authErrorPlayIntegrity =>
+      'अॅप पडताळणी अयशस्वी. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get authErrorUserDisabled => 'हे खाते बंद करण्यात आले आहे.';
+
+  @override
+  String get authErrorGeneric => 'काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get offlineBanner =>
+      'तुम्ही ऑफलाइन आहात. काही क्रिया अयशस्वी होऊ शकतात.';
+
+  @override
+  String get errorLoadFailed => 'सामग्री लोड होऊ शकली नाही.';
+
+  @override
   String get forceUpdateTitle => 'अपडेट आवश्यक आहे';
 
   @override

@@ -67,7 +67,8 @@ Future<void> _set(
           id: itemId,
           target: target.channelValue,
         );
-  } catch (e) {
+  } catch (e, st) {
+    await ErrorReporter.instance.record(e, st, reason: 'wallpaper.set');
     messenger.showSnackBar(
       SnackBar(
         content: Text(l10n?.wallpaperSetFailed ?? 'Could not set wallpaper.'),

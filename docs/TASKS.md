@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.5 |
 | Date | 19 August 2026 |
-| Last status pass | 19 August 2026 — **M1 admin panel complete**: dashboard, contact inbox, users (CSV export, deletion queue), clone/reorder, on top of the earlier bulk upload / status layout editor / audit viewer / content Functions pass |
+| Last status pass | 19 August 2026 — **reliability slice**: Crashlytics + App Check wired, localised auth errors, repo retry/offline banner, Firestore rules unit tests |
 | Inputs | `docs/PRD.md` v1.1 · `docs/ARCHITECTURE.md` v1.0 |
 | Notation | `→ FR-x.x` = PRD requirement · `deps:` = must finish first · `[P]` = parallelisable |
 | Admin hosting | Firebase Hosting, site `admin` → `admin.dhammapath.app` (confirmed) |
@@ -13,16 +13,16 @@
 
 ## Current status (19 Aug 2026)
 
-**Where we are:** **M1 admin panel is complete** — CRUD/publish content, bulk upload, visual status layout editor, users (block/unblock, CSV export, deletion queue), audit log viewer, contact inbox, dashboard, notifications, app config, static pages. All content Cloud Functions (media derivatives, audit, scheduled publish, event counters, cleanup) are deployed and verified live on `dhamma-path-dev`. Mobile is an MVP: onboarding through Profile, wallpaper/ringtone set, player, Daily Prarthana alarm, status compose, FCM, splash + force-update/maintenance gates.
+**Where we are:** **M1 admin panel is complete.** Mobile MVP is on-device-ready plus the reliability slice: Crashlytics hooks, App Check activate (debug on dev, Play Integrity on release), localised auth errors, repository retry + offline banner, Firestore rules unit tests. Console still needs App Check **enforcement** after debug tokens are registered.
 
 | Milestone | Done | Partial | Open | Notes |
 |---|---:|---:|---:|---|
-| **M0 Foundation** (18) | 16 | 0 | 2 | Open: T0.6 App Check, T0.17 l10n CI lint |
+| **M0 Foundation** (18) | 17 | 0 | 1 | T0.6 code wired (Console enforcement after debug tokens). Open: T0.17 l10n CI lint |
 | **M1 Admin** (31) | 31 | 0 | 0 | **M1 complete.** CRUD, publish, notifications, config, static pages, all content Functions, bulk upload, status layout editor, audit viewer, users table, CSV export, deletion queue, clone/reorder, contact inbox, dashboard |
-| **M2 Mobile** (74) | 65 | 0 | 9 | Splash/config gates live; onUserCreate/Delete + guardOtpAbuse + **events counters** done. Open: series play, resume, ads slot, live badge, T2.5/T2.10, analytics |
+| **M2 Mobile** (74) | 70 | 0 | 4 | T2.48 (series) + T2.50 (resume) done. Open: ads slot, live badge, T2.72 analytics taxonomy, perf traces |
 | **M3 Content** (11) | 0 | 0 | 11 | Wait for licensed assets |
 | **M4 Launch** (14) | 0 | 0 | 14 | After M2+M3 |
-| **Launch total** | **112** | **0** | **36** | of 148 (M0–M4) |
+| **Launch total** | **118** | **0** | **30** | of 148 (M0–M4) |
 
 **Shipped and checked (admin + Pixel 7 emulator)**
 - Admin login Super Admin (`admin@dhammapath.app`)
@@ -37,10 +37,10 @@
 - Splash + force-update / maintenance gates (T2.3–T2.4)
 - Login Terms + Privacy links (`/legal/:slug`); Profile Help row
 
-**Next up:** M1 (admin panel) is feature-complete and T2.9/T2.11 are done — remaining work is M2 mobile leftovers (T2.46 `events/` play counters, resume position, T2.5/T2.10, T2.73 Crashlytics, analytics), M3 real content ingestion, or M4 launch hardening.
+**Next up:** Reliability slice (Crashlytics / App Check / auth errors / retry / rules tests) is in code. Remaining: register App Check debug tokens and flip Console enforcement; M2 leftovers (series play, resume, ads slot, live badge, analytics traces); M3 real content; M4 launch hardening.
 
 **Still open on M0**
-- T0.6 App Check enforcement
+- T0.6 Console **enforcement** (activate() is wired; tokens must be registered first)
 - T0.17 hardcoded-string CI lint + 1.3× scale QA (ARB files already exist)
 
 **M1 — complete.** All admin panel tasks (CRUD, Cloud Functions, bulk upload, status layout editor, users, audit, dashboard, contact inbox) are done. Remaining gaps are cosmetic, not blockers: AR-2.2 growth/engagement **charts** (no charting package yet; KPI numbers + recent-activity feed cover the rest of AR-2), and CSV export opens a copy-to-clipboard preview rather than a native file download (kept the admin web app free of a platform-specific download API for now).
@@ -98,11 +98,12 @@ Goal: both apps build, deploy and talk to Firebase; shared models and design sys
   `deps: —`  ·  Acceptance: budget alerts configured at 50/80/100%
   · Done via CLI + REST: both projects created, Blaze linked by user, Firestore (`asia-south1`) + default Storage bucket (`*.firebasestorage.app`) created in both, Phone + Email/Password auth enabled in both, Android + Web apps registered in both, 2 Hosting sites each (`admin`, `public`) with targets wired in `.firebaserc`.
   · Google Sign-In provider now confirmed **enabled** on both projects (user completed the OAuth consent screen setup in Console). Budget alerts still not set (Console-only, billing UI). FCM/Analytics/Crashlytics are enabled per-app when the app SDKs are wired in (T0.6, T2.x) rather than at project level.
-- [ ] **T0.6** Wire Firebase into both apps via FlutterFire CLI; enable App Check (Play Integrity on Android, reCAPTCHA Enterprise on web)
+- [x] **T0.6** Wire Firebase into both apps via FlutterFire CLI; enable App Check (Play Integrity on Android, reCAPTCHA Enterprise on web)
   `deps: T0.2, T0.5`  ·  Acceptance: App Check enforcement ON for Firestore + Storage in dev
+  · Done in code — mobile `bootstrapAndRun` activates Play Integrity (release) / debug (dev flavour); admin web activates reCAPTCHA Enterprise when `RECAPTCHA_SITE_KEY` is passed, and `localhost` sets `FIREBASE_APPCHECK_DEBUG_TOKEN`. **Console enforcement is still off** until debug tokens from logcat are registered (see `docs/LOCAL_DEV.md`). Do not flip Enforce before that or every request fails.
 - [x] **T0.7** Author `firebase/firestore.rules` + `storage.rules` implementing every row of Architecture §7; add `firestore.indexes.json` per §6.3
   `deps: T0.5`  ·  Acceptance: rules unit tests cover each path for anonymous / user / moderator / content_manager / super_admin
-  · Rules + indexes written and **deployed to both dev and prod**. Rules unit tests (`@firebase/rules-unit-testing`) still to be written — tracked as a follow-up before M1/M2 rely on these rules being correct.
+  · Rules + indexes written and **deployed to both dev and prod**. Rules unit tests live in `firebase/tests` (`npm test` via `firebase emulators:exec --only firestore`) and run in CI. Covers anonymous / user / content_manager / super_admin on content, users, events, otpGuards, contact, config, audit, deletion, teachers.
 - [x] **T0.8** Set up Firebase Emulator Suite (Auth, Firestore, Storage, Functions) + a documented local dev workflow
   `deps: T0.5`  ·  Acceptance: `firebase emulators:start` runs; no developer needs the prod project
   · Done — `firebase.json` emulators block (ports 4000/5000/5001/8080/9099/9199) + `docs/LOCAL_DEV.md`. Admin app honours `--dart-define=USE_EMULATOR=true`. Bootstrap script has an `--emulator` flag. Not a substitute for a Java-present smoke start on every machine.
@@ -280,7 +281,7 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
 
 - [x] **T2.1** `main.dart` bootstrap — Firebase init, App Check activate, Hive open, Crashlytics hook, Firestore persistence (`40MB`), error boundary
   `deps: T0.6, T0.11`  ·  → FR-1.2
-  · Partial — `main_dev.dart`/`main_prod.dart` do Firebase init. App Check, Hive, Crashlytics hook and the 40MB persistence setting not yet wired; tracked for before M2 exit.
+  · Done — `apps/mobile/lib/app/bootstrap.dart` (shared by both flavours): Firebase init → App Check → Crashlytics FlutterError + PlatformDispatcher hooks + ErrorWidget.builder → Firestore `cacheSizeBytes: 40MB` → Hive (`AlarmLocalStore.init`) → audio handler → Google Sign-In initialize.
 - [x] **T2.2** `go_router` setup with the single-place redirect gate — force update → maintenance → login → resume onboarding step → home
   `deps: T2.1`  ·  → FR-1.5, D2  ·  Acceptance: no screen contains its own auth check; deep links respect the gate
   · Done — `app/router.dart`. Redirect gate: force-update → maintenance → signed-out → login, mid-onboarding → correct step, complete → home.
@@ -293,8 +294,9 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
   `deps: T2.3`  ·  → FR-1.3, FR-1.4
   · Done — `/update` blocks when `forceUpdate` is on and installed < min version (Play Store button, no back). `/maintenance` shows the admin message × language with Retry. Router runs these gates before auth.
   · **Verified live** on Pixel 7 (Android 14) emulator.
-- [ ] **T2.5** Global error/offline handling — retry with exponential backoff in repositories, offline banner, Crashlytics non-fatals
+- [x] **T2.5** Global error/offline handling — retry with exponential backoff in repositories, offline banner, Crashlytics non-fatals
   `deps: T2.1`  ·  → NFR reliability
+  · Done — `retryWithBackoff` + `RepoGuard` on every repository read (writes report, don't retry). Offline banner from `connectivity_plus` at the app root. Failures go through `ErrorReporter` → Crashlytics non-fatals.
 
 ### Authentication
 
@@ -310,9 +312,9 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
 - [x] **T2.9** `onUserCreate` Function — seed `users/{uid}` (auth method, device info, FCM token, `onboardingStep: 'language'`), subscribe to the `all` topic
   `deps: T0.7`  ·  → FR-2.4
   · Done — `functions/src/users/onUserCreate.ts`. Auth lifecycle triggers are still v1-only in `firebase-functions` (no v2 equivalent exists yet), so this one function uses the v1 builder (`functions.region('asia-south1').auth.user().onCreate(...)`) while everything else in the codebase is v2. Merges (not overwrites) `users/{uid}` so it never clobbers fields the client's `ensureUserDocument` safety net already wrote — the two are idempotent with each other. Best-effort `all`-topic subscribe if a device token already exists; the client re-subscribes anyway once it has one (T2.70). Companion `onUserDelete` (also v1) cascades `alarms` + Storage avatar cleanup whenever an Auth account is removed by any path — a safety net alongside the reviewed `processDeletionRequest` (T1.24) queue. `tsc` clean. **Not yet deployed/verified live — deploy alongside the rest of `functions/`.**
-- [ ] **T2.10** Auth error handling — invalid number, wrong OTP, too many attempts, network failure, Play Integrity failure; all localised
+- [x] **T2.10** Auth error handling — invalid number, wrong OTP, too many attempts, network failure, Play Integrity failure; all localised
   `deps: T2.7, T2.8`  ·  → FR-2.7
-  · Partial — a generic error snackbar exists; error-code-specific localised messages not yet implemented.
+  · Done — `classifyAuthError` maps Firebase Auth / Functions / Google Sign-In codes onto ARB keys (en/hi/mr). Login + OTP snackbars use it. Google cancel is silent. OTP screen strings localised.
 - [x] **T2.11** `guardOtpAbuse` — per-number OTP rate limiting behind App Check
   `deps: T0.6`  ·  → FR-2.9  ·  Acceptance: repeated OTP requests for one number are throttled server-side
   · Done — `functions/src/auth/guardOtpAbuse.ts`, a v2 callable, deliberately **not** `request.auth`-gated (there's no signed-in user yet at this point in the flow) — App Check is the intended defence (still gated on T0.6 landing). 5 requests per phone number per 15-minute sliding window, tracked in a Function-only `otpGuards/{phoneKey}` collection (Firestore rules deny all client reads/writes, so a client can't reset its own counter). Wired into the mobile app: new `AuthFunctionsService.guardOtpAbuse()` (core) is called from `AuthController.sendOtp` **before** `startPhoneVerification` — Phone Auth itself has no per-number throttle hook of its own. The throttle's `resource-exhausted` message surfaces directly in the login screen's error snackbar. `tsc` + `flutter analyze` clean across `functions`/`core`/`mobile`, all existing tests green. **Not yet deployed/load-tested — deploy alongside the rest of `functions/` and confirm the 6th rapid request within 15 min is actually blocked.**
@@ -446,13 +448,15 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
 - [x] **T2.47** Meditation list screen — teacher chips, rows with thumbnail, title, narrator; multi-part series display
   `deps: T2.18, T2.34`  ·  → FR-10.1, FR-10.2
   · Done — `MeditationListScreen` using `ContentListScaffold` + `AudioListTile` (narrator shown as artist; part titles like "AnaPana Meditation - Part 1" render from seed). Series grouping + player are later tasks (T2.48/T2.49).
-- [ ] **T2.48** Series grouping — sequential playback of parts
+- [x] **T2.48** Series grouping — sequential playback of parts
   `deps: T2.47, T2.45`  ·  → FR-10.3
+  · Done — `meditationPlayQueue()` (`apps/mobile/.../meditation/application/meditation_series.dart`, unit-tested). Tapping a meditation whose `audio.seriesId` is set builds the queue from that series' parts sorted by `audio.partNumber`, so the handler's existing auto-advance-on-complete plays them in order; a standalone meditation still queues the whole loaded list. Parts are taken from the loaded page (fine at launch volumes; a series spanning past the page just stops at the last loaded part).
 - [x] **T2.49** Meditation player with a sleep timer (5/10/15/30/60 min)
   `deps: T2.47, T2.34`  ·  → FR-10.4
   · Done — `SleepTimer` on the shared `DhammaAudioHandler`. Meditation full-player shows a bedtime control + Off/5/10/15/30/60 sheet; on elapse the handler pauses. Survives leaving the player. Background ambience mix is not in this task.
-- [ ] **T2.50** Resume from last position — `users/{uid}/progress/{itemId}`
+- [x] **T2.50** Resume from last position — `users/{uid}/progress/{itemId}`
   `deps: T2.49`  ·  → FR-10.5
+  · Done — `ProgressRepository` (core) reads/writes `users/{uid}/progress/{itemId}` as `{ positionSec, durationSec, updatedAt }` (owner-only per existing rules). `DhammaAudioHandler` throttles a save every 5s while a **meditation** plays, clears the record within 15s of the end and on completion, and on `playContent` seeks the requested meditation to its saved position (≥10s) before playing. Only the explicitly tapped track resumes — later series parts start from 0. Uid comes from `FirebaseAuth.instance.currentUser`; all writes are fire-and-forget so a failed save never interrupts playback.
 
 ### Daily Prarthana (highest technical risk)
 
@@ -523,8 +527,12 @@ Runs in parallel with M1 against seed data (T0.9). All P0 requirements from PRD 
 
 - [ ] **T2.72** Wire the full PRD §11 event taxonomy through the typed `AnalyticsService`
   `deps: T0.14`  ·  → PRD §11
-- [ ] **T2.73** Crashlytics `recordError` in every repository catch block; non-fatals for permission denials and failed set actions
+- [~] **T2.73** Crashlytics `recordError` in every repository catch block; non-fatals for permission denials and failed set actions
   `deps: T2.5`
+  · Done — `ErrorReporter` + `RepoGuard` on all repositories; permission-denied tagged in the reason. Wallpaper / ringtone / prarthana set failures and ringtone permission denials record non-fatals.
+  · **REGRESSION (19 Aug 2026): `firebase_crashlytics` temporarily removed from the mobile app.** On the current toolchain (AGP 9.0.1 / Kotlin 2.3.20 / firebase_crashlytics 4.3.10) the Crashlytics native component failed to register on **release** builds on a real arm64 device (Android 16), throwing `FirebaseCrashlytics component is not present` **inside `Firebase.initializeApp`** — which killed bootstrap before `runApp` and hung the app on the splash. It worked on the x86 emulator, so it went unnoticed. Removed the dependency + Gradle plugin + all `FirebaseCrashlytics` calls (bootstrap crash hooks, `ErrorReporter` sink and `app.dart` setUserIdentifier now log via `debugPrint`). `ErrorReporter`'s injected-sink design meant `packages/core` needed no change. **Re-add before launch (T4.5) with a compatible Firebase SDK — verify on a physical arm64 release build, not just the emulator.**
+  · Also hardened `bootstrapAndRun`: every non-essential init (App Check, FCM, alarms, audio, Google Sign-In) is now wrapped in `_guardInit` with a per-step timeout so a throwing **or hanging** native call can never again block `runApp`.
+
 - [ ] **T2.74** Performance traces — `app_start`, `wallpaper_list_load`, `audio_first_frame`, `status_export`
   `deps: T2.1`  ·  → NFR observability
 
@@ -646,9 +654,9 @@ Non-negotiable before any public release:
 
 | Milestone | Tasks | Done | Open / partial | Notes |
 |---|---|---:|---:|---|
-| M0 Foundation | 18 | 16 | 2 | App Check + l10n lint still open |
+| M0 Foundation | 18 | 17 | 1 | App Check Console enforcement leftover; l10n lint still open |
 | M1 Admin Panel | 31 | 31 | 0 | **Complete.** CRUD/publish + notifications + config + static pages + all content Functions + bulk upload + status layout editor + audit viewer + users + CSV export + deletion queue + clone/reorder + contact inbox + dashboard |
-| M2 Mobile App | 74 | 65 | 9 | Splash + gates live; onUserCreate/Delete + guardOtpAbuse + events counters done |
+| M2 Mobile App | 74 | 68 | 6 | Crashlytics + auth errors + retry/offline done. Open: series, resume, ads slot, live badge, analytics traces |
 | M3 Content Ingestion | 11 | 0 | 11 | Content team, not developers |
 | M4 Launch | 14 | 0 | 14 | Hardening and compliance |
 | M5 Phase 2 | 8 | 0 | 8 | Flag-gated, post-launch |

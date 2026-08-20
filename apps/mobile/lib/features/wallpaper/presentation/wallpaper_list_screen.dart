@@ -36,18 +36,30 @@ class WallpaperListScreen extends ConsumerWidget {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: FilledButton(
-                onPressed: () {
-                  final url = item.mediaUrl ?? item.thumbUrl;
-                  if (url == null) return;
-                  showSetWallpaperSheet(
-                    context: context,
-                    ref: ref,
-                    imageUrl: url,
-                    itemId: item.id,
-                  );
-                },
-                child: Text(l10n?.setWallpaperTitle ?? 'Set wallpaper'),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 40),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: () {
+                    final url = item.mediaUrl ?? item.thumbUrl;
+                    if (url == null) return;
+                    showSetWallpaperSheet(
+                      context: context,
+                      ref: ref,
+                      imageUrl: url,
+                      itemId: item.id,
+                    );
+                  },
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(l10n?.setWallpaperTitle ?? 'Set wallpaper'),
+                  ),
+                ),
               ),
             ),
           ),

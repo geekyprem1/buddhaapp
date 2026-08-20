@@ -22,10 +22,24 @@ abstract class FieldValidators {
     return null;
   }
 
+  /// Strips spaces, dashes, `+91` / `91` / leading `0` so a paste into the
+  /// login field becomes a 10-digit local number.
+  static String normalizeIndianMobile(String raw) {
+    var digits = raw.replaceAll(RegExp(r'\D'), '');
+    if (digits.startsWith('91') && digits.length > 10) {
+      digits = digits.substring(2);
+    }
+    if (digits.startsWith('0') && digits.length == 11) {
+      digits = digits.substring(1);
+    }
+    if (digits.length > 10) digits = digits.substring(0, 10);
+    return digits;
+  }
+
   /// Indian mobile number: exactly 10 digits, starting 6-9 (no country code
   /// — the `+91` prefix is a fixed UI element, not part of the stored value).
   static String? phone(String? value) {
-    final v = value?.trim() ?? '';
+    final v = normalizeIndianMobile(value ?? '');
     if (v.isEmpty) return 'error_phone_required';
     if (!_phonePattern.hasMatch(v)) return 'error_phone_invalid';
     return null;

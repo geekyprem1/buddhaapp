@@ -70,6 +70,11 @@ class _RingtoneListScreenState extends ConsumerState<RingtoneListScreen>
           language: language,
           isPlaying: playing,
           trailing: FilledButton.tonal(
+            style: FilledButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
             onPressed: url == null
                 ? null
                 : () => showSetRingtoneSheet(

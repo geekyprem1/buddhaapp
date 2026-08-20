@@ -102,7 +102,7 @@ class _TeacherSelectScreenState extends ConsumerState<TeacherSelectScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: AppSpacing.md,
                       mainAxisSpacing: AppSpacing.md,
-                      childAspectRatio: 0.85,
+                      childAspectRatio: 0.78,
                       children: [
                         for (final teacher in filtered)
                           _TeacherCard(
@@ -183,6 +183,8 @@ class _TeacherCard extends StatelessWidget {
               ),
               child: Text(
                 name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),

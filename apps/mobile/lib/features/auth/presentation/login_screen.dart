@@ -1,14 +1,15 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../widgets/brand_header.dart';
 import '../application/auth_controller.dart';
+import '../application/auth_error_messages.dart';
 
 /// Login screen (PRD FR-2.1) — logo, tagline, phone input, OTP + Google
 /// sign-in. No skip/guest affordance exists here by design (PRD D2).
@@ -30,14 +31,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _continueWithOtp() async {
-    final phone = _phoneController.text.trim();
+    final phone = FieldValidators.normalizeIndianMobile(
+      _phoneController.text,
+    );
     final error = FieldValidators.phone(phone);
     setState(() => _errorKey = error);
     if (error != null) return;
 
-    final sent = await ref
-        .read(authControllerProvider.notifier)
-        .sendOtp('+91$phone');
+    final sent =
+        await ref.read(authControllerProvider.notifier).sendOtp('+91$phone');
     if (!mounted) return;
     if (sent) {
       context.push(AppRoutes.otp, extra: '+91$phone');
@@ -55,11 +57,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = authState.isLoading;
 
     ref.listen(authControllerProvider, (previous, next) {
-      if (next.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_mapAuthError(next.error))),
-        );
-      }
+      if (!next.hasError) return;
+      final failure = classifyAuthError(next.error!);
+      if (!failure.shouldShow) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authErrorMessage(l10n, failure))),
+      );
     });
 
     return Scaffold(
@@ -69,58 +72,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              const SizedBox(height: AppSpacing.xxl),
-              const Icon(
-                Icons.self_improvement,
-                size: 56,
-                color: AppColors.primary,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                l10n?.appName ?? AppConstants.appName,
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                l10n?.tagline ?? AppConstants.tagline,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
               const SizedBox(height: AppSpacing.xl),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.md,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.divider),
-                      borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(12),
-                      ),
-                    ),
-                    child: const Text('+91'),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 10,
-                      decoration: InputDecoration(
-                        hintText: l10n?.mobileNumberHint,
-                        counterText: '',
-                        errorText: _errorKey == null
-                            ? null
-                            : _mapValidationError(_errorKey!),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.horizontal(
-                            right: Radius.circular(12),
+              const BrandHeader(compact: true),
+              const SizedBox(height: AppSpacing.xl),
+              TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                autofillHints: const [AutofillHints.telephoneNumberNational],
+                inputFormatters: const [_IndianMobileFormatter()],
+                onChanged: (_) {
+                  if (_errorKey != null) {
+                    setState(() => _errorKey = null);
+                  }
+                },
+                onSubmitted: (_) => _continueWithOtp(),
+                decoration: InputDecoration(
+                  hintText: l10n?.mobileNumberHint,
+                  counterText: '',
+                  errorMaxLines: 2,
+                  errorText: _errorKey == null
+                      ? null
+                      : _mapValidationError(_errorKey!),
+                  prefixIcon: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '+91',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
-                        ),
-                      ),
                     ),
                   ),
-                ],
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 56,
+                    maxWidth: 56,
+                    minHeight: 48,
+                    maxHeight: 48,
+                  ),
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               PrimaryPillButton(
@@ -132,8 +121,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               OutlinedButton.icon(
                 onPressed: isLoading ? null : _continueWithGoogle,
                 icon: const Icon(Icons.g_mobiledata),
-                label: Text(
-                  l10n?.loginContinueWithGoogle ?? 'Continue with Google',
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    l10n?.loginContinueWithGoogle ?? 'Continue with Google',
+                  ),
                 ),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(
@@ -145,53 +137,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text.rich(
-                TextSpan(
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    l10n?.loginLegalPrefix ??
+                        'By continuing you agree to the ',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                   ),
-                  children: [
-                    TextSpan(
-                      text: l10n?.loginLegalPrefix ??
-                          'By continuing you agree to the ',
+                  InkWell(
+                    onTap: () => context.push(
+                      '${AppRoutes.legal}/${StaticPageSlugs.terms}',
                     ),
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.baseline,
-                      baseline: TextBaseline.alphabetic,
-                      child: InkWell(
-                        onTap: () => context.push(
-                          '${AppRoutes.legal}/${StaticPageSlugs.terms}',
-                        ),
-                        child: Text(
-                          l10n?.profileTermsConditions ?? 'Terms',
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    child: Text(
+                      l10n?.profileTermsConditions ?? 'Terms',
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    TextSpan(text: l10n?.loginLegalAnd ?? ' and '),
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.baseline,
-                      baseline: TextBaseline.alphabetic,
-                      child: InkWell(
-                        onTap: () => context.push(
-                          '${AppRoutes.legal}/${StaticPageSlugs.privacy}',
+                  ),
+                  Text(
+                    l10n?.loginLegalAnd ?? ' and ',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
                         ),
-                        child: Text(
-                          l10n?.profilePrivacyPolicy ?? 'Privacy Policy',
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                  ),
+                  InkWell(
+                    onTap: () => context.push(
+                      '${AppRoutes.legal}/${StaticPageSlugs.privacy}',
+                    ),
+                    child: Text(
+                      l10n?.profilePrivacyPolicy ?? 'Privacy Policy',
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const TextSpan(text: '.'),
-                  ],
-                ),
-                textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    '.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -211,35 +204,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return key;
     }
   }
+}
 
-  String _mapAuthError(Object? error) {
-    // FR-2.9 — the `guardOtpAbuse` rate-limit throws this before Phone Auth
-    // even starts; its message already tells the user how long to wait.
-    if (error is FirebaseFunctionsException) {
-      if (error.code == 'resource-exhausted') {
-        return error.message ?? 'Too many attempts. Please try again later.';
-      }
-      return 'Something went wrong. Please try again.';
-    }
-    // FR-2.7 — surface actionable messages for the common Firebase Auth
-    // failure codes rather than a single generic string.
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'invalid-phone-number':
-          return 'That phone number looks invalid.';
-        case 'too-many-requests':
-          return 'Too many attempts. Please try again later.';
-        case 'network-request-failed':
-          return 'Network error. Check your connection and retry.';
-        case 'quota-exceeded':
-          return 'SMS quota exceeded. Please try again later.';
-        case 'app-not-authorized':
-        case 'missing-client-identifier':
-          return 'App verification failed. Please try again.';
-        default:
-          return error.message ?? 'Something went wrong. Please try again.';
-      }
-    }
-    return 'Something went wrong. Please try again.';
+/// Keeps the login field as 10 local digits even if the user pastes
+/// `+91`, spaces, or a leading `0`.
+class _IndianMobileFormatter extends TextInputFormatter {
+  const _IndianMobileFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = FieldValidators.normalizeIndianMobile(newValue.text);
+    return TextEditingValue(
+      text: digits,
+      selection: TextSelection.collapsed(offset: digits.length),
+    );
   }
 }

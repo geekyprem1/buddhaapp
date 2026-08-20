@@ -34,7 +34,7 @@ class TeacherFilterChipRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: AppSpacing.minTouchTarget,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -56,13 +56,10 @@ class TeacherFilterChipRow extends StatelessWidget {
           Semantics(
             label: 'Add another teacher',
             button: true,
-            child: InkWell(
-              onTap: onAddTeacher,
-              customBorder: const CircleBorder(),
-              child: const CircleAvatar(
-                radius: AppSpacing.minTouchTarget / 2,
-                child: Icon(Icons.add),
-              ),
+            child: IconButton(
+              onPressed: onAddTeacher,
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(Icons.add_circle_outline),
             ),
           ),
         ],
@@ -72,7 +69,11 @@ class TeacherFilterChipRow extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({required this.label, required this.selected, required this.onTap});
+  const _Chip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -81,8 +82,10 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChoiceChip(
-      label: Text(label),
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       selected: selected,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       onSelected: (_) => onTap(),
     );
   }

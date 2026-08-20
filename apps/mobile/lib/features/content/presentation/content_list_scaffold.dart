@@ -3,6 +3,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/generated/app_localizations.dart';
 import '../application/content_list_controller.dart';
 import '../application/teacher_filter_providers.dart';
 
@@ -80,6 +81,7 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final teacherId = ref.watch(contentTeacherFilterProvider(widget.module));
     final chips = ref.watch(selectedTeacherChipsProvider);
     final asyncContent = ref.watch(
@@ -89,7 +91,11 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [if (widget.helpAction != null) widget.helpAction!],
       ),
       body: Column(
@@ -110,7 +116,7 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
             child: asyncContent.when(
               loading: () => _buildLoading(),
               error: (e, _) => ErrorState(
-                message: 'Could not load content.',
+                message: l10n?.errorLoadFailed ?? 'Could not load content.',
                 onRetry: () => ref
                     .read(
                       contentListControllerProvider(

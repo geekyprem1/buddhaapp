@@ -98,9 +98,7 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
             onChanged: (v) {
               setState(() {
                 _everyday = v;
-                _days = v
-                    ? {1, 2, 3, 4, 5, 6, 7}
-                    : {..._days};
+                _days = v ? {1, 2, 3, 4, 5, 6, 7} : {..._days};
               });
             },
           ),
@@ -132,6 +130,8 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
               _prarthanaTitle ??
                   l10n?.prarthanaNoSelection ??
                   'No Prarthana selected',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             trailing: const Text('Choose >'),
             onTap: _pickSong,
@@ -258,7 +258,8 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
         SnackBar(content: Text(l10n?.prarthanaSetSuccess ?? 'Prarthana set.')),
       );
       Navigator.of(context).pop();
-    } catch (_) {
+    } catch (e, st) {
+      await ErrorReporter.instance.record(e, st, reason: 'prarthana.set');
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(

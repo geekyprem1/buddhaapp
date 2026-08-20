@@ -41,54 +41,62 @@ class ContentCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: aspectRatio,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    if (thumbUrl != null)
-                      CachedNetworkImage(
-                        imageUrl: thumbUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => const LoadingShimmer(),
-                        errorWidget: (_, __, ___) => const ColoredBox(
-                          color: AppColors.disabled,
-                          child: Icon(Icons.image_not_supported_outlined),
-                        ),
-                      )
-                    else
-                      const ColoredBox(color: AppColors.disabled),
-                    if (badge != null)
-                      Positioned(top: 8, left: 8, child: badge!),
-                    if (overlay != null)
-                      Positioned.fill(child: overlay!),
-                  ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final bounded = constraints.maxHeight.isFinite;
+            final thumb = _thumbStack();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (bounded)
+                  Expanded(child: thumb)
+                else
+                  AspectRatio(aspectRatio: aspectRatio, child: thumb),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-              ),
-          ],
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                  ),
+              ],
+            );
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _thumbStack() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (thumbUrl != null)
+            CachedNetworkImage(
+              imageUrl: thumbUrl!,
+              fit: BoxFit.cover,
+              placeholder: (_, __) => const LoadingShimmer(),
+              errorWidget: (_, __, ___) => const ColoredBox(
+                color: AppColors.disabled,
+                child: Icon(Icons.image_not_supported_outlined),
+              ),
+            )
+          else
+            const ColoredBox(color: AppColors.disabled),
+          if (badge != null) Positioned(top: 8, left: 8, child: badge!),
+          if (overlay != null) Positioned.fill(child: overlay!),
+        ],
       ),
     );
   }

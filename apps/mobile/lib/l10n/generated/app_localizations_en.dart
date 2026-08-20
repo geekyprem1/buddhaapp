@@ -426,6 +426,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusExportFailed => 'Could not export the status.';
 
   @override
+  String get otpScreenTitle => 'Verify OTP';
+
+  @override
+  String otpEnterCode(String phone) {
+    return 'Enter the code sent to $phone';
+  }
+
+  @override
+  String get otpVerify => 'Verify';
+
+  @override
+  String otpResendIn(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get otpResend => 'Resend code';
+
+  @override
+  String get otpChangeNumber => 'Change number';
+
+  @override
+  String get authErrorInvalidPhone => 'That phone number looks invalid.';
+
+  @override
+  String get authErrorInvalidOtp => 'Invalid code. Please try again.';
+
+  @override
+  String get authErrorSessionExpired => 'That code expired. Request a new one.';
+
+  @override
+  String get authErrorTooManyAttempts =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String get authErrorNetwork =>
+      'Network error. Check your connection and retry.';
+
+  @override
+  String get authErrorPlayIntegrity =>
+      'App verification failed. Please try again.';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled.';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get offlineBanner => 'You are offline. Some actions may fail.';
+
+  @override
+  String get errorLoadFailed => 'Could not load content.';
+
+  @override
   String get forceUpdateTitle => 'Update required';
 
   @override

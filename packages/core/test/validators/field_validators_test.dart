@@ -24,6 +24,20 @@ void main() {
     test('rejects wrong length', () {
       expect(FieldValidators.phone('96254605'), 'error_phone_invalid');
     });
+    test('accepts pasted +91 / spaced numbers', () {
+      expect(FieldValidators.phone('+91 96254 60555'), isNull);
+      expect(FieldValidators.phone('919625460555'), isNull);
+      expect(FieldValidators.phone('09625460555'), isNull);
+    });
+  });
+
+  group('FieldValidators.normalizeIndianMobile', () {
+    test('strips country code and punctuation', () {
+      expect(
+        FieldValidators.normalizeIndianMobile('+91-96254-60555'),
+        '9625460555',
+      );
+    });
   });
 
   group('FieldValidators.emailOptional', () {

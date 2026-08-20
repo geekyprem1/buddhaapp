@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../constants/firestore_collections.dart';
 import '../models/app_config.dart';
 import '../models/home_layout.dart';
+import '../utils/repo_guard.dart';
 
 /// Reads/writes `config/*` (Architecture §6.2, PRD AR-7.1).
-class ConfigRepository {
+class ConfigRepository with RepoGuard {
   ConfigRepository({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -31,30 +32,46 @@ class ConfigRepository {
   }
 
   Stream<AppConfig> watchAppConfig() {
-    return _appConfig.snapshots().map(_fromSnap);
+    return guardedStream(
+      'config.watchAppConfig',
+      _appConfig.snapshots().map(_fromSnap),
+    );
   }
 
-  Future<AppConfig> getAppConfig() async {
-    return _fromSnap(await _appConfig.get());
+  Future<AppConfig> getAppConfig() {
+    return guardedRead(
+      'config.getAppConfig',
+      () async => _fromSnap(await _appConfig.get()),
+    );
   }
 
   Future<void> saveAppConfig(AppConfig config) {
-    final data = config.toJson();
-    data['updatedAt'] = DateTime.now();
-    return _appConfig.set(data, SetOptions(merge: true));
+    return guardedWrite('config.saveAppConfig', () {
+      final data = config.toJson();
+      data['updatedAt'] = DateTime.now();
+      return _appConfig.set(data, SetOptions(merge: true));
+    });
   }
 
   Stream<HomeLayout> watchHomeLayout() {
-    return _homeLayout.snapshots().map(_layoutFromSnap);
+    return guardedStream(
+      'config.watchHomeLayout',
+      _homeLayout.snapshots().map(_layoutFromSnap),
+    );
   }
 
-  Future<HomeLayout> getHomeLayout() async {
-    return _layoutFromSnap(await _homeLayout.get());
+  Future<HomeLayout> getHomeLayout() {
+    return guardedRead(
+      'config.getHomeLayout',
+      () async => _layoutFromSnap(await _homeLayout.get()),
+    );
   }
 
   Future<void> saveHomeLayout(HomeLayout layout) {
-    final data = layout.toJson();
-    data['updatedAt'] = DateTime.now();
-    return _homeLayout.set(data, SetOptions(merge: true));
+    return guardedWrite('config.saveHomeLayout', () {
+      final data = layout.toJson();
+      data['updatedAt'] = DateTime.now();
+      return _homeLayout.set(data, SetOptions(merge: true));
+    });
   }
 }

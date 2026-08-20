@@ -21,7 +21,11 @@ class PrarthanaListScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(l10n?.homeDailyPrarthana ?? 'Daily Prarthana'),
+        title: Text(
+          l10n?.homeDailyPrarthana ?? 'Daily Prarthana',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           TextButton.icon(
             onPressed: () => context.push(AppRoutes.prarthanaHelp),
@@ -123,23 +127,34 @@ class _AlarmCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: ListTile(
-        title: Text(time, style: Theme.of(context).textTheme.headlineSmall),
-        subtitle: Text('$days · ${alarm.label}'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Switch(
-              value: alarm.isEnabled,
-              onChanged: (v) =>
-                  ref.read(prarthanaActionsProvider).toggle(alarm, v),
-            ),
-            IconButton(
-              tooltip: l10n?.prarthanaDelete ?? 'Delete',
-              onPressed: () =>
-                  ref.read(prarthanaActionsProvider).delete(alarm),
-              icon: const Icon(Icons.delete_outline),
-            ),
-          ],
+        title: Text(
+          time,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        subtitle: Text(
+          '$days · ${alarm.label}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: FittedBox(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Switch(
+                value: alarm.isEnabled,
+                onChanged: (v) =>
+                    ref.read(prarthanaActionsProvider).toggle(alarm, v),
+              ),
+              IconButton(
+                tooltip: l10n?.prarthanaDelete ?? 'Delete',
+                onPressed: () =>
+                    ref.read(prarthanaActionsProvider).delete(alarm),
+                icon: const Icon(Icons.delete_outline),
+              ),
+            ],
+          ),
         ),
         onTap: () => context.push(AppRoutes.prarthanaEdit, extra: alarm),
       ),

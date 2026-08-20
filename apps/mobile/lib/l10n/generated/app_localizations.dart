@@ -892,6 +892,102 @@ abstract class AppLocalizations {
   /// **'Could not export the status.'**
   String get statusExportFailed;
 
+  /// No description provided for @otpScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify OTP'**
+  String get otpScreenTitle;
+
+  /// No description provided for @otpEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code sent to {phone}'**
+  String otpEnterCode(String phone);
+
+  /// No description provided for @otpVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get otpVerify;
+
+  /// No description provided for @otpResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String otpResendIn(int seconds);
+
+  /// No description provided for @otpResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get otpResend;
+
+  /// No description provided for @otpChangeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Change number'**
+  String get otpChangeNumber;
+
+  /// No description provided for @authErrorInvalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'That phone number looks invalid.'**
+  String get authErrorInvalidPhone;
+
+  /// No description provided for @authErrorInvalidOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid code. Please try again.'**
+  String get authErrorInvalidOtp;
+
+  /// No description provided for @authErrorSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'That code expired. Request a new one.'**
+  String get authErrorSessionExpired;
+
+  /// No description provided for @authErrorTooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get authErrorTooManyAttempts;
+
+  /// No description provided for @authErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check your connection and retry.'**
+  String get authErrorNetwork;
+
+  /// No description provided for @authErrorPlayIntegrity.
+  ///
+  /// In en, this message translates to:
+  /// **'App verification failed. Please try again.'**
+  String get authErrorPlayIntegrity;
+
+  /// No description provided for @authErrorUserDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled.'**
+  String get authErrorUserDisabled;
+
+  /// No description provided for @authErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get authErrorGeneric;
+
+  /// No description provided for @offlineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline. Some actions may fail.'**
+  String get offlineBanner;
+
+  /// No description provided for @errorLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load content.'**
+  String get errorLoadFailed;
+
   /// No description provided for @forceUpdateTitle.
   ///
   /// In en, this message translates to:

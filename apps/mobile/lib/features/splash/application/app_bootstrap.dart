@@ -94,9 +94,18 @@ class AppBootstrapLoader {
 
 @Riverpod(keepAlive: true)
 Future<AppBootstrap> appBootstrap(Ref ref) async {
-  final info = await PackageInfo.fromPlatform();
+  // Never let a hanging platform channel block the splash forever — fall
+  // back to a placeholder version so the gate check still runs.
+  var version = '0.0.0';
+  try {
+    final info = await PackageInfo.fromPlatform()
+        .timeout(const Duration(seconds: 3));
+    version = info.version;
+  } catch (_) {
+    // keep the placeholder
+  }
   final loader = AppBootstrapLoader(
-    installedVersion: info.version,
+    installedVersion: version,
     fetchFirestore: () => ref.read(configRepositoryProvider).getAppConfig(),
     fetchRemoteOverlay: _overlayRemoteConfig,
     readCache: _readCachedConfig,

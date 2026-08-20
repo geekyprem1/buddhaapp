@@ -15,6 +15,7 @@ import '../repositories/contact_repository.dart';
 import '../repositories/content_repository.dart';
 import '../repositories/events_repository.dart';
 import '../repositories/notification_repository.dart';
+import '../repositories/progress_repository.dart';
 import '../repositories/static_page_repository.dart';
 import '../repositories/teacher_repository.dart';
 import '../repositories/user_repository.dart';
@@ -54,6 +55,9 @@ ConfigRepository configRepository(Ref ref) => ConfigRepository();
 
 @Riverpod(keepAlive: true)
 StaticPageRepository staticPageRepository(Ref ref) => StaticPageRepository();
+
+@Riverpod(keepAlive: true)
+ProgressRepository progressRepository(Ref ref) => ProgressRepository();
 
 @Riverpod(keepAlive: true)
 AuditRepository auditRepository(Ref ref) => AuditRepository();

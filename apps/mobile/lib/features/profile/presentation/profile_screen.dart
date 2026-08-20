@@ -59,6 +59,8 @@ class ProfileScreen extends ConsumerWidget {
                 ? user!.name
                 : (l10n?.statusTapName ?? 'Tap to add name'),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           if (user?.phone != null && user!.phone!.isNotEmpty)
@@ -91,11 +93,17 @@ class ProfileScreen extends ConsumerWidget {
           _row(
             icon: Icons.badge_outlined,
             label: l10n?.profileMyIdCard ?? 'My ID Card',
-            trailing: Text(
-              l10n?.profileComingSoon ?? 'Coming soon',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+            trailing: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 110),
+              child: Text(
+                l10n?.profileComingSoon ?? 'Coming soon',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+              ),
             ),
           ),
           _row(
@@ -199,7 +207,7 @@ class ProfileScreen extends ConsumerWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(icon, color: AppColors.primary),
-      title: Text(label),
+      title: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: trailing ?? const Icon(Icons.chevron_right),
       enabled: onTap != null,
       onTap: onTap,

@@ -163,6 +163,34 @@
   "statusPickCamera": "कॅमेरा",
   "statusExportFailed": "स्टेटस एक्सपोर्ट होऊ शकला नाही.",
 
+  "otpScreenTitle": "OTP सत्यापित करा",
+  "otpEnterCode": "{phone} वर पाठवलेला कोड टाका",
+  "@otpEnterCode": {
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+  "otpVerify": "सत्यापित करा",
+  "otpResendIn": "{seconds} सेकंदात पुन्हा पाठवा",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "otpResend": "कोड पुन्हा पाठवा",
+  "otpChangeNumber": "नंबर बदला",
+
+  "authErrorInvalidPhone": "हा फोन नंबर चुकीचा वाटतो.",
+  "authErrorInvalidOtp": "चुकीचा कोड. कृपया पुन्हा प्रयत्न करा.",
+  "authErrorSessionExpired": "कोड कालबाह्य झाला. नवीन कोड मागा.",
+  "authErrorTooManyAttempts": "खूप वेळा प्रयत्न झाले. नंतर पुन्हा प्रयत्न करा.",
+  "authErrorNetwork": "नेटवर्क त्रुटी. कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.",
+  "authErrorPlayIntegrity": "अॅप पडताळणी अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
+  "authErrorUserDisabled": "हे खाते बंद करण्यात आले आहे.",
+  "authErrorGeneric": "काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा.",
+  "offlineBanner": "तुम्ही ऑफलाइन आहात. काही क्रिया अयशस्वी होऊ शकतात.",
+  "errorLoadFailed": "सामग्री लोड होऊ शकली नाही.",
+
   "forceUpdateTitle": "अपडेट आवश्यक आहे",
   "forceUpdateBody": "पुढे जाण्यासाठी धम्म पथाची नवीन आवृत्ती हवी.",
   "forceUpdateButton": "अपडेट करा",

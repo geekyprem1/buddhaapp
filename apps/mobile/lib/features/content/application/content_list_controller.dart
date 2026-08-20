@@ -92,7 +92,8 @@ class ContentListController extends _$ContentListController {
           isLoadingMore: false,
         ),
       );
-    } catch (_) {
+    } catch (e, st) {
+      await ErrorReporter.instance.record(e, st, reason: 'content.loadMore');
       // Keep the already-loaded items; just stop the spinner. A transient
       // load-more failure shouldn't blow away the whole list.
       state = AsyncData(current.copyWith(isLoadingMore: false));

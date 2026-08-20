@@ -79,12 +79,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onPressed: () => context.push(AppRoutes.profile),
           icon: const Icon(Icons.person_outline),
         ),
-        title: Text(l10n?.appName ?? AppConstants.appName),
+        title: Text(
+          l10n?.appName ?? AppConstants.appName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
-          TextButton.icon(
+          IconButton(
+            tooltip: l10n?.homeShareApp ?? 'Share App',
             onPressed: shareApp,
             icon: const Icon(Icons.share, color: AppColors.whatsappGreen),
-            label: Text(l10n?.homeShareApp ?? 'Share App'),
           ),
         ],
       ),
@@ -140,6 +144,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: AppSpacing.md,
           mainAxisSpacing: AppSpacing.md,
+          childAspectRatio: 1.05,
           children: [
             for (final id in section.ids) _gridTile(context, l10n, id),
           ],
@@ -170,6 +175,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Expanded(
                 child: Text(
                   _labelFor(l10n, id),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
@@ -229,13 +236,21 @@ class _ModuleTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.card),
         onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: AppColors.primary),
-            const SizedBox(height: AppSpacing.sm),
-            Text(label),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 32, color: AppColors.primary),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

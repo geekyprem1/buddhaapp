@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:core/core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'media_item_mapper.dart';
@@ -18,11 +19,24 @@ class DhammaAudioHandler extends BaseAudioHandler
         _onComplete();
       }
     });
+    // FR-10.5 — persist the play position periodically so meditations can be
+    // resumed later. Throttled to one write every few seconds.
+    _player.positionStream.listen(_maybeSaveProgress);
   }
 
   final AudioPlayer _player = AudioPlayer();
   final EventsRepository _events = EventsRepository();
+  final ProgressRepository _progress = ProgressRepository();
   var _retrying = false;
+
+  /// How close to the start we ignore (nothing worth resuming yet) and how
+  /// close to the end counts as "finished" (clear instead of save).
+  static const _minResumable = Duration(seconds: 10);
+  static const _completeSlack = Duration(seconds: 15);
+  static const _saveInterval = Duration(seconds: 5);
+  DateTime _lastProgressSave = DateTime.fromMillisecondsSinceEpoch(0);
+
+  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
   late final SleepTimer sleepTimer = SleepTimer(
     onElapsed: () {
@@ -57,11 +71,25 @@ class DhammaAudioHandler extends BaseAudioHandler
 
     var index = playable.indexWhere((e) => e.id == item.id);
     if (index < 0) index = 0;
-    await _loadIndex(index);
+
+    // Only the explicitly requested track resumes; later parts of a series
+    // start from the beginning.
+    final resumeAt = await _savedResumePosition(playable[index]);
+    await _loadIndex(index, startAt: resumeAt);
     await play();
   }
 
-  Future<void> _loadIndex(int index) async {
+  /// The stored resume point for a meditation, or `null` if none/ineligible.
+  Future<Duration?> _savedResumePosition(ContentItem item) async {
+    if (item.type != ContentType.meditation) return null;
+    final uid = _uid;
+    if (uid == null) return null;
+    final saved = await _progress.get(uid: uid, itemId: item.id);
+    if (saved == null || saved.position < _minResumable) return null;
+    return saved.position;
+  }
+
+  Future<void> _loadIndex(int index, {Duration? startAt}) async {
     final items = queue.value;
     if (index < 0 || index >= items.length) return;
     final item = items[index];
@@ -78,12 +106,48 @@ class DhammaAudioHandler extends BaseAudioHandler
       await _player.setUrl(url);
       _retrying = false;
     }
+    if (startAt != null && startAt > Duration.zero) {
+      await _player.seek(startAt);
+    }
+  }
+
+  /// Throttled position persistence for the current meditation.
+  void _maybeSaveProgress(Duration position) {
+    final item = mediaItem.value;
+    if (item == null || !isMeditationMedia(item)) return;
+    if (!_player.playing) return;
+    final uid = _uid;
+    if (uid == null) return;
+
+    final now = DateTime.now();
+    if (now.difference(_lastProgressSave) < _saveInterval) return;
+    _lastProgressSave = now;
+
+    final duration = item.duration;
+    // Near the end → treat as finished so it won't offer a stale resume.
+    if (duration != null && position >= duration - _completeSlack) {
+      unawaited(_progress.clear(uid: uid, itemId: item.id).catchError((_) {}));
+      return;
+    }
+    if (position < _minResumable) return;
+    unawaited(
+      _progress
+          .save(
+            uid: uid,
+            itemId: item.id,
+            position: position,
+            duration: duration,
+          )
+          .catchError((_) {}),
+    );
   }
 
   Future<void> _onComplete() async {
     // FR-9.10 — count a *completed* play. Fire-and-forget into `events/`;
     // `aggregateEvents` folds it into the content doc's `counters.plays`.
     _recordPlay(mediaItem.value);
+    // A finished item has no meaningful resume point — clear it (FR-10.5).
+    _clearProgress(mediaItem.value);
 
     if (_player.loopMode == LoopMode.one) {
       await _player.seek(Duration.zero);
@@ -102,6 +166,13 @@ class DhammaAudioHandler extends BaseAudioHandler
     } else {
       await stop();
     }
+  }
+
+  void _clearProgress(MediaItem? item) {
+    if (item == null || !isMeditationMedia(item)) return;
+    final uid = _uid;
+    if (uid == null) return;
+    unawaited(_progress.clear(uid: uid, itemId: item.id).catchError((_) {}));
   }
 
   void _recordPlay(MediaItem? item) {

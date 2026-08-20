@@ -35,6 +35,9 @@ abstract class AppConstants {
   static const fnProcessDeletionRequest = 'processDeletionRequest';
   static const fnGuardOtpAbuse = 'guardOtpAbuse';
 
+  /// Firestore disk cache cap (Architecture §10 / T2.1 — 40 MB).
+  static const firestoreCacheSizeBytes = 40 * 1024 * 1024;
+
   /// Default page size for paginated content queries (Architecture §10).
   static const defaultPageSize = 20;
 

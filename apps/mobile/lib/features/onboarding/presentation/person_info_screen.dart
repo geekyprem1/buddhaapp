@@ -21,6 +21,7 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
   final _emailController = TextEditingController();
 
   String? _nameError;
+  String? _phoneError;
   String? _emailError;
   bool _phoneReadOnly = false;
 
@@ -29,8 +30,12 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
     super.initState();
     final user = ref.read(authServiceProvider).currentUser;
     if (user != null) {
-      if (user.phoneNumber != null) {
-        _phoneController.text = user.phoneNumber!.replaceFirst('+91', '');
+      final phone = user.phoneNumber;
+      // Only lock the field for phone-auth users who actually have a verified
+      // number. Google users come through with a null or empty phoneNumber, so
+      // the field must stay editable for them to enter one (FR-4.2).
+      if (phone != null && phone.isNotEmpty) {
+        _phoneController.text = phone.replaceFirst('+91', '');
         _phoneReadOnly = true;
       }
       if (user.email != null) _emailController.text = user.email!;
@@ -46,20 +51,16 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
     super.dispose();
   }
 
-  bool get _isValid {
-    return FieldValidators.name(_nameController.text) == null &&
-        FieldValidators.phone(_phoneController.text) == null &&
-        FieldValidators.emailOptional(_emailController.text) == null;
-  }
-
   Future<void> _continue() async {
     final nameErr = FieldValidators.name(_nameController.text);
+    final phoneErr = FieldValidators.phone(_phoneController.text);
     final emailErr = FieldValidators.emailOptional(_emailController.text);
     setState(() {
       _nameError = nameErr;
+      _phoneError = phoneErr;
       _emailError = emailErr;
     });
-    if (nameErr != null || emailErr != null) return;
+    if (nameErr != null || phoneErr != null || emailErr != null) return;
 
     await ref
         .read(onboardingControllerProvider.notifier)
@@ -93,7 +94,11 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(errorText: _mapNameError()),
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  if (_nameError != null) {
+                    setState(() => _nameError = null);
+                  }
+                },
               ),
               const SizedBox(height: AppSpacing.md),
               Text(l10n?.mobileNumberLabel ?? 'Mobile Number'),
@@ -103,9 +108,15 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
                 readOnly: _phoneReadOnly,
                 keyboardType: TextInputType.phone,
                 maxLength: 10,
+                onChanged: (_) {
+                  if (_phoneError != null) {
+                    setState(() => _phoneError = null);
+                  }
+                },
                 decoration: InputDecoration(
                   hintText: l10n?.mobileNumberHint,
                   counterText: '',
+                  errorText: _mapPhoneError(),
                   filled: _phoneReadOnly,
                   fillColor: _phoneReadOnly ? AppColors.disabled : null,
                 ),
@@ -117,13 +128,17 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(errorText: _mapEmailError()),
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  if (_emailError != null) {
+                    setState(() => _emailError = null);
+                  }
+                },
               ),
               const SizedBox(height: AppSpacing.xl),
               PrimaryPillButton(
                 label: l10n?.continueButton ?? 'Continue',
                 isLoading: state.isLoading,
-                onPressed: _isValid ? _continue : null,
+                onPressed: state.isLoading ? null : _continue,
               ),
             ],
           ),
@@ -138,6 +153,14 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
     return _nameError == 'error_name_required'
         ? (l10n?.errorNameRequired ?? 'Please enter your name')
         : (l10n?.errorNameInvalid ?? 'Please enter a valid name');
+  }
+
+  String? _mapPhoneError() {
+    if (_phoneError == null) return null;
+    final l10n = AppLocalizations.of(context);
+    return _phoneError == 'error_phone_required'
+        ? (l10n?.errorPhoneRequired ?? 'Please enter your mobile number')
+        : (l10n?.errorPhoneInvalid ?? 'Please enter a valid number');
   }
 
   String? _mapEmailError() {

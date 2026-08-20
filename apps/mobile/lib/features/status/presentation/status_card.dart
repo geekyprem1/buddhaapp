@@ -156,7 +156,10 @@ class StatusCard extends ConsumerWidget {
                       }
                     }),
                     icon: const Icon(Icons.download),
-                    label: Text(l10n?.download ?? 'Download'),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(l10n?.download ?? 'Download'),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -172,7 +175,10 @@ class StatusCard extends ConsumerWidget {
                       () => ref.read(statusExportProvider).share(item),
                     ),
                     icon: const Icon(Icons.share),
-                    label: Text(l10n?.share ?? 'Share'),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(l10n?.share ?? 'Share'),
+                    ),
                   ),
                 ),
               ],
