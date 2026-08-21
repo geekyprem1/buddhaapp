@@ -105,6 +105,8 @@ abstract class AdminStrings {
   static const moduleField = 'Module';
   static const nameField = 'Name';
   static const bioField = 'Bio';
+  static const teacherUploadIdRequired =
+      'Set an English name or id before uploading files.';
   static const portrait = 'Portrait';
   static const thumbnail = 'Thumbnail';
   static const signature = 'Signature';

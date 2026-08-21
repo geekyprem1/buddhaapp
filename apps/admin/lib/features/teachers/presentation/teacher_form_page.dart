@@ -263,9 +263,19 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
               ],
             ),
             const SizedBox(height: 24),
+            if (storageId.isEmpty) ...[
+              Text(
+                AdminStrings.teacherUploadIdRequired,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+              ),
+              const SizedBox(height: 12),
+            ],
             UploadField(
               label: AdminStrings.portrait,
               valueUrl: _portrait,
+              enabled: storageId.isNotEmpty,
               storagePathBuilder: (ext) =>
                   StoragePaths.teacherPortrait(storageId, ext),
               onUploaded: (url) {
@@ -279,6 +289,7 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
             UploadField(
               label: AdminStrings.thumbnail,
               valueUrl: _thumb,
+              enabled: storageId.isNotEmpty,
               storagePathBuilder: (ext) =>
                   StoragePaths.teacherThumb(storageId, ext),
               onUploaded: (url) {
@@ -292,6 +303,7 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
             UploadField(
               label: AdminStrings.signature,
               valueUrl: _signature,
+              enabled: storageId.isNotEmpty,
               storagePathBuilder: (ext) =>
                   StoragePaths.teacherSignature(storageId, ext),
               onUploaded: (url) {
