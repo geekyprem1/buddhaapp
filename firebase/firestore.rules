@@ -65,7 +65,7 @@ service cloud.firestore {
     }
 
     // --- Content collections (wallpapers, ringtones, songs, meditations,
-    //     statuses, prarthanas) share the same shape and the same rules.
+    //     chantings, statuses, prarthanas) share the same shape and rules.
     //     Firestore rules can't parameterise the collection name itself in
     //     a single match block, so the same rule body is repeated per
     //     collection via this function + one match block each. ---
@@ -117,6 +117,13 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
     match /meditations/{itemId} {
+      allow read: if contentCanRead();
+      allow create: if contentCanCreate();
+      allow update: if contentCanUpdate() &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['counters']);
+      allow delete: if isSuperAdmin();
+    }
+    match /chantings/{itemId} {
       allow read: if contentCanRead();
       allow create: if contentCanCreate();
       allow update: if contentCanUpdate() &&

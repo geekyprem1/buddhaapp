@@ -18,8 +18,10 @@ abstract class AdminStrings {
       'This account is not an admin. The desk is restricted to authorised staff.';
   static const accountInactive = 'This admin account has been deactivated.';
   static const badCredentials = 'Email or password is incorrect.';
-  static const tooManyAttempts = 'Too many attempts. Wait a minute and try again.';
-  static const networkError = 'Network failed. Check your connection and retry.';
+  static const tooManyAttempts =
+      'Too many attempts. Wait a minute and try again.';
+  static const networkError =
+      'Network failed. Check your connection and retry.';
   static const genericError = 'Could not sign in. Try again.';
   static const emailRequired = 'Enter your email.';
   static const emailInvalid = 'Enter a valid email.';
@@ -38,6 +40,7 @@ abstract class AdminStrings {
   static const ringtones = 'Ringtones';
   static const songs = 'Songs';
   static const meditations = 'Meditations';
+  static const chantings = 'Chanting';
   static const statuses = 'Statuses';
   static const prarthanas = 'Prarthanas';
   static const users = 'Users';
@@ -265,12 +268,14 @@ abstract class AdminStrings {
   static const notifAudienceRequired = 'Pick a valid audience.';
   static const notifRouteInvalid = 'Route must start with /.';
   static const notifUrlInvalid = 'Enter an http(s) URL.';
-  static const notifScheduleInvalid = 'Pick a time at least one minute from now.';
+  static const notifScheduleInvalid =
+      'Pick a time at least one minute from now.';
   static const notifTestTokenRequired = 'Paste a device token to send a test.';
   static const notifSent = 'Notification sent.';
   static const notifScheduled = 'Notification scheduled.';
   static const notifTestSent = 'Test notification sent.';
-  static const notifScheduleCancelled = 'Schedule cancelled. Campaign is a draft again.';
+  static const notifScheduleCancelled =
+      'Schedule cancelled. Campaign is a draft again.';
   static const notifStatsSent = 'Sent';
   static const notifFailed = 'Send failed. Edit and try again.';
   static const notifSending = 'Sending…';
@@ -294,14 +299,16 @@ abstract class AdminStrings {
   static const configForceConfirmTitle = 'Turn on force update?';
   static const configForceConfirmBody =
       'Users below the minimum version will be blocked until they update.';
-  static const configForceOnHint = 'Force update is on. Users below the minimum version are blocked.';
+  static const configForceOnHint =
+      'Force update is on. Users below the minimum version are blocked.';
   static const configMaintenance = 'Maintenance mode';
   static const configMaintenanceHint =
       'Shows the maintenance screen to every signed-in user.';
   static const configMaintenanceConfirmTitle = 'Turn on maintenance mode?';
   static const configMaintenanceConfirmBody =
       'The mobile app will show the maintenance message and block the rest of the app.';
-  static const configMaintenanceOnHint = 'Maintenance mode is on for every user.';
+  static const configMaintenanceOnHint =
+      'Maintenance mode is on for every user.';
   static const configBothGatesOn = 'Force update and maintenance are both on.';
   static const configMaintenanceMessage = 'Maintenance message';
   static const configMaintenanceMessageRequired =
@@ -309,7 +316,8 @@ abstract class AdminStrings {
   static const configLanguages = 'Languages';
   static const configLanguageRequired = 'Keep at least one language.';
   static const configLanguageFields = 'Fill code, name and native name.';
-  static const configLanguageDuplicate = 'That language code is already listed.';
+  static const configLanguageDuplicate =
+      'That language code is already listed.';
   static const configLangCode = 'Code';
   static const configLangName = 'Name';
   static const configLangNative = 'Native name';
@@ -327,7 +335,8 @@ abstract class AdminStrings {
 
   static const pageTitle = 'Title';
   static const pageBody = 'Body';
-  static const pageBodyHint = 'Write the page. Use the buttons for bold, heading, list and links.';
+  static const pageBodyHint =
+      'Write the page. Use the buttons for bold, heading, list and links.';
   static const pagePreview = 'Preview';
   static const pagePreviewEmpty = 'Preview appears here.';
   static const pageNotAuthored = 'Not saved yet.';

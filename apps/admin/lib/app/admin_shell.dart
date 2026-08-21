@@ -137,18 +137,18 @@ class _BrandMark extends StatelessWidget {
         Text(
           AdminStrings.deskName.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: AppColors.accent,
-            letterSpacing: 2.2,
-            fontWeight: FontWeight.w600,
-          ),
+                color: AppColors.accent,
+                letterSpacing: 2.2,
+                fontWeight: FontWeight.w600,
+              ),
         ),
         const SizedBox(height: 4),
         Text(
           AdminStrings.appName,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w700,
-          ),
+                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
         ),
       ],
     );
@@ -204,15 +204,15 @@ class _NavTile extends StatelessWidget {
                       Expanded(
                         child: Text(
                           label,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: selected
-                                    ? AppColors.primary
-                                    : AppColors.textPrimary,
-                                fontWeight: selected
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: selected
+                                        ? AppColors.primary
+                                        : AppColors.textPrimary,
+                                    fontWeight: selected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                  ),
                         ),
                       ),
                     ],
@@ -262,9 +262,9 @@ class _TopBar extends StatelessWidget {
                   child: Text(
                     AdminRole.label(role),
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 ),
               const SizedBox(width: 12),
@@ -297,6 +297,7 @@ IconData _iconFor(String path) {
     AdminRoutes.ringtones => Icons.notifications_outlined,
     AdminRoutes.songs => Icons.library_music_outlined,
     AdminRoutes.meditations => Icons.self_improvement,
+    AdminRoutes.chantings => Icons.graphic_eq_rounded,
     AdminRoutes.statuses => Icons.photo_outlined,
     AdminRoutes.prarthanas => Icons.alarm_outlined,
     AdminRoutes.users => Icons.manage_accounts_outlined,

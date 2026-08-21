@@ -6,6 +6,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/otp_screen.dart';
+import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
+import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/meditation/presentation/meditation_list_screen.dart';
 import '../features/onboarding/presentation/language_screen.dart';
@@ -48,10 +50,12 @@ abstract class AppRoutes {
   static const onboardingPersonInfo = '/onboarding/person-info';
   static const onboardingTeacher = '/onboarding/teacher';
   static const home = '/home';
+  static const buddhistCalendar = '/buddhist-calendar';
   static const wallpapers = '/wallpapers';
   static const ringtones = '/ringtones';
   static const ringtoneHelp = '/ringtones/help';
   static const songs = '/songs';
+  static const chantings = '/chanting';
   static const meditations = '/meditations';
   static const player = '/player';
   static const wallpaperDetail = '/wallpapers/view';
@@ -109,8 +113,7 @@ GoRouter appRouter(Ref ref) {
       }
 
       final user = authValue.valueOrNull;
-      final isAuthRoute =
-          path == AppRoutes.login || path == AppRoutes.otp;
+      final isAuthRoute = path == AppRoutes.login || path == AppRoutes.otp;
       final isLegalRoute = path.startsWith('${AppRoutes.legal}/');
 
       if (user == null) {
@@ -127,7 +130,8 @@ GoRouter appRouter(Ref ref) {
       }
 
       final profile = profileValue.valueOrNull;
-      final step = profile?.onboardingStep ?? AppConstants.onboardingStepLanguage;
+      final step =
+          profile?.onboardingStep ?? AppConstants.onboardingStepLanguage;
 
       if (isAuthRoute ||
           path == AppRoutes.splash ||
@@ -195,6 +199,10 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
+        path: AppRoutes.buddhistCalendar,
+        builder: (context, state) => const BuddhistCalendarScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.profile,
         builder: (context, state) => const ProfileScreen(),
       ),
@@ -236,6 +244,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.songs,
         builder: (context, state) => const SongListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.chantings,
+        builder: (context, state) => const ChantingListScreen(),
       ),
       GoRoute(
         path: AppRoutes.meditations,

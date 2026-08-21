@@ -16,6 +16,8 @@ const _moduleRoutes = <String, String>{
   'songs': '/songs',
   'meditation': '/meditations',
   'meditations': '/meditations',
+  'chanting': '/chanting',
+  'chantings': '/chanting',
   'status': '/statuses',
   'statuses': '/statuses',
   'prarthana': '/prarthana',

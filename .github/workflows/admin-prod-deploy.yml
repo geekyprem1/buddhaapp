@@ -1,0 +1,82 @@
+name: Deploy Prod Admin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/admin-prod-deploy.yml"
+      - ".firebaserc"
+      - "firebase.json"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "apps/admin/**"
+      - "packages/core/**"
+      - "packages/design_system/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+concurrency:
+  group: admin-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy Prod Admin
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace dependencies
+        run: dart pub get
+
+      - name: Analyze Admin
+        working-directory: apps/admin
+        run: flutter analyze --no-pub
+
+      - name: Test Admin
+        working-directory: apps/admin
+        run: flutter test --no-pub
+
+      - name: Validate production secrets
+        shell: bash
+        env:
+          PROD_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DHAMMA_PATH_PROD }}
+        run: |
+          if [[ -z "$PROD_RECAPTCHA_SITE_KEY" || -z "$FIREBASE_SERVICE_ACCOUNT" ]]; then
+            echo "::error::Required production deployment secrets are not configured."
+            exit 1
+          fi
+
+      - name: Build Prod Admin web
+        working-directory: apps/admin
+        env:
+          PROD_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+        run: >-
+          flutter build web --no-pub
+          -t lib/main_prod.dart
+          --release
+          --dart-define=RECAPTCHA_SITE_KEY="$PROD_RECAPTCHA_SITE_KEY"
+
+      - name: Deploy only Prod Admin Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DHAMMA_PATH_PROD }}
+          projectId: dhamma-path-prod
+          target: admin
+          channelId: live
+          entryPoint: .
+          disableComment: true

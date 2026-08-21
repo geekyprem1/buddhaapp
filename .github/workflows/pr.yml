@@ -31,7 +31,7 @@ jobs:
         run: dart pub global run melos exec -- "dart analyze ."
 
       - name: Format check
-        run: dart format --set-exit-if-changed packages apps 2>$null || true
+        run: dart format --output=none --set-exit-if-changed packages apps 2>/dev/null || true
 
       - name: Test all packages
         run: dart pub global run melos exec --dir-exists=test -- "flutter test"

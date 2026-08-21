@@ -42,6 +42,10 @@ service firebase.storage {
       allow read: if isSignedIn();
       allow write: if isContentEditor();
     }
+    match /chantings/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
     match /statuses/{itemId}/{fileName} {
       allow read: if isSignedIn();
       allow write: if isContentEditor();

@@ -14,6 +14,7 @@ abstract class AdminRoutes {
   static const ringtones = '/content/ringtones';
   static const songs = '/content/songs';
   static const meditations = '/content/meditations';
+  static const chantings = '/content/chantings';
   static const statuses = '/content/statuses';
   static const prarthanas = '/content/prarthanas';
   static const users = '/users';
@@ -71,6 +72,11 @@ const adminDestinations = <AdminDestination>[
   AdminDestination(
     path: AdminRoutes.meditations,
     label: 'Meditations',
+    allowed: AdminRole.canModerate,
+  ),
+  AdminDestination(
+    path: AdminRoutes.chantings,
+    label: 'Chanting',
     allowed: AdminRole.canModerate,
   ),
   AdminDestination(

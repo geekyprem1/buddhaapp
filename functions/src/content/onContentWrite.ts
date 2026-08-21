@@ -168,6 +168,7 @@ export const onWallpaperWrite = makeTrigger("wallpapers");
 export const onRingtoneWrite = makeTrigger("ringtones");
 export const onSongWrite = makeTrigger("songs");
 export const onMeditationWrite = makeTrigger("meditations");
+export const onChantingWrite = makeTrigger("chantings");
 export const onStatusWrite = makeTrigger("statuses");
 export const onPrarthanaWrite = makeTrigger("prarthanas");
 

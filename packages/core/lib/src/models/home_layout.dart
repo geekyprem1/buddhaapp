@@ -8,31 +8,58 @@ abstract class HomeModuleIds {
   static const song = 'song';
   static const prarthana = 'prarthana';
   static const status = 'status';
+  static const buddhistCalendar = 'buddhist_calendar';
+  static const dailyPaliWord = 'daily_pali_word';
+  static const chanting = 'chanting';
+  static const tipitaka = 'tipitaka';
+  static const dana = 'dana';
+  static const buddhistPlaces = 'buddhist_places';
 
   static const all = <String>[
     wallpaper,
     meditation,
     ringtone,
     song,
+    buddhistCalendar,
+    dailyPaliWord,
+    chanting,
+    tipitaka,
+    dana,
+    buddhistPlaces,
     prarthana,
     status,
   ];
 
   static const wide = <String>{prarthana, status};
 
+  static const comingSoon = <String>{
+    dailyPaliWord,
+    tipitaka,
+    dana,
+    buddhistPlaces,
+  };
+
   static bool isKnown(String id) => all.contains(id);
 
   static bool isWide(String id) => wide.contains(id);
 
+  static bool isComingSoon(String id) => comingSoon.contains(id);
+
   static String label(String id) => switch (id) {
-    wallpaper => 'Wallpaper',
-    meditation => 'Meditation',
-    ringtone => 'Ringtone',
-    song => 'Song',
-    prarthana => 'Daily Prarthana',
-    status => 'Trending Status',
-    _ => id,
-  };
+        wallpaper => 'Wallpaper',
+        meditation => 'Meditation',
+        ringtone => 'Ringtone',
+        song => 'Song',
+        prarthana => 'Daily Prarthana',
+        status => 'Trending Status',
+        buddhistCalendar => 'Buddhist Calendar',
+        dailyPaliWord => 'Daily Pali Word',
+        chanting => 'Chanting',
+        tipitaka => 'Tipitaka',
+        dana => 'Dana',
+        buddhistPlaces => 'Buddhist Places',
+        _ => id,
+      };
 }
 
 class HomeModule {
@@ -77,6 +104,12 @@ class HomeLayout {
       HomeModule(id: HomeModuleIds.meditation),
       HomeModule(id: HomeModuleIds.ringtone),
       HomeModule(id: HomeModuleIds.song),
+      HomeModule(id: HomeModuleIds.buddhistCalendar),
+      HomeModule(id: HomeModuleIds.dailyPaliWord),
+      HomeModule(id: HomeModuleIds.chanting),
+      HomeModule(id: HomeModuleIds.tipitaka),
+      HomeModule(id: HomeModuleIds.dana),
+      HomeModule(id: HomeModuleIds.buddhistPlaces),
       HomeModule(id: HomeModuleIds.prarthana),
       HomeModule(id: HomeModuleIds.status),
     ],
@@ -104,27 +137,22 @@ class HomeLayout {
   List<HomeModule> get visibleModules =>
       normalize().modules.where((m) => m.visible).toList();
 
-  /// Consecutive grid tiles stay in a 2-column row; Prarthana / Status
-  /// break out as full-width cards so order still matches the desk.
+  /// All regular modules stay in one continuous 2-column grid. Daily
+  /// Prarthana and Trending Status are always rendered below it as wide cards.
   List<HomeSection> get sections {
-    final sections = <HomeSection>[];
-    var grid = <String>[];
-    void flush() {
-      if (grid.isEmpty) return;
-      sections.add(HomeSection.grid(List<String>.from(grid)));
-      grid = <String>[];
-    }
+    final visible = visibleModules;
+    final gridIds = visible
+        .where((module) => !HomeModuleIds.isWide(module.id))
+        .map((module) => module.id)
+        .toList();
+    final wideIds = visible
+        .where((module) => HomeModuleIds.isWide(module.id))
+        .map((module) => module.id);
 
-    for (final module in visibleModules) {
-      if (HomeModuleIds.isWide(module.id)) {
-        flush();
-        sections.add(HomeSection.wide(module.id));
-      } else {
-        grid.add(module.id);
-      }
-    }
-    flush();
-    return sections;
+    return [
+      if (gridIds.isNotEmpty) HomeSection.grid(gridIds),
+      for (final id in wideIds) HomeSection.wide(id),
+    ];
   }
 
   factory HomeLayout.fromJson(Map<String, dynamic> json) {
@@ -139,6 +167,6 @@ class HomeLayout {
   }
 
   Map<String, dynamic> toJson() => {
-    'modules': normalize().modules.map((m) => m.toJson()).toList(),
-  };
+        'modules': normalize().modules.map((m) => m.toJson()).toList(),
+      };
 }

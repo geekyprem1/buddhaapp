@@ -8,18 +8,19 @@ import 'localised_text.dart';
 part 'content_item.freezed.dart';
 part 'content_item.g.dart';
 
-/// One shape for all six content types (wallpaper, ringtone, song,
-/// meditation, status, prarthana) — see Architecture §6.2 design notes.
+/// One shape for all seven content types (wallpaper, ringtone, song,
+/// meditation, chanting, status, prarthana) — see Architecture §6.2 design
+/// notes.
 ///
 /// Only the sub-object matching [type] is expected to be non-null:
 /// `wallpaper` for `ContentType.wallpaper`, `audio` for ringtone/song/
-/// meditation/prarthana, `status` for `ContentType.status`.
+/// meditation/chanting/prarthana, `status` for `ContentType.status`.
 @freezed
 class ContentItem with _$ContentItem {
   const factory ContentItem({
     required String id,
 
-    /// wallpaper | ringtone | song | meditation | status | prarthana
+    /// wallpaper | ringtone | song | meditation | chanting | status | prarthana
     required String type,
     @Default(<String>[]) List<String> teacherIds,
     String? categoryId,
@@ -75,6 +76,7 @@ abstract class ContentType {
   static const ringtone = 'ringtone';
   static const song = 'song';
   static const meditation = 'meditation';
+  static const chanting = 'chanting';
   static const status = 'status';
   static const prarthana = 'prarthana';
 }

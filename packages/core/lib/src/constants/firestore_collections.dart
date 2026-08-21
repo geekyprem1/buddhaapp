@@ -14,6 +14,7 @@ abstract class FirestoreCollections {
   static const ringtones = 'ringtones';
   static const songs = 'songs';
   static const meditations = 'meditations';
+  static const chantings = 'chantings';
   static const statuses = 'statuses';
   static const prarthanas = 'prarthanas';
 
@@ -34,13 +35,14 @@ abstract class FirestoreCollections {
   static const favourites = 'favourites';
   static const progress = 'progress';
 
-  /// All six content-type collections in one list — used by the generic
+  /// All seven content-type collections in one list — used by the generic
   /// content repository and by the admin `ContentTypeConfig` registry.
   static const List<String> contentCollections = [
     wallpapers,
     ringtones,
     songs,
     meditations,
+    chantings,
     statuses,
     prarthanas,
   ];
@@ -69,11 +71,11 @@ abstract class StaticPageSlugs {
   static const all = <String>[about, privacy, terms, contact, help];
 
   static String label(String slug) => switch (slug) {
-    about => 'About',
-    privacy => 'Privacy Policy',
-    terms => 'Terms & Conditions',
-    contact => 'Contact',
-    help => 'Help',
-    _ => slug,
-  };
+        about => 'About',
+        privacy => 'Privacy Policy',
+        terms => 'Terms & Conditions',
+        contact => 'Contact',
+        help => 'Help',
+        _ => slug,
+      };
 }

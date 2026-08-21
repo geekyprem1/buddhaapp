@@ -89,6 +89,14 @@ const contentTypeConfigs = <ContentTypeConfig>[
     hasLevel: true,
   ),
   ContentTypeConfig(
+    type: ContentType.chanting,
+    collection: FirestoreCollections.chantings,
+    label: AdminStrings.chantings,
+    route: AdminRoutes.chantings,
+    media: ContentMediaKind.audio,
+    artistLabel: AdminStrings.artistField,
+  ),
+  ContentTypeConfig(
     type: ContentType.status,
     collection: FirestoreCollections.statuses,
     label: AdminStrings.statuses,

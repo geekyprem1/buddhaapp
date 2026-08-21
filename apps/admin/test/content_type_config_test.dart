@@ -3,8 +3,8 @@ import 'package:dhamma_path_admin/features/content/application/content_type_conf
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('registry covers the six launch content types', () {
-    expect(contentTypeConfigs, hasLength(6));
+  test('registry covers the seven content types', () {
+    expect(contentTypeConfigs, hasLength(7));
     expect(
       contentTypeConfigs.map((c) => c.type).toSet(),
       {
@@ -12,6 +12,7 @@ void main() {
         ContentType.ringtone,
         ContentType.song,
         ContentType.meditation,
+        ContentType.chanting,
         ContentType.status,
         ContentType.prarthana,
       },
@@ -26,5 +27,9 @@ void main() {
     final songs = configForType(ContentType.song);
     expect(songs.hasLyrics, isTrue);
     expect(songs.hasAlbum, isTrue);
+
+    final chanting = configForType(ContentType.chanting);
+    expect(chanting.media, ContentMediaKind.audio);
+    expect(chanting.hasAudioMeta, isTrue);
   });
 }

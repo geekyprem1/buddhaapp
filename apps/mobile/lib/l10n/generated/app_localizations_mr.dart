@@ -91,7 +91,13 @@ class AppLocalizationsMr extends AppLocalizations {
   String get homeWallpaper => 'वॉलपेपर';
 
   @override
+  String get homeWallpaperSubtitle => 'एचडी वॉलपेपर';
+
+  @override
   String get homeMeditation => 'ध्यान';
+
+  @override
+  String get homeMeditationSubtitle => 'टायमर आणि मार्गदर्शन';
 
   @override
   String get homeRingtone => 'रिंगटोन';
@@ -107,6 +113,152 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get homeTrendingStatus => 'ट्रेंडिंग स्टेटस';
+
+  @override
+  String get homeBuddhistCalendar => 'बौद्ध दिनदर्शिका';
+
+  @override
+  String get homeBuddhistCalendarSubtitle => 'उपोसथ • उत्सव';
+
+  @override
+  String get calendarTitle => 'बौद्ध दिनदर्शिका';
+
+  @override
+  String get calendarToday => 'आज';
+
+  @override
+  String get calendarSelectedDate => 'निवडलेली तारीख';
+
+  @override
+  String get calendarNoObservance =>
+      'या तारखेला कोणताही चिन्हांकित उत्सव नाही.';
+
+  @override
+  String get calendarUpcoming => 'आगामी उत्सव आणि उपोसथ';
+
+  @override
+  String get calendarUposatha => 'उपोसथ';
+
+  @override
+  String get calendarFestival => 'बौद्ध उत्सव';
+
+  @override
+  String get calendarEstimated => 'अंदाजित';
+
+  @override
+  String get calendarNoticeTitle => 'या तारखांविषयी';
+
+  @override
+  String get calendarEstimateNotice =>
+      'चांद्र उपोसथ आणि उत्सवांच्या तारखा चंद्रकलांवर आधारित अंदाज आहेत. देश, परंपरा किंवा वेळ क्षेत्रानुसार एक दिवसाचा फरक असू शकतो. कृपया स्थानिक विहाराकडून खात्री करा.';
+
+  @override
+  String get calendarPreviousMonth => 'मागील महिना';
+
+  @override
+  String get calendarNextMonth => 'पुढील महिना';
+
+  @override
+  String get calendarNewMoonUposatha => 'अमावस्या उपोसथ';
+
+  @override
+  String get calendarFirstQuarterUposatha => 'प्रथम चरण उपोसथ';
+
+  @override
+  String get calendarFullMoonUposatha => 'पौर्णिमा उपोसथ';
+
+  @override
+  String get calendarLastQuarterUposatha => 'अंतिम चरण उपोसथ';
+
+  @override
+  String get calendarMaghaPuja => 'माघ पूजा (संघ दिवस)';
+
+  @override
+  String get calendarParinirvanaDay => 'परिनिर्वाण दिवस';
+
+  @override
+  String get calendarVesak => 'वेसाक (बुद्ध दिवस)';
+
+  @override
+  String get calendarAsalhaPuja => 'आषाढ पूजा (धम्म दिवस)';
+
+  @override
+  String get calendarPavarana => 'पवारणा दिवस';
+
+  @override
+  String get calendarDhammaChakraDay => 'धम्मचक्र प्रवर्तन दिवस';
+
+  @override
+  String get calendarBodhiDay => 'बोधी दिवस';
+
+  @override
+  String get calendarUposathaDescription =>
+      'सखोल साधना, ध्यान, दान आणि शील पालनाचा दिवस.';
+
+  @override
+  String get calendarMaghaDescription =>
+      'बुद्धांच्या अरहंत शिष्यांच्या स्वयंभू सभेचे स्मरण.';
+
+  @override
+  String get calendarParinirvanaDescription =>
+      'महायान परंपरांमध्ये बुद्धांच्या अंतिम निब्बानाचे स्मरण.';
+
+  @override
+  String get calendarVesakDescription =>
+      'बुद्धांचा जन्म, संबोधी आणि महापरिनिर्वाण यांचे पवित्र स्मरण.';
+
+  @override
+  String get calendarAsalhaDescription =>
+      'बुद्धांच्या प्रथम धम्म उपदेशाचे आणि संघाच्या उदयाचे स्मरण.';
+
+  @override
+  String get calendarPavaranaDescription =>
+      'पारंपरिक वर्षावासाच्या समाप्तीचा दिवस.';
+
+  @override
+  String get calendarDhammaChakraDescription =>
+      'दीक्षाभूमी, नागपूर येथील ऐतिहासिक बौद्ध धम्मदीक्षा दिवसाचे स्मरण.';
+
+  @override
+  String get calendarBodhiDescription =>
+      'अनेक महायान परंपरांमध्ये बुद्धांच्या संबोधीचे स्मरण.';
+
+  @override
+  String get homeDailyPaliWord => 'आजचा पालि शब्द';
+
+  @override
+  String get homeDailyPaliWordSubtitle => 'दररोज एक शब्द शिका';
+
+  @override
+  String get homeChanting => 'बौद्ध वंदना';
+
+  @override
+  String get homeChantingSubtitle => 'ऑडिओ संग्रह';
+
+  @override
+  String get chantingEmpty => 'अजून कोणतेही वंदना ऑडिओ नाहीत.';
+
+  @override
+  String get homeTipitaka => 'त्रिपिटक';
+
+  @override
+  String get homeTipitakaSubtitle => 'धम्म ग्रंथ वाचा';
+
+  @override
+  String get homeDana => 'दान';
+
+  @override
+  String get homeDanaSubtitle => 'धम्माला सहकार्य करा';
+
+  @override
+  String get homeBuddhistPlaces => 'बौद्ध स्थळे';
+
+  @override
+  String get homeBuddhistPlacesSubtitle => 'पवित्र स्थळे';
+
+  @override
+  String get featureComingSoonBody =>
+      'आम्ही तुमच्यासाठी हे वैशिष्ट्य तयार करत आहोत।';
 
   @override
   String get filterAll => 'सर्व';

@@ -76,8 +76,7 @@ StorageService storageService(Ref ref) => StorageService();
 AnalyticsService analyticsService(Ref ref) => AnalyticsService();
 
 @Riverpod(keepAlive: true)
-AdminFunctionsService adminFunctionsService(Ref ref) =>
-    AdminFunctionsService();
+AdminFunctionsService adminFunctionsService(Ref ref) => AdminFunctionsService();
 
 /// One [ContentRepository] instance per collection name, cached for the
 /// lifetime of the app (Architecture §11 generic content module).
@@ -123,18 +122,20 @@ abstract class ContentCollections {
   static const ringtones = FirestoreCollections.ringtones;
   static const songs = FirestoreCollections.songs;
   static const meditations = FirestoreCollections.meditations;
+  static const chantings = FirestoreCollections.chantings;
   static const statuses = FirestoreCollections.statuses;
   static const prarthanas = FirestoreCollections.prarthanas;
 
   /// Maps a [ContentType] value to its Firestore collection name. Returns
   /// `null` for an unknown type.
   static String? forType(String type) => switch (type) {
-    ContentType.wallpaper => wallpapers,
-    ContentType.ringtone => ringtones,
-    ContentType.song => songs,
-    ContentType.meditation => meditations,
-    ContentType.status => statuses,
-    ContentType.prarthana => prarthanas,
-    _ => null,
-  };
+        ContentType.wallpaper => wallpapers,
+        ContentType.ringtone => ringtones,
+        ContentType.song => songs,
+        ContentType.meditation => meditations,
+        ContentType.chanting => chantings,
+        ContentType.status => statuses,
+        ContentType.prarthana => prarthanas,
+        _ => null,
+      };
 }

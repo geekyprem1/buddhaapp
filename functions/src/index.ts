@@ -22,6 +22,7 @@ export {
   onRingtoneWrite,
   onSongWrite,
   onMeditationWrite,
+  onChantingWrite,
   onStatusWrite,
   onPrarthanaWrite,
 } from "./content/onContentWrite";

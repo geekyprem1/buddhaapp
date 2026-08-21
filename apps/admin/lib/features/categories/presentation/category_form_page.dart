@@ -18,6 +18,7 @@ const _modules = [
   ContentType.ringtone,
   ContentType.song,
   ContentType.meditation,
+  ContentType.chanting,
   ContentType.status,
   ContentType.prarthana,
 ];

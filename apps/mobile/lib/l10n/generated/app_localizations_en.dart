@@ -88,10 +88,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileHelp => 'Help';
 
   @override
-  String get homeWallpaper => 'Wallpaper';
+  String get homeWallpaper => 'Wallpapers';
+
+  @override
+  String get homeWallpaperSubtitle => 'HD wallpapers';
 
   @override
   String get homeMeditation => 'Meditation';
+
+  @override
+  String get homeMeditationSubtitle => 'Timer & guide';
 
   @override
   String get homeRingtone => 'Ringtone';
@@ -107,6 +113,150 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTrendingStatus => 'Trending Status';
+
+  @override
+  String get homeBuddhistCalendar => 'Buddhist Calendar';
+
+  @override
+  String get homeBuddhistCalendarSubtitle => 'Uposatha • Festivals';
+
+  @override
+  String get calendarTitle => 'Buddhist Calendar';
+
+  @override
+  String get calendarToday => 'Today';
+
+  @override
+  String get calendarSelectedDate => 'Selected date';
+
+  @override
+  String get calendarNoObservance => 'No marked observance on this date.';
+
+  @override
+  String get calendarUpcoming => 'Upcoming observances';
+
+  @override
+  String get calendarUposatha => 'Uposatha';
+
+  @override
+  String get calendarFestival => 'Festival';
+
+  @override
+  String get calendarEstimated => 'Estimated';
+
+  @override
+  String get calendarNoticeTitle => 'About these dates';
+
+  @override
+  String get calendarEstimateNotice =>
+      'Lunar Uposatha and festival dates are estimates based on moon phases. They may vary by a day, country or Buddhist tradition. Please confirm with your local monastery.';
+
+  @override
+  String get calendarPreviousMonth => 'Previous month';
+
+  @override
+  String get calendarNextMonth => 'Next month';
+
+  @override
+  String get calendarNewMoonUposatha => 'New Moon Uposatha';
+
+  @override
+  String get calendarFirstQuarterUposatha => 'First Quarter Uposatha';
+
+  @override
+  String get calendarFullMoonUposatha => 'Full Moon Uposatha';
+
+  @override
+  String get calendarLastQuarterUposatha => 'Last Quarter Uposatha';
+
+  @override
+  String get calendarMaghaPuja => 'Magha Puja (Sangha Day)';
+
+  @override
+  String get calendarParinirvanaDay => 'Parinirvana Day';
+
+  @override
+  String get calendarVesak => 'Vesak (Buddha Day)';
+
+  @override
+  String get calendarAsalhaPuja => 'Asalha Puja (Dhamma Day)';
+
+  @override
+  String get calendarPavarana => 'Pavarana Day';
+
+  @override
+  String get calendarDhammaChakraDay => 'Dhammachakra Pravartan Day';
+
+  @override
+  String get calendarBodhiDay => 'Bodhi Day';
+
+  @override
+  String get calendarUposathaDescription =>
+      'A day for deeper practice, meditation, generosity and observing the precepts.';
+
+  @override
+  String get calendarMaghaDescription =>
+      'Remembers the spontaneous gathering of the Buddha\'s enlightened disciples.';
+
+  @override
+  String get calendarParinirvanaDescription =>
+      'Commemorates the Buddha\'s passing into final Nibbana in Mahayana traditions.';
+
+  @override
+  String get calendarVesakDescription =>
+      'Honours the Buddha\'s birth, awakening and final Nibbana.';
+
+  @override
+  String get calendarAsalhaDescription =>
+      'Remembers the Buddha\'s first teaching and the arising of the Sangha.';
+
+  @override
+  String get calendarPavaranaDescription =>
+      'Marks the end of the traditional rains retreat.';
+
+  @override
+  String get calendarDhammaChakraDescription =>
+      'Commemorates the historic Buddhist conversion at Deekshabhoomi, Nagpur.';
+
+  @override
+  String get calendarBodhiDescription =>
+      'Commemorates the Buddha\'s awakening in several Mahayana traditions.';
+
+  @override
+  String get homeDailyPaliWord => 'Daily Pali Word';
+
+  @override
+  String get homeDailyPaliWordSubtitle => 'Learn one word daily';
+
+  @override
+  String get homeChanting => 'Chanting';
+
+  @override
+  String get homeChantingSubtitle => 'Audio collection';
+
+  @override
+  String get chantingEmpty => 'No chants yet.';
+
+  @override
+  String get homeTipitaka => 'Tipitaka';
+
+  @override
+  String get homeTipitakaSubtitle => 'Read scriptures';
+
+  @override
+  String get homeDana => 'Dana';
+
+  @override
+  String get homeDanaSubtitle => 'Support Dhamma';
+
+  @override
+  String get homeBuddhistPlaces => 'Buddhist Places';
+
+  @override
+  String get homeBuddhistPlacesSubtitle => 'Sacred sites';
+
+  @override
+  String get featureComingSoonBody => 'We are preparing this feature for you.';
 
   @override
   String get filterAll => 'All';

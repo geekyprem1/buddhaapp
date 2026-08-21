@@ -259,14 +259,26 @@ abstract class AppLocalizations {
   /// No description provided for @homeWallpaper.
   ///
   /// In en, this message translates to:
-  /// **'Wallpaper'**
+  /// **'Wallpapers'**
   String get homeWallpaper;
+
+  /// No description provided for @homeWallpaperSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'HD wallpapers'**
+  String get homeWallpaperSubtitle;
 
   /// No description provided for @homeMeditation.
   ///
   /// In en, this message translates to:
   /// **'Meditation'**
   String get homeMeditation;
+
+  /// No description provided for @homeMeditationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Timer & guide'**
+  String get homeMeditationSubtitle;
 
   /// No description provided for @homeRingtone.
   ///
@@ -297,6 +309,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Trending Status'**
   String get homeTrendingStatus;
+
+  /// No description provided for @homeBuddhistCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddhist Calendar'**
+  String get homeBuddhistCalendar;
+
+  /// No description provided for @homeBuddhistCalendarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Uposatha • Festivals'**
+  String get homeBuddhistCalendarSubtitle;
+
+  /// No description provided for @calendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddhist Calendar'**
+  String get calendarTitle;
+
+  /// No description provided for @calendarToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get calendarToday;
+
+  /// No description provided for @calendarSelectedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected date'**
+  String get calendarSelectedDate;
+
+  /// No description provided for @calendarNoObservance.
+  ///
+  /// In en, this message translates to:
+  /// **'No marked observance on this date.'**
+  String get calendarNoObservance;
+
+  /// No description provided for @calendarUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming observances'**
+  String get calendarUpcoming;
+
+  /// No description provided for @calendarUposatha.
+  ///
+  /// In en, this message translates to:
+  /// **'Uposatha'**
+  String get calendarUposatha;
+
+  /// No description provided for @calendarFestival.
+  ///
+  /// In en, this message translates to:
+  /// **'Festival'**
+  String get calendarFestival;
+
+  /// No description provided for @calendarEstimated.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated'**
+  String get calendarEstimated;
+
+  /// No description provided for @calendarNoticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About these dates'**
+  String get calendarNoticeTitle;
+
+  /// No description provided for @calendarEstimateNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar Uposatha and festival dates are estimates based on moon phases. They may vary by a day, country or Buddhist tradition. Please confirm with your local monastery.'**
+  String get calendarEstimateNotice;
+
+  /// No description provided for @calendarPreviousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get calendarPreviousMonth;
+
+  /// No description provided for @calendarNextMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get calendarNextMonth;
+
+  /// No description provided for @calendarNewMoonUposatha.
+  ///
+  /// In en, this message translates to:
+  /// **'New Moon Uposatha'**
+  String get calendarNewMoonUposatha;
+
+  /// No description provided for @calendarFirstQuarterUposatha.
+  ///
+  /// In en, this message translates to:
+  /// **'First Quarter Uposatha'**
+  String get calendarFirstQuarterUposatha;
+
+  /// No description provided for @calendarFullMoonUposatha.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Moon Uposatha'**
+  String get calendarFullMoonUposatha;
+
+  /// No description provided for @calendarLastQuarterUposatha.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Quarter Uposatha'**
+  String get calendarLastQuarterUposatha;
+
+  /// No description provided for @calendarMaghaPuja.
+  ///
+  /// In en, this message translates to:
+  /// **'Magha Puja (Sangha Day)'**
+  String get calendarMaghaPuja;
+
+  /// No description provided for @calendarParinirvanaDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Parinirvana Day'**
+  String get calendarParinirvanaDay;
+
+  /// No description provided for @calendarVesak.
+  ///
+  /// In en, this message translates to:
+  /// **'Vesak (Buddha Day)'**
+  String get calendarVesak;
+
+  /// No description provided for @calendarAsalhaPuja.
+  ///
+  /// In en, this message translates to:
+  /// **'Asalha Puja (Dhamma Day)'**
+  String get calendarAsalhaPuja;
+
+  /// No description provided for @calendarPavarana.
+  ///
+  /// In en, this message translates to:
+  /// **'Pavarana Day'**
+  String get calendarPavarana;
+
+  /// No description provided for @calendarDhammaChakraDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhammachakra Pravartan Day'**
+  String get calendarDhammaChakraDay;
+
+  /// No description provided for @calendarBodhiDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Bodhi Day'**
+  String get calendarBodhiDay;
+
+  /// No description provided for @calendarUposathaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A day for deeper practice, meditation, generosity and observing the precepts.'**
+  String get calendarUposathaDescription;
+
+  /// No description provided for @calendarMaghaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembers the spontaneous gathering of the Buddha\'s enlightened disciples.'**
+  String get calendarMaghaDescription;
+
+  /// No description provided for @calendarParinirvanaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Commemorates the Buddha\'s passing into final Nibbana in Mahayana traditions.'**
+  String get calendarParinirvanaDescription;
+
+  /// No description provided for @calendarVesakDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Honours the Buddha\'s birth, awakening and final Nibbana.'**
+  String get calendarVesakDescription;
+
+  /// No description provided for @calendarAsalhaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembers the Buddha\'s first teaching and the arising of the Sangha.'**
+  String get calendarAsalhaDescription;
+
+  /// No description provided for @calendarPavaranaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Marks the end of the traditional rains retreat.'**
+  String get calendarPavaranaDescription;
+
+  /// No description provided for @calendarDhammaChakraDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Commemorates the historic Buddhist conversion at Deekshabhoomi, Nagpur.'**
+  String get calendarDhammaChakraDescription;
+
+  /// No description provided for @calendarBodhiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Commemorates the Buddha\'s awakening in several Mahayana traditions.'**
+  String get calendarBodhiDescription;
+
+  /// No description provided for @homeDailyPaliWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Pali Word'**
+  String get homeDailyPaliWord;
+
+  /// No description provided for @homeDailyPaliWordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn one word daily'**
+  String get homeDailyPaliWordSubtitle;
+
+  /// No description provided for @homeChanting.
+  ///
+  /// In en, this message translates to:
+  /// **'Chanting'**
+  String get homeChanting;
+
+  /// No description provided for @homeChantingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio collection'**
+  String get homeChantingSubtitle;
+
+  /// No description provided for @chantingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No chants yet.'**
+  String get chantingEmpty;
+
+  /// No description provided for @homeTipitaka.
+  ///
+  /// In en, this message translates to:
+  /// **'Tipitaka'**
+  String get homeTipitaka;
+
+  /// No description provided for @homeTipitakaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read scriptures'**
+  String get homeTipitakaSubtitle;
+
+  /// No description provided for @homeDana.
+  ///
+  /// In en, this message translates to:
+  /// **'Dana'**
+  String get homeDana;
+
+  /// No description provided for @homeDanaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support Dhamma'**
+  String get homeDanaSubtitle;
+
+  /// No description provided for @homeBuddhistPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddhist Places'**
+  String get homeBuddhistPlaces;
+
+  /// No description provided for @homeBuddhistPlacesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sacred sites'**
+  String get homeBuddhistPlacesSubtitle;
+
+  /// No description provided for @featureComingSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We are preparing this feature for you.'**
+  String get featureComingSoonBody;
 
   /// No description provided for @filterAll.
   ///

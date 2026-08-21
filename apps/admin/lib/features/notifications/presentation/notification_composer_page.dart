@@ -21,6 +21,7 @@ const _modules = <(String, String)>[
   ('ringtone', 'Ringtones'),
   ('song', 'Songs'),
   ('meditation', 'Meditations'),
+  ('chanting', 'Chanting'),
   ('status', 'Statuses'),
   ('prarthana', 'Daily Prarthana'),
   ('profile', 'Profile'),
@@ -185,14 +186,14 @@ class _NotificationComposerPageState
     }
     if (_linkKind == _LinkKind.url) {
       final uri = Uri.tryParse(_url.text.trim());
-      if (uri == null ||
-          (uri.scheme != 'http' && uri.scheme != 'https')) {
+      if (uri == null || (uri.scheme != 'http' && uri.scheme != 'https')) {
         return AdminStrings.notifUrlInvalid;
       }
     }
     if (_schedule &&
         (_scheduledAt == null ||
-            _scheduledAt!.isBefore(DateTime.now().add(const Duration(minutes: 1))))) {
+            _scheduledAt!
+                .isBefore(DateTime.now().add(const Duration(minutes: 1))))) {
       return AdminStrings.notifScheduleInvalid;
     }
     return null;
@@ -200,7 +201,8 @@ class _NotificationComposerPageState
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _back() async {
@@ -210,8 +212,7 @@ class _NotificationComposerPageState
 
   Future<void> _saveDraft() async {
     final error = _validate();
-    if (error != null &&
-        error != AdminStrings.notifScheduleInvalid) {
+    if (error != null && error != AdminStrings.notifScheduleInvalid) {
       _snack(error);
       return;
     }
@@ -258,22 +259,22 @@ class _NotificationComposerPageState
       body: _schedule
           ? AdminStrings.confirmScheduleBody
           : '${AdminStrings.confirmSendBody} ${NotificationAudience.label(_audience())}.',
-      confirmLabel: _schedule
-          ? AdminStrings.scheduleSend
-          : AdminStrings.sendNow,
+      confirmLabel:
+          _schedule ? AdminStrings.scheduleSend : AdminStrings.sendNow,
     );
     if (!ok) return;
     setState(() => _busy = true);
     try {
-      final result = await ref.read(adminFunctionsServiceProvider).sendNotification(
-            campaignId: _id,
-            title: _title.text.trim(),
-            body: _body.text.trim(),
-            imageUrl: _imageUrl,
-            deepLink: _deepLink(),
-            audience: _audience(),
-            scheduledAt: _schedule ? _scheduledAt : null,
-          );
+      final result =
+          await ref.read(adminFunctionsServiceProvider).sendNotification(
+                campaignId: _id,
+                title: _title.text.trim(),
+                body: _body.text.trim(),
+                imageUrl: _imageUrl,
+                deepLink: _deepLink(),
+                audience: _audience(),
+                scheduledAt: _schedule ? _scheduledAt : null,
+              );
       _status = result.status;
       _delivered = result.deliveredCount;
       _dirty = false;
@@ -498,16 +499,16 @@ class _NotificationComposerPageState
             child: Text(
               _status == NotificationCampaignStatus.sent
                   ? '${AdminStrings.notifStatsSent} · '
-                        '${_delivered == 0 ? AdminStrings.topicAccepted : '$_delivered delivered'} · '
-                        '$_opened opened'
+                      '${_delivered == 0 ? AdminStrings.topicAccepted : '$_delivered delivered'} · '
+                      '$_opened opened'
                   : _status == NotificationCampaignStatus.failed
                       ? AdminStrings.notifFailed
                       : AdminStrings.notifSending,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: _status == NotificationCampaignStatus.failed
-                    ? AppColors.error
-                    : AppColors.textSecondary,
-              ),
+                    color: _status == NotificationCampaignStatus.failed
+                        ? AppColors.error
+                        : AppColors.textSecondary,
+                  ),
             ),
           ),
         TextField(
@@ -529,7 +530,8 @@ class _NotificationComposerPageState
           UploadField(
             label: AdminStrings.notifImage,
             valueUrl: _imageUrl,
-            storagePathBuilder: (ext) => StoragePaths.notificationImage(_id, ext),
+            storagePathBuilder: (ext) =>
+                StoragePaths.notificationImage(_id, ext),
             onUploaded: (url) => setState(() {
               _imageUrl = url;
               _dirty = true;
@@ -538,7 +540,8 @@ class _NotificationComposerPageState
         else if (_imageUrl != null)
           Image.network(_imageUrl!, height: 120, fit: BoxFit.cover),
         const SizedBox(height: 20),
-        Text(AdminStrings.notifAudience, style: Theme.of(context).textTheme.titleSmall),
+        Text(AdminStrings.notifAudience,
+            style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -559,8 +562,9 @@ class _NotificationComposerPageState
         const SizedBox(height: 8),
         if (_audienceKind == _AudienceKind.language)
           DropdownButtonFormField<String>(
-            value: _language,
-            decoration: const InputDecoration(labelText: AdminStrings.notifLanguage),
+            initialValue: _language,
+            decoration:
+                const InputDecoration(labelText: AdminStrings.notifLanguage),
             items: [
               for (final code in AppConstants.supportedLanguageCodes)
                 DropdownMenuItem(value: code, child: Text(code)),
@@ -574,13 +578,15 @@ class _NotificationComposerPageState
           ),
         if (_audienceKind == _AudienceKind.teacher)
           DropdownButtonFormField<String>(
-            value: teachers.any((t) => t.id == _teacherId)
+            initialValue: teachers.any((t) => t.id == _teacherId)
                 ? _teacherId
                 : (teachers.isEmpty ? null : teachers.first.id),
-            decoration: const InputDecoration(labelText: AdminStrings.teachersField),
+            decoration:
+                const InputDecoration(labelText: AdminStrings.teachersField),
             items: [
               for (final t in teachers)
-                DropdownMenuItem(value: t.id, child: Text(t.name.resolve('en'))),
+                DropdownMenuItem(
+                    value: t.id, child: Text(t.name.resolve('en'))),
             ],
             onChanged: _locked
                 ? null
@@ -591,8 +597,9 @@ class _NotificationComposerPageState
           ),
         if (_audienceKind == _AudienceKind.platform)
           DropdownButtonFormField<String>(
-            value: _platform,
-            decoration: const InputDecoration(labelText: AdminStrings.notifPlatform),
+            initialValue: _platform,
+            decoration:
+                const InputDecoration(labelText: AdminStrings.notifPlatform),
             items: const [
               DropdownMenuItem(value: 'android', child: Text('Android')),
               DropdownMenuItem(value: 'ios', child: Text('iOS')),
@@ -608,11 +615,13 @@ class _NotificationComposerPageState
           TextField(
             controller: _userId,
             enabled: !_locked,
-            decoration: const InputDecoration(labelText: AdminStrings.notifUserId),
+            decoration:
+                const InputDecoration(labelText: AdminStrings.notifUserId),
             onChanged: (_) => _markDirty(),
           ),
         const SizedBox(height: 20),
-        Text(AdminStrings.notifDeepLink, style: Theme.of(context).textTheme.titleSmall),
+        Text(AdminStrings.notifDeepLink,
+            style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -633,8 +642,9 @@ class _NotificationComposerPageState
         const SizedBox(height: 8),
         if (_linkKind == _LinkKind.module)
           DropdownButtonFormField<String>(
-            value: _module,
-            decoration: const InputDecoration(labelText: AdminStrings.moduleField),
+            initialValue: _module,
+            decoration:
+                const InputDecoration(labelText: AdminStrings.moduleField),
             items: [
               for (final item in _modules)
                 DropdownMenuItem(value: item.$1, child: Text(item.$2)),
@@ -678,7 +688,8 @@ class _NotificationComposerPageState
                     _schedule = v;
                     _dirty = true;
                     if (v && _scheduledAt == null) {
-                      _scheduledAt = DateTime.now().add(const Duration(hours: 1));
+                      _scheduledAt =
+                          DateTime.now().add(const Duration(hours: 1));
                     }
                   }),
         ),
@@ -696,7 +707,8 @@ class _NotificationComposerPageState
             ),
           ),
         const SizedBox(height: 20),
-        Text(AdminStrings.notifTestSend, style: Theme.of(context).textTheme.titleSmall),
+        Text(AdminStrings.notifTestSend,
+            style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         TextField(
           controller: _testToken,
@@ -719,19 +731,19 @@ class _NotificationComposerPageState
   }
 
   String _audienceKindLabel(_AudienceKind kind) => switch (kind) {
-    _AudienceKind.all => AdminStrings.notifAudienceAll,
-    _AudienceKind.language => AdminStrings.notifAudienceLanguage,
-    _AudienceKind.teacher => AdminStrings.notifAudienceTeacher,
-    _AudienceKind.platform => AdminStrings.notifAudiencePlatform,
-    _AudienceKind.user => AdminStrings.notifAudienceUser,
-  };
+        _AudienceKind.all => AdminStrings.notifAudienceAll,
+        _AudienceKind.language => AdminStrings.notifAudienceLanguage,
+        _AudienceKind.teacher => AdminStrings.notifAudienceTeacher,
+        _AudienceKind.platform => AdminStrings.notifAudiencePlatform,
+        _AudienceKind.user => AdminStrings.notifAudienceUser,
+      };
 
   String _linkKindLabel(_LinkKind kind) => switch (kind) {
-    _LinkKind.none => AdminStrings.notifLinkNone,
-    _LinkKind.module => AdminStrings.notifLinkModule,
-    _LinkKind.route => AdminStrings.notifLinkRoute,
-    _LinkKind.url => AdminStrings.notifLinkUrl,
-  };
+        _LinkKind.none => AdminStrings.notifLinkNone,
+        _LinkKind.module => AdminStrings.notifLinkModule,
+        _LinkKind.route => AdminStrings.notifLinkRoute,
+        _LinkKind.url => AdminStrings.notifLinkUrl,
+      };
 }
 
 class _PhonePreview extends StatelessWidget {
@@ -832,7 +844,8 @@ class _PhonePreview extends StatelessWidget {
                                   errorBuilder: (_, __, ___) => const SizedBox(
                                     width: 44,
                                     height: 44,
-                                    child: ColoredBox(color: AppColors.disabled),
+                                    child:
+                                        ColoredBox(color: AppColors.disabled),
                                   ),
                                 ),
                               ),
