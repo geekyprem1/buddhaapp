@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../auth/application/admin_session.dart';
 import '../application/users_providers.dart';
 
@@ -60,7 +61,8 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
 
     setState(() => _exporting = true);
     try {
-      final csv = await ref.read(adminFunctionsServiceProvider).exportUsersCsv();
+      final csv =
+          await ref.read(adminFunctionsServiceProvider).exportUsersCsv();
       if (!mounted) return;
       setState(() => _exporting = false);
       await showDialog<void>(
@@ -86,7 +88,8 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
       body: blocking
           ? AdminStrings.usersConfirmBlockBody
           : AdminStrings.usersConfirmUnblockBody,
-      confirmLabel: blocking ? AdminStrings.usersBlock : AdminStrings.usersUnblock,
+      confirmLabel:
+          blocking ? AdminStrings.usersBlock : AdminStrings.usersUnblock,
     );
     if (!ok) return;
 
@@ -153,7 +156,10 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
             children: [
               if (canManage) const _DeletionQueueSection(),
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  bottom: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -165,49 +171,44 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
                       onChanged: (v) => setState(() => _query = v),
                     ),
                     const SizedBox(height: 12),
-                    Row(
+                    ResponsiveFormRow(
                       children: [
-                        Expanded(
-                          child: DropdownButtonFormField<String?>(
-                            initialValue: _language,
-                            decoration: const InputDecoration(
-                              labelText: AdminStrings.usersLanguage,
-                            ),
-                            items: [
-                              const DropdownMenuItem(
-                                value: null,
-                                child: Text(AdminStrings.usersAllLanguages),
-                              ),
-                              for (final l in languages)
-                                DropdownMenuItem(value: l, child: Text(l)),
-                            ],
-                            onChanged: (v) => setState(() => _language = v),
+                        DropdownButtonFormField<String?>(
+                          initialValue: _language,
+                          decoration: const InputDecoration(
+                            labelText: AdminStrings.usersLanguage,
                           ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text(AdminStrings.usersAllLanguages),
+                            ),
+                            for (final l in languages)
+                              DropdownMenuItem(value: l, child: Text(l)),
+                          ],
+                          onChanged: (v) => setState(() => _language = v),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: DropdownButtonFormField<_StatusFilter>(
-                            initialValue: _status,
-                            decoration: const InputDecoration(
-                              labelText: AdminStrings.usersStatus,
+                        DropdownButtonFormField<_StatusFilter>(
+                          initialValue: _status,
+                          decoration: const InputDecoration(
+                            labelText: AdminStrings.usersStatus,
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: _StatusFilter.all,
+                              child: Text(AdminStrings.usersAllStatus),
                             ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: _StatusFilter.all,
-                                child: Text(AdminStrings.usersAllStatus),
-                              ),
-                              DropdownMenuItem(
-                                value: _StatusFilter.active,
-                                child: Text(AdminStrings.usersActiveOnly),
-                              ),
-                              DropdownMenuItem(
-                                value: _StatusFilter.blocked,
-                                child: Text(AdminStrings.usersBlockedOnly),
-                              ),
-                            ],
-                            onChanged: (v) => setState(
-                              () => _status = v ?? _StatusFilter.all,
+                            DropdownMenuItem(
+                              value: _StatusFilter.active,
+                              child: Text(AdminStrings.usersActiveOnly),
                             ),
+                            DropdownMenuItem(
+                              value: _StatusFilter.blocked,
+                              child: Text(AdminStrings.usersBlockedOnly),
+                            ),
+                          ],
+                          onChanged: (v) => setState(
+                            () => _status = v ?? _StatusFilter.all,
                           ),
                         ),
                       ],
@@ -219,7 +220,10 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
                 child: rows.isEmpty
                     ? const EmptyState(message: AdminStrings.usersEmpty)
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                        padding: AdminResponsive.pagePadding(
+                          context,
+                          top: 8,
+                        ),
                         itemCount: rows.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, i) {
@@ -257,103 +261,124 @@ class _UserRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final action = !canManage
+        ? null
+        : busy
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : OutlinedButton(
+                onPressed: onToggleBlock,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor:
+                      user.isBlocked ? AppColors.success : AppColors.error,
+                  side: BorderSide(
+                    color: user.isBlocked ? AppColors.success : AppColors.error,
+                  ),
+                ),
+                child: Text(
+                  user.isBlocked
+                      ? AdminStrings.usersUnblock
+                      : AdminStrings.usersBlock,
+                ),
+              );
+    final profile = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CircleAvatar(
+          backgroundColor: AppColors.disabled,
+          backgroundImage: (user.photoUrl != null && user.photoUrl!.isNotEmpty)
+              ? NetworkImage(user.photoUrl!)
+              : null,
+          child: (user.photoUrl == null || user.photoUrl!.isEmpty)
+              ? const Icon(Icons.person_outline, color: AppColors.primary)
+              : null,
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                user.name.isEmpty ? AdminStrings.usersNoName : user.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleMedium,
+              ),
+              if (user.isBlocked) ...[
+                const SizedBox(height: 4),
+                const _BlockedBadge(),
+              ],
+              const SizedBox(height: 2),
+              Text(
+                [
+                  if ((user.phone ?? '').isNotEmpty) user.phone,
+                  if ((user.email ?? '').isNotEmpty) user.email,
+                  user.uid,
+                ].join(' · '),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 12,
+                runSpacing: 4,
+                children: [
+                  _MetaChip(label: user.language.toUpperCase()),
+                  _MetaChip(label: user.platform),
+                  _MetaChip(
+                    label:
+                        '${AdminStrings.usersTeachers}: ${user.selectedTeachers.length}',
+                  ),
+                  _MetaChip(
+                    label:
+                        '${AdminStrings.usersJoined} ${_fmt(user.createdAt)}',
+                  ),
+                  _MetaChip(
+                    label:
+                        '${AdminStrings.usersLastActive} ${_fmt(user.lastActiveAt)}',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              backgroundColor: AppColors.disabled,
-              backgroundImage: (user.photoUrl != null && user.photoUrl!.isNotEmpty)
-                  ? NetworkImage(user.photoUrl!)
-                  : null,
-              child: (user.photoUrl == null || user.photoUrl!.isEmpty)
-                  ? const Icon(Icons.person_outline, color: AppColors.primary)
-                  : null,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
+        child: AdminResponsive.isCompact(context)
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  profile,
+                  if (action != null) ...[
+                    const SizedBox(height: 12),
+                    Align(alignment: Alignment.centerRight, child: action),
+                  ],
+                ],
+              )
+            : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        user.name.isEmpty ? AdminStrings.usersNoName : user.name,
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      if (user.isBlocked) ...[
-                        const SizedBox(width: 8),
-                        const _BlockedBadge(),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    [
-                      if ((user.phone ?? '').isNotEmpty) user.phone,
-                      if ((user.email ?? '').isNotEmpty) user.email,
-                      user.uid,
-                    ].join(' · '),
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 4,
-                    children: [
-                      _MetaChip(label: user.language.toUpperCase()),
-                      _MetaChip(label: user.platform),
-                      _MetaChip(
-                        label:
-                            '${AdminStrings.usersTeachers}: ${user.selectedTeachers.length}',
-                      ),
-                      _MetaChip(
-                        label:
-                            '${AdminStrings.usersJoined} ${_fmt(user.createdAt)}',
-                      ),
-                      _MetaChip(
-                        label:
-                            '${AdminStrings.usersLastActive} ${_fmt(user.lastActiveAt)}',
-                      ),
-                    ],
-                  ),
+                  Expanded(child: profile),
+                  if (action != null) ...[
+                    const SizedBox(width: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: action,
+                    ),
+                  ],
                 ],
               ),
-            ),
-            if (canManage)
-              busy
-                  ? const Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  : OutlinedButton(
-                      onPressed: onToggleBlock,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor:
-                            user.isBlocked ? AppColors.success : AppColors.error,
-                        side: BorderSide(
-                          color: user.isBlocked
-                              ? AppColors.success
-                              : AppColors.error,
-                        ),
-                      ),
-                      child: Text(
-                        user.isBlocked
-                            ? AdminStrings.usersUnblock
-                            : AdminStrings.usersBlock,
-                      ),
-                    ),
-          ],
-        ),
       ),
     );
   }
@@ -397,7 +422,7 @@ class _DeletionQueueSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(adminDeletionRequestsProvider);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
+      padding: AdminResponsive.pagePadding(context, bottom: 0),
       child: async.when(
         loading: () => const SizedBox.shrink(),
         error: (_, __) => const SizedBox.shrink(),
@@ -486,33 +511,46 @@ class _DeletionRowState extends ConsumerState<_DeletionRow> {
 
   @override
   Widget build(BuildContext context) {
+    final action = _busy
+        ? const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : OutlinedButton(
+            onPressed: _execute,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.error,
+              side: const BorderSide(color: AppColors.error),
+            ),
+            child: const Text(AdminStrings.usersDeletionExecute),
+          );
+    final description = Text(
+      widget.requestedAt == null
+          ? widget.uid
+          : '${widget.uid} · ${AdminStrings.usersDeletionRequestedAt} ${widget.requestedAt}',
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              widget.requestedAt == null
-                  ? widget.uid
-                  : '${widget.uid} · ${AdminStrings.usersDeletionRequestedAt} ${widget.requestedAt}',
+      child: AdminResponsive.isCompact(context)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                description,
+                const SizedBox(height: 8),
+                Align(alignment: Alignment.centerRight, child: action),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(child: description),
+                const SizedBox(width: 16),
+                action,
+              ],
             ),
-          ),
-          _busy
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : OutlinedButton(
-                  onPressed: _execute,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
-                  ),
-                  child: const Text(AdminStrings.usersDeletionExecute),
-                ),
-        ],
-      ),
     );
   }
 }
@@ -524,13 +562,25 @@ class _CsvPreviewDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final availableHeight = media.size.height - media.viewInsets.bottom;
+    final previewHeight =
+        (availableHeight * 0.55).clamp(80.0, 400.0).toDouble();
+
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      scrollable: true,
       title: const Text(AdminStrings.usersExportCsv),
-      content: SizedBox(
-        width: 640,
-        height: 400,
+      content: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 640, maxHeight: previewHeight),
         child: SingleChildScrollView(
-          child: SelectableText(csv, style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SelectableText(
+              csv,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            ),
+          ),
         ),
       ),
       actions: [

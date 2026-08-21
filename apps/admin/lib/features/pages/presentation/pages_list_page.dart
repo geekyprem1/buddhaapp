@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/admin_access.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/pages_providers.dart';
 
 class PagesListPage extends ConsumerWidget {
@@ -23,7 +24,7 @@ class PagesListPage extends ConsumerWidget {
         data: (pages) {
           final bySlug = {for (final page in pages) page.slug: page};
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 32),
+            padding: AdminResponsive.pagePadding(context),
             itemCount: StaticPageSlugs.all.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
@@ -47,30 +48,46 @@ class PagesListPage extends ConsumerWidget {
                             children: [
                               Text(
                                 StaticPageSlugs.label(slug),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               Text(
                                 page == null
                                     ? AdminStrings.pageNotAuthored
                                     : page.title.resolve('en'),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(color: AppColors.textSecondary),
                               ),
+                              if (AdminResponsive.isCompact(context))
+                                Text(
+                                  page == null
+                                      ? AdminStrings.pageDraft
+                                      : AdminStrings.pageSaved,
+                                  style: TextStyle(
+                                    color: page == null
+                                        ? AppColors.textSecondary
+                                        : AppColors.success,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
-                        Text(
-                          page == null
-                              ? AdminStrings.pageDraft
-                              : AdminStrings.pageSaved,
-                          style: TextStyle(
-                            color: page == null
-                                ? AppColors.textSecondary
-                                : AppColors.success,
+                        if (!AdminResponsive.isCompact(context))
+                          Text(
+                            page == null
+                                ? AdminStrings.pageDraft
+                                : AdminStrings.pageSaved,
+                            style: TextStyle(
+                              color: page == null
+                                  ? AppColors.textSecondary
+                                  : AppColors.success,
+                            ),
                           ),
-                        ),
                         const Icon(Icons.chevron_right),
                       ],
                     ),

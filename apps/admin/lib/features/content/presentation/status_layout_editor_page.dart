@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../auth/application/admin_session.dart';
 import '../application/content_providers.dart';
 import '../application/content_type_config.dart';
@@ -126,7 +127,8 @@ class _StatusLayoutEditorPageState
           ref.watch(adminRoleProvider).valueOrNull,
         );
         return AdminPageFrame(
-          title: '${AdminStrings.statusLayoutTitle} — ${item.title.resolve('en')}',
+          title:
+              '${AdminStrings.statusLayoutTitle} — ${item.title.resolve('en')}',
           onBack: () => context.go(
             '${widget.config.route}/${widget.itemId}',
           ),
@@ -184,7 +186,11 @@ class _StatusLayoutEditorPageState
                 }),
               );
               return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  top: 24,
+                  bottom: 48,
+                ),
                 child: wide
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,7 +204,10 @@ class _StatusLayoutEditorPageState
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Center(
-                            child: SizedBox(width: 320, child: preview),
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 320),
+                              child: preview,
+                            ),
                           ),
                           const SizedBox(height: 24),
                           controls,
@@ -317,9 +326,8 @@ class _PreviewCanvasState extends State<_PreviewCanvas> {
       );
     }
     // Match the base image's aspect so preview == mobile composite in proportion.
-    final aspect = _imageSize == null
-        ? 4 / 5
-        : _imageSize!.width / _imageSize!.height;
+    final aspect =
+        _imageSize == null ? 4 / 5 : _imageSize!.width / _imageSize!.height;
 
     return AspectRatio(
       aspectRatio: aspect,
@@ -331,8 +339,7 @@ class _PreviewCanvasState extends State<_PreviewCanvas> {
             final ch = c.maxHeight;
             final f = _frame;
             final n = _name;
-            final diameter =
-                (f.w * cw) < (f.h * ch) ? (f.w * cw) : (f.h * ch);
+            final diameter = (f.w * cw) < (f.h * ch) ? (f.w * cw) : (f.h * ch);
             final fontSize = n.size * ch;
 
             return Stack(
@@ -622,7 +629,6 @@ class _Controls extends StatelessWidget {
           label: const Text(AdminStrings.statusSamplePhoto),
         ),
         const Divider(height: 32),
-
         Text(AdminStrings.statusNameSize, style: theme.textTheme.labelLarge),
         Slider(
           value: name.size.clamp(0.02, 0.10),
@@ -647,7 +653,6 @@ class _Controls extends StatelessWidget {
           ],
         ),
         const Divider(height: 32),
-
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: const Text(AdminStrings.statusWatermark),

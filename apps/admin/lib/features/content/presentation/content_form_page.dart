@@ -8,6 +8,7 @@ import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/localised_text_field.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../../widgets/unsaved_changes_guard.dart';
 import '../../../widgets/upload_field.dart';
 import '../../auth/application/admin_session.dart';
@@ -378,7 +379,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+          padding: AdminResponsive.pagePadding(context, top: 24, bottom: 48),
           children: [
             LocalisedTextField(
               label: 'Title',
@@ -492,103 +493,96 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
               ),
             ],
             const SizedBox(height: 16),
-            Row(
+            ResponsiveFormRow(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _source,
-                    enabled: canEdit,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.source,
-                    ),
-                    onChanged: (_) => _markDirty(),
+                TextField(
+                  controller: _source,
+                  enabled: canEdit,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.source,
                   ),
+                  onChanged: (_) => _markDirty(),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _licence,
-                    enabled: canEdit,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.licence,
-                    ),
-                    onChanged: (_) => _markDirty(),
+                TextField(
+                  controller: _licence,
+                  enabled: canEdit,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.licence,
                   ),
+                  onChanged: (_) => _markDirty(),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Row(
+            ResponsiveFormRow(
               children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    key: ValueKey(_status),
-                    initialValue: _status,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.statusField,
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: ContentStatus.draft,
-                        child: Text('draft'),
-                      ),
-                      DropdownMenuItem(
-                        value: ContentStatus.published,
-                        child: Text('published'),
-                      ),
-                      DropdownMenuItem(
-                        value: ContentStatus.unpublished,
-                        child: Text('unpublished'),
-                      ),
-                      DropdownMenuItem(
-                        value: ContentStatus.archived,
-                        child: Text('archived'),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() {
-                        _status = v;
-                        _dirty = true;
-                      });
-                    },
+                DropdownButtonFormField<String>(
+                  key: ValueKey(_status),
+                  initialValue: _status,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.statusField,
                   ),
-                ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 120,
-                  child: TextField(
-                    controller: _sort,
-                    enabled: canEdit,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.sortOrder,
+                  items: const [
+                    DropdownMenuItem(
+                      value: ContentStatus.draft,
+                      child: Text('draft'),
                     ),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (_) => _markDirty(),
+                    DropdownMenuItem(
+                      value: ContentStatus.published,
+                      child: Text('published'),
+                    ),
+                    DropdownMenuItem(
+                      value: ContentStatus.unpublished,
+                      child: Text('unpublished'),
+                    ),
+                    DropdownMenuItem(
+                      value: ContentStatus.archived,
+                      child: Text('archived'),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v == null) return;
+                    setState(() {
+                      _status = v;
+                      _dirty = true;
+                    });
+                  },
+                ),
+                TextField(
+                  controller: _sort,
+                  enabled: canEdit,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.sortOrder,
                   ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (_) => _markDirty(),
                 ),
-                const SizedBox(width: 16),
-                FilterChip(
-                  label: const Text(AdminStrings.featured),
-                  selected: _featured,
-                  onSelected: canEdit
-                      ? (v) {
-                          _featured = v;
-                          _markDirty();
-                        }
-                      : null,
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text(AdminStrings.premium),
-                  selected: _premium,
-                  onSelected: canEdit
-                      ? (v) {
-                          _premium = v;
-                          _markDirty();
-                        }
-                      : null,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilterChip(
+                      label: const Text(AdminStrings.featured),
+                      selected: _featured,
+                      onSelected: canEdit
+                          ? (v) {
+                              _featured = v;
+                              _markDirty();
+                            }
+                          : null,
+                    ),
+                    FilterChip(
+                      label: const Text(AdminStrings.premium),
+                      selected: _premium,
+                      onSelected: canEdit
+                          ? (v) {
+                              _premium = v;
+                              _markDirty();
+                            }
+                          : null,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -639,42 +633,32 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
             ],
             if (config.hasSeries) ...[
               const SizedBox(height: 16),
-              Row(
+              ResponsiveFormRow(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _series,
-                      enabled: canEdit,
-                      decoration: const InputDecoration(
-                        labelText: AdminStrings.seriesField,
-                      ),
-                      onChanged: (_) => _markDirty(),
+                  TextField(
+                    controller: _series,
+                    enabled: canEdit,
+                    decoration: const InputDecoration(
+                      labelText: AdminStrings.seriesField,
                     ),
+                    onChanged: (_) => _markDirty(),
                   ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: 120,
-                    child: TextField(
-                      controller: _part,
-                      enabled: canEdit,
-                      decoration: const InputDecoration(
-                        labelText: AdminStrings.partField,
-                      ),
-                      keyboardType: TextInputType.number,
-                      onChanged: (_) => _markDirty(),
+                  TextField(
+                    controller: _part,
+                    enabled: canEdit,
+                    decoration: const InputDecoration(
+                      labelText: AdminStrings.partField,
                     ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) => _markDirty(),
                   ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: 160,
-                    child: TextField(
-                      controller: _level,
-                      enabled: canEdit,
-                      decoration: const InputDecoration(
-                        labelText: AdminStrings.levelField,
-                      ),
-                      onChanged: (_) => _markDirty(),
+                  TextField(
+                    controller: _level,
+                    enabled: canEdit,
+                    decoration: const InputDecoration(
+                      labelText: AdminStrings.levelField,
                     ),
+                    onChanged: (_) => _markDirty(),
                   ),
                 ],
               ),
@@ -733,7 +717,8 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                   ),
                 ),
               const SizedBox(height: 8),
-              Row(
+              ResponsiveFormRow(
+                spacing: 8,
                 children: [
                   _numField(_frameX, 'Frame X'),
                   _numField(_frameY, 'Frame Y'),
@@ -742,19 +727,24 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                 ],
               ),
               const SizedBox(height: 8),
-              Row(
+              ResponsiveFormRow(
+                spacing: 8,
                 children: [
                   _numField(_nameX, 'Name X'),
                   _numField(_nameY, 'Name Y'),
-                  FilterChip(
-                    label: const Text('Watermark'),
-                    selected: _watermark,
-                    onSelected: canEdit
-                        ? (v) {
-                            _watermark = v;
-                            _markDirty();
-                          }
-                        : null,
+                  Wrap(
+                    children: [
+                      FilterChip(
+                        label: const Text('Watermark'),
+                        selected: _watermark,
+                        onSelected: canEdit
+                            ? (v) {
+                                _watermark = v;
+                                _markDirty();
+                              }
+                            : null,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -771,16 +761,11 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   }
 
   Widget _numField(TextEditingController controller, String label) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(labelText: label),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (_) => _markDirty(),
-        ),
-      ),
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      onChanged: (_) => _markDirty(),
     );
   }
 }

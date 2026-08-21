@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app/admin_strings.dart';
+import 'responsive_layout.dart';
 
 class ConfirmDialog extends StatelessWidget {
   const ConfirmDialog({
@@ -34,6 +35,11 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: AdminResponsive.isCompact(context) ? 16 : 40,
+        vertical: 24,
+      ),
       title: Text(title),
       content: Text(body),
       actions: [

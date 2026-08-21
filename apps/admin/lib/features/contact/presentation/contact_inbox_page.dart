@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../auth/application/admin_session.dart';
 import '../application/contact_providers.dart';
 
@@ -82,7 +83,11 @@ class _ContactInboxPageState extends ConsumerState<ContactInboxPage> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  top: 16,
+                  bottom: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -124,7 +129,11 @@ class _ContactInboxPageState extends ConsumerState<ContactInboxPage> {
                 child: rows.isEmpty
                     ? const EmptyState(message: AdminStrings.contactEmpty)
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                        padding: AdminResponsive.pagePadding(
+                          context,
+                          top: 8,
+                          bottom: 32,
+                        ),
                         itemCount: rows.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, i) => _MessageTile(
@@ -167,9 +176,8 @@ class _MessageTile extends StatelessWidget {
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           leading: CircleAvatar(
-            backgroundColor:
-                (resolved ? AppColors.success : AppColors.primary)
-                    .withValues(alpha: 0.15),
+            backgroundColor: (resolved ? AppColors.success : AppColors.primary)
+                .withValues(alpha: 0.15),
             child: Icon(
               resolved ? Icons.check : Icons.mail_outline,
               color: resolved ? AppColors.success : AppColors.primary,
@@ -184,6 +192,8 @@ class _MessageTile extends StatelessWidget {
           ),
           subtitle: Text(
             '${AdminStrings.contactFrom} ${message.uid}${_when(message.createdAt)}',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: AppColors.textSecondary),
           ),

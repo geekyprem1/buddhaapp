@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/content_providers.dart';
 import '../application/content_type_config.dart';
 
@@ -111,7 +112,11 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  top: 16,
+                  bottom: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -157,7 +162,11 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                     ? const EmptyState(message: AdminStrings.emptyList)
                     : reorderable
                         ? ReorderableListView.builder(
-                            padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                            padding: AdminResponsive.pagePadding(
+                              context,
+                              top: 8,
+                              bottom: 32,
+                            ),
                             itemCount: rows.length,
                             onReorderItem: (oldIndex, newIndex) =>
                                 _reorder(rows, oldIndex, newIndex),
@@ -185,7 +194,11 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                             },
                           )
                         : ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                            padding: AdminResponsive.pagePadding(
+                              context,
+                              top: 8,
+                              bottom: 32,
+                            ),
                             itemCount: rows.length,
                             separatorBuilder: (_, __) =>
                                 const SizedBox(height: 8),
@@ -267,8 +280,16 @@ class _ContentRow extends StatelessWidget {
                       const Icon(Icons.broken_image_outlined),
                 ),
               ),
-        title: Text(item.title.resolve('en')),
-        subtitle: Text('${item.status} · ${item.id}'),
+        title: Text(
+          item.title.resolve('en'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          '${item.status} · ${item.id}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         trailing: PopupMenuButton<String>(
           onSelected: (value) {
             switch (value) {

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/audit_providers.dart';
 
 /// Audit log viewer (T1.29, AR-1.5). Lists `auditLogs` newest-first with an
@@ -48,7 +49,8 @@ class _AuditLogPageState extends ConsumerState<AuditLogPage> {
 
   bool _matches(AuditLog log) {
     final since = _since;
-    if (since != null && (log.createdAt == null || log.createdAt!.isBefore(since))) {
+    if (since != null &&
+        (log.createdAt == null || log.createdAt!.isBefore(since))) {
       return false;
     }
     if (_query.isEmpty) return true;
@@ -75,7 +77,7 @@ class _AuditLogPageState extends ConsumerState<AuditLogPage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+            padding: AdminResponsive.pagePadding(context, bottom: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -87,53 +89,48 @@ class _AuditLogPageState extends ConsumerState<AuditLogPage> {
                   onChanged: (v) => setState(() => _query = v),
                 ),
                 const SizedBox(height: 12),
-                Row(
+                ResponsiveFormRow(
                   children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String?>(
-                        initialValue: _entityType,
-                        decoration: const InputDecoration(
-                          labelText: AdminStrings.auditEntity,
-                        ),
-                        items: [
-                          const DropdownMenuItem(
-                            value: null,
-                            child: Text(AdminStrings.auditAllEntities),
-                          ),
-                          for (final t in _entityTypes)
-                            DropdownMenuItem(value: t, child: Text(t)),
-                        ],
-                        onChanged: (v) => setState(() => _entityType = v),
+                    DropdownButtonFormField<String?>(
+                      initialValue: _entityType,
+                      decoration: const InputDecoration(
+                        labelText: AdminStrings.auditEntity,
                       ),
+                      items: [
+                        const DropdownMenuItem(
+                          value: null,
+                          child: Text(AdminStrings.auditAllEntities),
+                        ),
+                        for (final t in _entityTypes)
+                          DropdownMenuItem(value: t, child: Text(t)),
+                      ],
+                      onChanged: (v) => setState(() => _entityType = v),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: DropdownButtonFormField<_Range>(
-                        initialValue: _range,
-                        decoration: const InputDecoration(
-                          labelText: AdminStrings.auditRange,
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: _Range.all,
-                            child: Text(AdminStrings.auditRangeAll),
-                          ),
-                          DropdownMenuItem(
-                            value: _Range.h24,
-                            child: Text(AdminStrings.auditRange24h),
-                          ),
-                          DropdownMenuItem(
-                            value: _Range.d7,
-                            child: Text(AdminStrings.auditRange7d),
-                          ),
-                          DropdownMenuItem(
-                            value: _Range.d30,
-                            child: Text(AdminStrings.auditRange30d),
-                          ),
-                        ],
-                        onChanged: (v) =>
-                            setState(() => _range = v ?? _Range.all),
+                    DropdownButtonFormField<_Range>(
+                      initialValue: _range,
+                      decoration: const InputDecoration(
+                        labelText: AdminStrings.auditRange,
                       ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: _Range.all,
+                          child: Text(AdminStrings.auditRangeAll),
+                        ),
+                        DropdownMenuItem(
+                          value: _Range.h24,
+                          child: Text(AdminStrings.auditRange24h),
+                        ),
+                        DropdownMenuItem(
+                          value: _Range.d7,
+                          child: Text(AdminStrings.auditRange7d),
+                        ),
+                        DropdownMenuItem(
+                          value: _Range.d30,
+                          child: Text(AdminStrings.auditRange30d),
+                        ),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => _range = v ?? _Range.all),
                     ),
                   ],
                 ),
@@ -150,7 +147,7 @@ class _AuditLogPageState extends ConsumerState<AuditLogPage> {
                   return const EmptyState(message: AdminStrings.auditEmpty);
                 }
                 return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                  padding: AdminResponsive.pagePadding(context, top: 8),
                   itemCount: rows.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, i) => _AuditRow(log: rows[i]),
@@ -223,6 +220,47 @@ class _DiffView extends StatelessWidget {
       );
     }
     final keys = {...before.keys, ...after.keys}.toList()..sort();
+    if (AdminResponsive.isCompact(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final key in keys)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.disabled.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        key,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AdminStrings.auditBefore,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      Text(_fmt(before[key])),
+                      const SizedBox(height: 8),
+                      Text(
+                        AdminStrings.auditAfter,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      Text(_fmt(after[key])),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

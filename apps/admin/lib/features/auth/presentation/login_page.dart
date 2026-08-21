@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/admin_strings.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/admin_auth_controller.dart';
 import '../application/admin_session.dart';
 
@@ -62,7 +63,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         'wrong-password' ||
         'user-not-found' ||
         'INVALID_LOGIN_CREDENTIALS' ||
-        'invalid-login-credentials' => AdminStrings.badCredentials,
+        'invalid-login-credentials' =>
+          AdminStrings.badCredentials,
         'too-many-requests' => AdminStrings.tooManyAttempts,
         'network-request-failed' => AdminStrings.networkError,
         'user-disabled' => AdminStrings.accountInactive,
@@ -78,8 +80,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final auth = ref.watch(adminAuthControllerProvider);
     final isLoading = auth.isLoading;
-    final idleExpired =
-        widget.idleExpired || ref.watch(idleSignOutProvider);
+    final idleExpired = widget.idleExpired || ref.watch(idleSignOutProvider);
 
     ref.listen(adminAuthControllerProvider, (previous, next) {
       if (next.hasError && context.mounted) {
@@ -95,7 +96,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 440),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
+            padding: EdgeInsets.all(AdminResponsive.gutter(context)),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: AppColors.surface,
@@ -112,26 +113,31 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(32, 36, 32, 32),
+                padding: EdgeInsets.fromLTRB(
+                  AdminResponsive.gutter(context),
+                  AdminResponsive.isCompact(context) ? 24 : 36,
+                  AdminResponsive.gutter(context),
+                  AdminResponsive.gutter(context),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
                       AdminStrings.loginEyebrow.toUpperCase(),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        letterSpacing: 2.4,
-                        color: AppColors.accent,
-                        fontWeight: FontWeight.w600,
-                      ),
+                            letterSpacing: 2.4,
+                            color: AppColors.accent,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       AdminStrings.appName,
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -142,8 +148,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Text(
                       AdminStrings.loginBody,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                            color: AppColors.textSecondary,
+                          ),
                     ),
                     if (idleExpired) ...[
                       const SizedBox(height: 16),

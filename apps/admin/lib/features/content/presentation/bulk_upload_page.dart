@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/content_providers.dart';
 import '../application/content_type_config.dart';
 
@@ -70,7 +71,8 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
         if (bytes == null) continue;
         final ext = file.name.split('.').last.toLowerCase();
         final entry = _BulkFile(name: file.name, bytes: bytes, ext: ext);
-        if (!FieldValidators.hasAllowedExtension(file.name, _allowedExtensions)) {
+        if (!FieldValidators.hasAllowedExtension(
+            file.name, _allowedExtensions)) {
           entry
             ..status = _BulkStatus.failed
             ..error = AdminStrings.bulkBadType;
@@ -98,7 +100,8 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
       });
 
       final id = repo.newId();
-      final path = StoragePaths.contentOriginal(config.collection, id, file.ext);
+      final path =
+          StoragePaths.contentOriginal(config.collection, id, file.ext);
       try {
         // 1. Draft doc first — the media Function merges onto it.
         await repo.createWithId(
@@ -187,13 +190,13 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
         ),
       ],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+        padding: AdminResponsive.pagePadding(context, top: 24, bottom: 48),
         children: [
           Text(
             AdminStrings.bulkHint,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
-            ),
+                  color: AppColors.textSecondary,
+                ),
           ),
           const SizedBox(height: 8),
           if (doneCount > 0)
@@ -228,25 +231,25 @@ class _BulkRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final (icon, color, label) = switch (file.status) {
       _BulkStatus.queued => (
-        Icons.schedule,
-        AppColors.textSecondary,
-        AdminStrings.bulkQueued,
-      ),
+          Icons.schedule,
+          AppColors.textSecondary,
+          AdminStrings.bulkQueued,
+        ),
       _BulkStatus.uploading => (
-        Icons.cloud_upload_outlined,
-        AppColors.primary,
-        '${AdminStrings.bulkUploadingLabel} ${(file.progress * 100).round()}%',
-      ),
+          Icons.cloud_upload_outlined,
+          AppColors.primary,
+          '${AdminStrings.bulkUploadingLabel} ${(file.progress * 100).round()}%',
+        ),
       _BulkStatus.done => (
-        Icons.check_circle_outline,
-        AppColors.success,
-        AdminStrings.bulkDoneLabel,
-      ),
+          Icons.check_circle_outline,
+          AppColors.success,
+          AdminStrings.bulkDoneLabel,
+        ),
       _BulkStatus.failed => (
-        Icons.error_outline,
-        AppColors.error,
-        file.error ?? AdminStrings.bulkFailedLabel,
-      ),
+          Icons.error_outline,
+          AppColors.error,
+          file.error ?? AdminStrings.bulkFailedLabel,
+        ),
     };
 
     return Padding(

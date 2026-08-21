@@ -8,6 +8,7 @@ import '../../../app/admin_access.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/localised_text_field.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../../widgets/unsaved_changes_guard.dart';
 import '../application/pages_providers.dart';
 
@@ -60,7 +61,8 @@ class _PageEditorPageState extends ConsumerState<PageEditorPage>
   }
 
   void _hydrate(StaticPage? page) {
-    _title = page?.title ?? LocalisedText(en: StaticPageSlugs.label(widget.slug));
+    _title =
+        page?.title ?? LocalisedText(en: StaticPageSlugs.label(widget.slug));
     _en.text = page?.body.en ?? '';
     _hi.text = page?.body.hi ?? '';
     _mr.text = page?.body.mr ?? '';
@@ -70,10 +72,10 @@ class _PageEditorPageState extends ConsumerState<PageEditorPage>
   }
 
   TextEditingController get _active => switch (_tabs.index) {
-    1 => _hi,
-    2 => _mr,
-    _ => _en,
-  };
+        1 => _hi,
+        2 => _mr,
+        _ => _en,
+      };
 
   void _wrap(String open, String close) {
     final controller = _active;
@@ -176,7 +178,11 @@ class _PageEditorPageState extends ConsumerState<PageEditorPage>
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(32, 16, 32, 48),
+          padding: AdminResponsive.pagePadding(
+            context,
+            top: 16,
+            bottom: 48,
+          ),
           children: [
             LocalisedTextField(
               label: AdminStrings.pageTitle,
@@ -243,8 +249,8 @@ class _PageEditorPageState extends ConsumerState<PageEditorPage>
                     ? Text(
                         AdminStrings.pagePreviewEmpty,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                              color: AppColors.textSecondary,
+                            ),
                       )
                     : SimpleHtmlText(html: preview),
               ),
@@ -254,8 +260,8 @@ class _PageEditorPageState extends ConsumerState<PageEditorPage>
               Text(
                 '${AdminStrings.configUpdatedAt} ${_updatedAt!.toLocal()}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                      color: AppColors.textSecondary,
+                    ),
               ),
             ],
           ],

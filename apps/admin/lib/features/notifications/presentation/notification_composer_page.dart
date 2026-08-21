@@ -9,6 +9,7 @@ import '../../../app/admin_access.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../../widgets/unsaved_changes_guard.dart';
 import '../../../widgets/upload_field.dart';
 import '../../auth/application/admin_session.dart';
@@ -448,6 +449,8 @@ class _NotificationComposerPageState
         child: LayoutBuilder(
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= 980;
+            final compact = AdminResponsive.isCompact(context);
+            final gutter = AdminResponsive.gutter(context);
             final form = _form(teachers);
             final preview = _PhonePreview(
               title: _title.text.trim().isEmpty
@@ -460,8 +463,16 @@ class _NotificationComposerPageState
             );
             if (!wide) {
               return ListView(
-                padding: const EdgeInsets.fromLTRB(32, 16, 32, 32),
-                children: [preview, const SizedBox(height: 24), form],
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  top: 16,
+                  bottom: 32,
+                ),
+                children: [
+                  preview,
+                  SizedBox(height: compact ? 16 : 24),
+                  form,
+                ],
               );
             }
             return Row(
@@ -470,14 +481,14 @@ class _NotificationComposerPageState
                 Expanded(
                   flex: 3,
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(32, 16, 16, 32),
+                    padding: EdgeInsets.fromLTRB(gutter, 16, gutter / 2, 32),
                     child: form,
                   ),
                 ),
                 Expanded(
                   flex: 2,
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 32, 32),
+                    padding: EdgeInsets.fromLTRB(gutter / 2, 16, gutter, 32),
                     child: preview,
                   ),
                 ),
@@ -767,7 +778,12 @@ class _PhonePreview extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 320),
+          constraints: BoxConstraints(
+            maxWidth: (MediaQuery.sizeOf(context).width -
+                    2 * AdminResponsive.gutter(context))
+                .clamp(0, 320)
+                .toDouble(),
+          ),
           child: AspectRatio(
             aspectRatio: 9 / 16,
             child: DecoratedBox(

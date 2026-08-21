@@ -7,6 +7,7 @@ import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/localised_text_field.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../../widgets/unsaved_changes_guard.dart';
 import '../application/config_providers.dart';
 
@@ -99,7 +100,8 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _toggleForce(bool value) async {
@@ -244,7 +246,10 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(32, 16, 32, 48),
+          padding: AdminResponsive.pagePadding(
+            context,
+            bottom: 48,
+          ),
           children: [
             if (_forceUpdate || _maintenance)
               Padding(
@@ -269,26 +274,21 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
                 ),
               ),
             _heading(AdminStrings.configVersions),
-            Row(
+            ResponsiveFormRow(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _minVersion,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.configMinVersion,
-                    ),
-                    onChanged: (_) => _markDirty(),
+                TextField(
+                  controller: _minVersion,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.configMinVersion,
                   ),
+                  onChanged: (_) => _markDirty(),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _latestVersion,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.configLatestVersion,
-                    ),
-                    onChanged: (_) => _markDirty(),
+                TextField(
+                  controller: _latestVersion,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.configLatestVersion,
                   ),
+                  onChanged: (_) => _markDirty(),
                 ),
               ],
             ),
@@ -339,35 +339,27 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
                   icon: const Icon(Icons.close),
                 ),
               ),
-            Row(
+            ResponsiveFormRow(
+              spacing: 8,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _langCode,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.configLangCode,
-                    ),
+                TextField(
+                  controller: _langCode,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.configLangCode,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _langName,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.configLangName,
-                    ),
+                TextField(
+                  controller: _langName,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.configLangName,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _langNative,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.configLangNative,
-                    ),
+                TextField(
+                  controller: _langNative,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.configLangNative,
                   ),
                 ),
-                const SizedBox(width: 8),
                 OutlinedButton(
                   onPressed: _addLanguage,
                   child: const Text(AdminStrings.addNew),
@@ -379,8 +371,8 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
             Text(
               AdminStrings.configHomeModulesHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+                    color: AppColors.textSecondary,
+                  ),
             ),
             const SizedBox(height: 8),
             ReorderableListView.builder(
@@ -429,8 +421,8 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
             Text(
               AdminStrings.configFlagsHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+                    color: AppColors.textSecondary,
+                  ),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
@@ -464,8 +456,8 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
               Text(
                 '${AdminStrings.configUpdatedAt} ${_updatedAt!.toLocal()}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                      color: AppColors.textSecondary,
+                    ),
               ),
             ],
           ],
@@ -480,8 +472,8 @@ class _ConfigPageState extends ConsumerState<ConfigPage> {
       child: Text(
         text,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-        ),
+              fontWeight: FontWeight.w700,
+            ),
       ),
     );
   }

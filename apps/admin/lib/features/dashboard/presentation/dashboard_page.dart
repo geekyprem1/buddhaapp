@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/admin_strings.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../auth/application/admin_session.dart';
 import '../application/dashboard_providers.dart';
 
@@ -21,29 +22,33 @@ class DashboardPage extends ConsumerWidget {
     return ColoredBox(
       color: AppColors.background,
       child: ListView(
-        padding: const EdgeInsets.all(32),
+        padding: AdminResponsive.pagePadding(
+          context,
+          top: AdminResponsive.gutter(context),
+          bottom: AdminResponsive.gutter(context),
+        ),
         children: [
           Text(
             AdminStrings.dashboard.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              letterSpacing: 2.2,
-              color: AppColors.accent,
-              fontWeight: FontWeight.w600,
-            ),
+                  letterSpacing: 2.2,
+                  color: AppColors.accent,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             email.isEmpty ? 'Welcome.' : 'Welcome, $email',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+                  fontWeight: FontWeight.w700,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             role.isEmpty ? '' : AdminRole.label(role),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.textSecondary,
-            ),
+                  color: AppColors.textSecondary,
+                ),
           ),
           const SizedBox(height: 28),
           async.when(
@@ -118,11 +123,22 @@ class _DashboardBody extends StatelessWidget {
                   ListTile(
                     dense: true,
                     leading: const Icon(Icons.history, size: 18),
-                    title: Text('${log.action} · ${log.entityType}/${log.entityId}'),
-                    subtitle: Text(
-                      log.actorEmail ?? (log.actorUid.isEmpty ? 'system' : log.actorUid),
+                    title: Text(
+                      '${log.action} · ${log.entityType}/${log.entityId}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    trailing: Text(_when(log.createdAt)),
+                    subtitle: Text(
+                      AdminResponsive.isCompact(context)
+                          ? '${log.actorEmail ?? (log.actorUid.isEmpty ? 'system' : log.actorUid)}\n${_when(log.createdAt)}'
+                          : log.actorEmail ??
+                              (log.actorUid.isEmpty ? 'system' : log.actorUid),
+                      maxLines: AdminResponsive.isCompact(context) ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: AdminResponsive.isCompact(context)
+                        ? null
+                        : Text(_when(log.createdAt)),
                   ),
               ],
             ),
@@ -148,7 +164,7 @@ class _KpiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 220,
+      width: AdminResponsive.isCompact(context) ? double.infinity : 220,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.surface,
@@ -163,17 +179,17 @@ class _KpiCard extends StatelessWidget {
               Text(
                 label.toUpperCase(),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  letterSpacing: 1.4,
-                  color: AppColors.textSecondary,
-                ),
+                      letterSpacing: 1.4,
+                      color: AppColors.textSecondary,
+                    ),
               ),
               const SizedBox(height: 10),
               Text(
                 value,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                ),
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
             ],
           ),

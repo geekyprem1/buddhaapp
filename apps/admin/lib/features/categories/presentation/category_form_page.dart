@@ -10,6 +10,7 @@ import '../../../util/slug.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/localised_text_field.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../../../widgets/unsaved_changes_guard.dart';
 import '../application/categories_providers.dart';
 
@@ -178,7 +179,7 @@ class _CategoryFormPageState extends ConsumerState<CategoryFormPage> {
           ),
         ],
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+          padding: AdminResponsive.pagePadding(context, top: 24, bottom: 48),
           children: [
             DropdownButtonFormField<String>(
               key: ValueKey(_module),
@@ -217,28 +218,28 @@ class _CategoryFormPageState extends ConsumerState<CategoryFormPage> {
               onChanged: (_) => _markDirty(),
             ),
             const SizedBox(height: 16),
-            Row(
+            ResponsiveFormRow(
               children: [
-                SizedBox(
-                  width: 140,
-                  child: TextField(
-                    controller: _sortCtrl,
-                    decoration: const InputDecoration(
-                      labelText: AdminStrings.sortOrder,
-                    ),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (_) => _markDirty(),
+                TextField(
+                  controller: _sortCtrl,
+                  decoration: const InputDecoration(
+                    labelText: AdminStrings.sortOrder,
                   ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (_) => _markDirty(),
                 ),
-                const SizedBox(width: 16),
-                FilterChip(
-                  label: const Text(AdminStrings.active),
-                  selected: _isActive,
-                  onSelected: (v) {
-                    _isActive = v;
-                    _markDirty();
-                  },
+                Wrap(
+                  children: [
+                    FilterChip(
+                      label: const Text(AdminStrings.active),
+                      selected: _isActive,
+                      onSelected: (v) {
+                        _isActive = v;
+                        _markDirty();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

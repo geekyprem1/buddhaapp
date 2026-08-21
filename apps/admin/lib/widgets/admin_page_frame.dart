@@ -1,6 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
+import 'responsive_layout.dart';
+
 class AdminPageFrame extends StatelessWidget {
   const AdminPageFrame({
     required this.title,
@@ -23,27 +25,54 @@ class AdminPageFrame extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(32, 24, 32, 16),
-            child: Row(
-              children: [
-                if (onBack != null) ...[
-                  IconButton(
-                    tooltip: 'Back',
-                    onPressed: onBack,
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                Expanded(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
+            padding: AdminResponsive.pagePadding(
+              context,
+              top: AdminResponsive.isCompact(context) ? 12 : 24,
+              bottom: 16,
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compact = AdminResponsive.isCompact(context);
+                final stackActions = compact || constraints.maxWidth < 720;
+                final heading = Row(
+                  children: [
+                    if (onBack != null) ...[
+                      IconButton(
+                        tooltip: 'Back',
+                        onPressed: onBack,
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: compact ? 2 : 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                      ),
                     ),
-                  ),
-                ),
-                ...actions,
-              ],
+                    if (!stackActions) ...actions,
+                  ],
+                );
+                if (!stackActions || actions.isEmpty) return heading;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    heading,
+                    const SizedBox(height: 12),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: actions,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           const Divider(height: 1),

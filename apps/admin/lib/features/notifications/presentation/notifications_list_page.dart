@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/admin_access.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/notifications_providers.dart';
 
 class NotificationsListPage extends ConsumerStatefulWidget {
@@ -48,7 +49,11 @@ class _NotificationsListPageState extends ConsumerState<NotificationsListPage> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  top: 16,
+                  bottom: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -72,13 +77,10 @@ class _NotificationsListPageState extends ConsumerState<NotificationsListPage> {
                         ])
                           FilterChip(
                             label: Text(
-                              status == null
-                                  ? 'All'
-                                  : _statusLabel(status),
+                              status == null ? 'All' : _statusLabel(status),
                             ),
                             selected: _status == status,
-                            onSelected: (_) =>
-                                setState(() => _status = status),
+                            onSelected: (_) => setState(() => _status = status),
                           ),
                       ],
                     ),
@@ -89,7 +91,11 @@ class _NotificationsListPageState extends ConsumerState<NotificationsListPage> {
                 child: rows.isEmpty
                     ? const EmptyState(message: AdminStrings.emptyList)
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                        padding: AdminResponsive.pagePadding(
+                          context,
+                          top: 8,
+                          bottom: 32,
+                        ),
                         itemCount: rows.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, i) {
@@ -119,6 +125,7 @@ class _CampaignRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = AdminResponsive.isCompact(context);
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(12),
@@ -136,7 +143,7 @@ class _CampaignRow extends StatelessWidget {
                   color: AppColors.primary,
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: compact ? 12 : 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,14 +158,39 @@ class _CampaignRow extends StatelessWidget {
                     Text(
                       '${NotificationAudience.label(campaign.audience)}'
                       '${_when(campaign)}',
+                      maxLines: compact ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                            color: AppColors.textSecondary,
+                          ),
                     ),
+                    if (compact) ...[
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (campaign.status ==
+                              NotificationCampaignStatus.sent)
+                            Text(
+                              campaign.deliveredCount == 0
+                                  ? AdminStrings.topicAccepted
+                                  : '${campaign.deliveredCount} delivered',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: AppColors.textSecondary),
+                            ),
+                          _StatusChip(status: campaign.status),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
-              if (campaign.status == NotificationCampaignStatus.sent)
+              if (!compact &&
+                  campaign.status == NotificationCampaignStatus.sent)
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: Text(
@@ -166,11 +198,11 @@ class _CampaignRow extends StatelessWidget {
                         ? AdminStrings.topicAccepted
                         : '${campaign.deliveredCount} delivered',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                          color: AppColors.textSecondary,
+                        ),
                   ),
                 ),
-              _StatusChip(status: campaign.status),
+              if (!compact) _StatusChip(status: campaign.status),
               const SizedBox(width: 8),
               const Icon(Icons.chevron_right),
             ],
@@ -224,10 +256,10 @@ class _StatusChip extends StatelessWidget {
 }
 
 String _statusLabel(String status) => switch (status) {
-  NotificationCampaignStatus.draft => 'Draft',
-  NotificationCampaignStatus.scheduled => 'Scheduled',
-  NotificationCampaignStatus.sending => 'Sending',
-  NotificationCampaignStatus.sent => 'Sent',
-  NotificationCampaignStatus.failed => 'Failed',
-  _ => status,
-};
+      NotificationCampaignStatus.draft => 'Draft',
+      NotificationCampaignStatus.scheduled => 'Scheduled',
+      NotificationCampaignStatus.sending => 'Sending',
+      NotificationCampaignStatus.sent => 'Sent',
+      NotificationCampaignStatus.failed => 'Failed',
+      _ => status,
+    };

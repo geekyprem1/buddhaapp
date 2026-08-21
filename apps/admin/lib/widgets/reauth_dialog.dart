@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/admin_strings.dart';
 import '../features/auth/application/admin_auth_controller.dart';
+import 'responsive_layout.dart';
 
 /// Forced password re-entry for destructive actions (AR-1.4).
 class ReauthDialog extends ConsumerStatefulWidget {
@@ -64,6 +65,11 @@ class _ReauthDialogState extends ConsumerState<ReauthDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: AdminResponsive.isCompact(context) ? 16 : 40,
+        vertical: 24,
+      ),
       title: const Text(AdminStrings.reauthTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,

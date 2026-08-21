@@ -8,6 +8,7 @@ import '../features/auth/application/admin_auth_controller.dart';
 import '../features/auth/application/admin_session.dart';
 import 'admin_access.dart';
 import 'admin_strings.dart';
+import '../widgets/responsive_layout.dart';
 
 /// Collapsible left nav + top bar (AR-8.1). Collapses to icons below 1100px.
 class AdminShell extends ConsumerWidget {
@@ -18,7 +19,8 @@ class AdminShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = MediaQuery.sizeOf(context).width;
-    final collapsed = width < 1100;
+    final compact = width < AdminResponsive.compactBreakpoint;
+    final collapsed = width < AdminResponsive.expandedNavBreakpoint;
     final location = GoRouterState.of(context).uri.path;
     final role = ref.watch(adminRoleProvider).valueOrNull ?? '';
     final user = ref.watch(adminAuthUserProvider);
@@ -26,29 +28,50 @@ class AdminShell extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Row(
-        children: [
-          AdminSideNav(
-            destinations: items,
-            currentPath: location,
-            collapsed: collapsed,
-            onSelect: (path) => context.go(path),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                _TopBar(
-                  email: user?.email ?? '',
-                  role: role,
-                  onSignOut: () =>
-                      ref.read(adminAuthControllerProvider.notifier).signOut(),
-                ),
-                const Divider(height: 1),
-                Expanded(child: child),
-              ],
+      drawer: compact
+          ? Drawer(
+              width: 248,
+              child: AdminSideNav(
+                destinations: items,
+                currentPath: location,
+                onSelect: (path) {
+                  Navigator.of(context).pop();
+                  context.go(path);
+                },
+              ),
+            )
+          : null,
+      body: Builder(
+        builder: (scaffoldContext) => Row(
+          children: [
+            if (!compact)
+              AdminSideNav(
+                destinations: items,
+                currentPath: location,
+                collapsed: collapsed,
+                onSelect: (path) => context.go(path),
+              ),
+            Expanded(
+              child: Column(
+                children: [
+                  _TopBar(
+                    email: user?.email ?? '',
+                    role: role,
+                    compact: compact,
+                    onMenu: compact
+                        ? () => Scaffold.of(scaffoldContext).openDrawer()
+                        : null,
+                    onSignOut: () => ref
+                        .read(adminAuthControllerProvider.notifier)
+                        .signOut(),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(child: child),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -231,25 +254,37 @@ class _TopBar extends StatelessWidget {
   const _TopBar({
     required this.email,
     required this.role,
+    required this.compact,
     required this.onSignOut,
+    this.onMenu,
   });
 
   final String email;
   final String role;
+  final bool compact;
   final VoidCallback onSignOut;
+  final VoidCallback? onMenu;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
       child: SizedBox(
-        height: 64,
+        height: compact ? 56 : 64,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(
+            horizontal: AdminResponsive.gutter(context),
+          ),
           child: Row(
             children: [
+              if (onMenu != null)
+                IconButton(
+                  tooltip: 'Open navigation',
+                  onPressed: onMenu,
+                  icon: const Icon(Icons.menu),
+                ),
               const Spacer(),
-              if (role.isNotEmpty)
+              if (!compact && role.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -267,19 +302,55 @@ class _TopBar extends StatelessWidget {
                         ),
                   ),
                 ),
-              const SizedBox(width: 12),
-              Flexible(
-                child: Text(
-                  email,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium,
+              if (!compact) ...[
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    email,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: onSignOut,
-                child: const Text(AdminStrings.signOut),
-              ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: onSignOut,
+                  child: const Text(AdminStrings.signOut),
+                ),
+              ] else
+                PopupMenuButton<String>(
+                  tooltip: 'Account',
+                  icon: const Icon(Icons.account_circle_outlined),
+                  onSelected: (value) {
+                    if (value == 'sign_out') onSignOut();
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      enabled: false,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 240),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              email,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (role.isNotEmpty)
+                              Text(
+                                AdminRole.label(role),
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    const PopupMenuItem(
+                      value: 'sign_out',
+                      child: Text(AdminStrings.signOut),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),

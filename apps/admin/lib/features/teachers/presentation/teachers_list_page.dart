@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/admin_access.dart';
 import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
+import '../../../widgets/responsive_layout.dart';
 import '../application/teachers_providers.dart';
 
 class TeachersListPage extends ConsumerStatefulWidget {
@@ -46,7 +47,11 @@ class _TeachersListPageState extends ConsumerState<TeachersListPage> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+                padding: AdminResponsive.pagePadding(
+                  context,
+                  top: 16,
+                  bottom: 8,
+                ),
                 child: TextField(
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.search),
@@ -59,7 +64,11 @@ class _TeachersListPageState extends ConsumerState<TeachersListPage> {
                 child: filtered.isEmpty
                     ? const EmptyState(message: AdminStrings.emptyList)
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+                        padding: AdminResponsive.pagePadding(
+                          context,
+                          top: 8,
+                          bottom: 32,
+                        ),
                         itemCount: filtered.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, i) {
@@ -114,27 +123,43 @@ class _TeacherRow extends StatelessWidget {
                   children: [
                     Text(
                       teacher.name.resolve('en'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     Text(
                       teacher.id,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                            color: AppColors.textSecondary,
+                          ),
                     ),
+                    if (AdminResponsive.isCompact(context))
+                      Text(
+                        teacher.isActive
+                            ? AdminStrings.active
+                            : AdminStrings.inactive,
+                        style: TextStyle(
+                          color: teacher.isActive
+                              ? AppColors.success
+                              : AppColors.textSecondary,
+                        ),
+                      ),
                   ],
                 ),
               ),
-              Text(
-                teacher.isActive
-                    ? AdminStrings.active
-                    : AdminStrings.inactive,
-                style: TextStyle(
-                  color: teacher.isActive
-                      ? AppColors.success
-                      : AppColors.textSecondary,
+              if (!AdminResponsive.isCompact(context))
+                Text(
+                  teacher.isActive
+                      ? AdminStrings.active
+                      : AdminStrings.inactive,
+                  style: TextStyle(
+                    color: teacher.isActive
+                        ? AppColors.success
+                        : AppColors.textSecondary,
+                  ),
                 ),
-              ),
               const SizedBox(width: 8),
               const Icon(Icons.chevron_right),
             ],
