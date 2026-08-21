@@ -142,7 +142,10 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       ..clear()
       ..addAll(item.teacherIds);
     _mediaUrl = item.mediaUrl;
-    _thumbUrl = item.thumbUrl;
+    _thumbUrl =
+        config.media == ContentMediaKind.audio && item.thumbUrl == item.mediaUrl
+            ? null
+            : item.thumbUrl;
     final audio = item.audio;
     if (audio != null) {
       _duration.text = audio.durationSec?.toString() ?? '';
@@ -214,7 +217,9 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       teacherIds: _teacherIds.toList(),
       categoryId: _categoryId,
       mediaUrl: _mediaUrl,
-      thumbUrl: _thumbUrl ?? _mediaUrl,
+      thumbUrl: config.media == ContentMediaKind.image
+          ? (_thumbUrl ?? _mediaUrl)
+          : _thumbUrl,
       storagePath: _mediaUrl,
       language: config.media == ContentMediaKind.audio ? 'en' : null,
       status: _status,
@@ -462,7 +467,9 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
               onUploaded: (url) {
                 setState(() {
                   _mediaUrl = url;
-                  _thumbUrl ??= url;
+                  if (config.media == ContentMediaKind.image) {
+                    _thumbUrl ??= url;
+                  }
                   _dirty = true;
                 });
               },

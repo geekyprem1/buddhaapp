@@ -47,7 +47,9 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
   }
 
   Future<void> _restore(ContentItem item) async {
-    await ref.read(contentRepositoryProvider(config.collection)).restore(item.id);
+    await ref
+        .read(contentRepositoryProvider(config.collection))
+        .restore(item.id);
     ref.invalidate(adminContentListProvider(config.collection));
   }
 
@@ -143,8 +145,8 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                       Text(
                         AdminStrings.reorderHint,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                              color: AppColors.textSecondary,
+                            ),
                       ),
                     ],
                   ],
@@ -166,6 +168,7 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: _ContentRow(
                                   item: item,
+                                  media: config.media,
                                   onOpen: () =>
                                       context.go('${config.route}/${item.id}'),
                                   onPublish: () =>
@@ -190,6 +193,7 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                               final item = rows[i];
                               return _ContentRow(
                                 item: item,
+                                media: config.media,
                                 onOpen: () =>
                                     context.go('${config.route}/${item.id}'),
                                 onPublish: () =>
@@ -214,6 +218,7 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
 class _ContentRow extends StatelessWidget {
   const _ContentRow({
     required this.item,
+    required this.media,
     required this.onOpen,
     required this.onPublish,
     required this.onUnpublish,
@@ -223,6 +228,7 @@ class _ContentRow extends StatelessWidget {
   });
 
   final ContentItem item;
+  final ContentMediaKind media;
   final VoidCallback onOpen;
   final VoidCallback onPublish;
   final VoidCallback onUnpublish;
@@ -232,17 +238,28 @@ class _ContentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final thumbUrl = item.thumbUrl;
+    final previewUrl = media == ContentMediaKind.image
+        ? (thumbUrl != null && thumbUrl.isNotEmpty ? thumbUrl : item.mediaUrl)
+        : (thumbUrl != null && thumbUrl.isNotEmpty && thumbUrl != item.mediaUrl
+            ? thumbUrl
+            : null);
+
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(12),
       child: ListTile(
         onTap: onOpen,
-        leading: item.thumbUrl == null
-            ? const Icon(Icons.image_outlined)
+        leading: previewUrl == null || previewUrl.isEmpty
+            ? Icon(
+                media == ContentMediaKind.audio
+                    ? Icons.audiotrack_outlined
+                    : Icons.image_outlined,
+              )
             : ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: Image.network(
-                  item.thumbUrl!,
+                  previewUrl,
                   width: 48,
                   height: 48,
                   fit: BoxFit.cover,
