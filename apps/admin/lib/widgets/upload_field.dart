@@ -15,6 +15,7 @@ class UploadField extends ConsumerStatefulWidget {
     this.allowedExtensions = FieldValidators.allowedImageExtensions,
     this.maxBytes = FieldValidators.maxImageBytes,
     this.enabled = true,
+    this.onBeforeUpload,
     super.key,
   });
 
@@ -25,6 +26,7 @@ class UploadField extends ConsumerStatefulWidget {
   final List<String> allowedExtensions;
   final int maxBytes;
   final bool enabled;
+  final Future<void> Function()? onBeforeUpload;
 
   @override
   ConsumerState<UploadField> createState() => _UploadFieldState();
@@ -59,6 +61,13 @@ class _UploadFieldState extends ConsumerState<UploadField> {
     }
 
     final ext = file.name.split('.').last.toLowerCase();
+    try {
+      await widget.onBeforeUpload?.call();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _error = 'Could not prepare upload. $e');
+      return;
+    }
     final path = widget.storagePathBuilder(ext);
     final contentType = _contentType(ext);
     setState(() {
@@ -67,10 +76,10 @@ class _UploadFieldState extends ConsumerState<UploadField> {
     });
 
     final upload = ref.read(storageServiceProvider).uploadBytes(
-      path: path,
-      bytes: bytes,
-      contentType: contentType,
-    );
+          path: path,
+          bytes: bytes,
+          contentType: contentType,
+        );
     _upload = upload;
     final sub = upload.progress.listen((p) {
       if (mounted) setState(() => _progress = p);

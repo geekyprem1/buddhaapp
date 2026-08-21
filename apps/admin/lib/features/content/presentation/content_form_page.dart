@@ -64,6 +64,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   String? _mediaUrl;
   String? _thumbUrl;
   String? _docId;
+  bool _draftCreated = false;
   bool _dirty = false;
   bool _loaded = false;
   bool _saving = false;
@@ -126,6 +127,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
 
   void _hydrate(ContentItem item) {
     _docId = item.id;
+    _draftCreated = true;
     _title = item.title;
     _artist.text = item.artist ?? '';
     _source.text = item.source ?? '';
@@ -177,6 +179,15 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     return id;
   }
 
+  Future<void> _ensureDraftExists() async {
+    if (!widget.isNew || _draftCreated) return;
+    final draft = _buildItem().copyWith(status: ContentStatus.draft);
+    await ref
+        .read(contentRepositoryProvider(config.collection))
+        .createWithId(draft);
+    _draftCreated = true;
+  }
+
   ContentItem _buildItem() {
     final id = _ensureId();
     AudioMeta? audio;
@@ -188,9 +199,8 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
         level: _level.text.trim().isEmpty ? null : _level.text.trim(),
         album: _album.text.trim().isEmpty ? null : _album.text.trim(),
         lyrics: _lyrics.isEmpty ? null : _lyrics,
-        recommendedTime: _recommended.text.trim().isEmpty
-            ? null
-            : _recommended.text.trim(),
+        recommendedTime:
+            _recommended.text.trim().isEmpty ? null : _recommended.text.trim(),
         description: _description.isEmpty ? null : _description,
         trimStartSec: config.hasTrim ? 0 : null,
         trimEndSec: config.hasTrim ? int.tryParse(_duration.text) : null,
@@ -272,7 +282,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     final item = _buildItem();
     final repo = ref.read(contentRepositoryProvider(config.collection));
     try {
-      if (widget.isNew) {
+      if (widget.isNew && !_draftCreated) {
         await repo.createWithId(item);
       } else {
         await repo.update(item);
@@ -443,6 +453,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                   ? FieldValidators.maxAudioBytes
                   : FieldValidators.maxImageBytes,
               enabled: canEdit,
+              onBeforeUpload: _ensureDraftExists,
               storagePathBuilder: (ext) => StoragePaths.contentOriginal(
                 config.collection,
                 _ensureId(),
@@ -462,6 +473,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                 label: AdminStrings.thumbnail,
                 valueUrl: _thumbUrl,
                 enabled: canEdit,
+                onBeforeUpload: _ensureDraftExists,
                 storagePathBuilder: (ext) =>
                     StoragePaths.contentThumb(config.collection, _ensureId()),
                 onUploaded: (url) {

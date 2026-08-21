@@ -96,9 +96,7 @@ async function processImage(
       orientation: height >= width ? "portrait" : "landscape",
     };
   }
-  await getFirestore().collection(collection).doc(itemId).set(patch, {
-    merge: true,
-  });
+  await getFirestore().collection(collection).doc(itemId).update(patch);
 }
 
 /** Step quality/width down until the WebP thumbnail fits under 40 KB. */
@@ -158,7 +156,5 @@ async function processAudio(
     patch.audio = { durationSec };
   }
 
-  await getFirestore().collection(collection).doc(itemId).set(patch, {
-    merge: true,
-  });
+  await getFirestore().collection(collection).doc(itemId).update(patch);
 }

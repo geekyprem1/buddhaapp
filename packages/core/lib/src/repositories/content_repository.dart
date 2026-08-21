@@ -131,11 +131,12 @@ class ContentRepository with RepoGuard {
   Future<void> createWithId(ContentItem item) {
     final data = item.toJson()
       ..remove('id')
+      ..remove('counters')
       ..['createdAt'] = DateTime.now()
       ..['updatedAt'] = DateTime.now();
     return guardedWrite(
       'content.createWithId',
-      () => _collection.doc(item.id).set(data),
+      () => _collection.doc(item.id).set(data, SetOptions(merge: true)),
     );
   }
 
