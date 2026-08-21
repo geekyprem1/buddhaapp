@@ -49,26 +49,19 @@ jobs:
         working-directory: apps/admin
         run: flutter test --no-pub
 
-      - name: Validate production secrets
+      - name: Validate production credentials
         shell: bash
         env:
-          PROD_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DHAMMA_PATH_PROD }}
         run: |
-          if [[ -z "$PROD_RECAPTCHA_SITE_KEY" || -z "$FIREBASE_SERVICE_ACCOUNT" ]]; then
-            echo "::error::Required production deployment secrets are not configured."
+          if [[ -z "$FIREBASE_SERVICE_ACCOUNT" ]]; then
+            echo "::error::Firebase production service-account secret is not configured."
             exit 1
           fi
 
       - name: Build Prod Admin web
         working-directory: apps/admin
-        env:
-          PROD_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
-        run: >-
-          flutter build web --no-pub
-          -t lib/main_prod.dart
-          --release
-          --dart-define=RECAPTCHA_SITE_KEY="$PROD_RECAPTCHA_SITE_KEY"
+        run: flutter build web --no-pub -t lib/main_prod.dart --release
 
       - name: Deploy only Prod Admin Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
