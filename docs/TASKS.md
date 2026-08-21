@@ -587,6 +587,9 @@ Goal: replace seed data with the real, licensed launch library.
   `deps: T1.13`  ·  → NFR cost control
 - [ ] **T4.7** Play Store compliance — Data Safety form matching actual data use, permission rationale for every runtime permission, target SDK current, privacy policy live on the `public` Hosting site
   `deps: T3.9`  ·  → PRD §12, §14
+  · Public legal site deployed and verified on 21 Aug 2026 with `firebase deploy --only hosting:public --project dhamma-path-prod`; Home, Privacy, Terms, Contact, and Delete Account return HTTPS 200, an unsupported route returns the branded 404, and configured security/privacy headers are present. This task remains open pending the Data Safety reconciliation, target-SDK check, and remaining store-compliance work.
+  · **Privacy Policy URL:** https://dhamma-path-prod-public.web.app/privacy/
+  · **Account Deletion URL:** https://dhamma-path-prod-public.web.app/delete-account/
 - [ ] **T4.8** Store listing — icon, feature graphic, screenshots ×3 languages, description, content rating questionnaire
   `deps: T4.7`
 - [ ] **T4.9** Takedown drill — unpublish an item in admin and confirm it disappears from a live client within 5 minutes
