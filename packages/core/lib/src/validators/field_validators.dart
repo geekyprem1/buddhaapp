@@ -112,6 +112,6 @@ abstract class FieldValidators {
   /// Max upload sizes, in bytes, enforced client-side before the resumable
   /// upload starts (Architecture §9.6).
   static const int maxImageBytes = 8 * 1024 * 1024; // 8 MB
-  static const int maxAudioBytes = 20 * 1024 * 1024; // 20 MB
+  static const int maxAudioBytes = 150 * 1024 * 1024; // 150 MB
   static const int maxVideoBytes = 60 * 1024 * 1024; // 60 MB, Phase 2
 }
