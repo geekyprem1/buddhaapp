@@ -1,11 +1,11 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/admin_strings.dart';
+import '../../../util/file_pick.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/responsive_layout.dart';
 import '../application/content_providers.dart';
@@ -58,11 +58,9 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
       _isAudio ? FieldValidators.maxAudioBytes : FieldValidators.maxImageBytes;
 
   Future<void> _pick() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final result = await pickUploadFiles(
       allowedExtensions: _allowedExtensions,
       allowMultiple: true,
-      withData: true,
     );
     if (result == null) return;
     setState(() {

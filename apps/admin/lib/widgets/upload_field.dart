@@ -1,10 +1,10 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/admin_strings.dart';
+import '../util/file_pick.dart';
 
 class UploadField extends ConsumerStatefulWidget {
   const UploadField({
@@ -39,10 +39,8 @@ class _UploadFieldState extends ConsumerState<UploadField> {
 
   Future<void> _pick() async {
     if (!widget.enabled) return;
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final result = await pickUploadFiles(
       allowedExtensions: widget.allowedExtensions,
-      withData: true,
     );
     final file = result?.files.single;
     final bytes = file?.bytes;
