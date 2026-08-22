@@ -15,11 +15,11 @@ class PrarthanaHelpScreen extends ConsumerWidget {
       l10n?.prarthanaHelpStep1 ??
           'Pick a time, the days it should repeat, and a prarthana song.',
       l10n?.prarthanaHelpStep2 ??
-          'Allow exact alarms and notifications if Android asks.',
+          'Allow notifications and exact alarms if Android asks.',
       l10n?.prarthanaHelpStep3 ??
-          'Turn off battery optimisation for Dhamma Path so the alarm is not killed.',
+          'If a phone still misses the alarm, open App info and set Battery to Unrestricted. This is optional and only needed on some devices.',
       l10n?.prarthanaHelpStep4 ??
-          'When it rings, Stop or Snooze 10 minutes. It works with the app closed.',
+          'When it rings, use Stop or Snooze on the notification. It works with the app closed.',
     ];
 
     return Scaffold(
@@ -63,19 +63,19 @@ class PrarthanaHelpScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.lg),
           FilledButton.icon(
             onPressed: () =>
-                ref.read(alarmServiceProvider).openBatterySettings(),
-            icon: const Icon(Icons.battery_saver_outlined),
+                ref.read(alarmServiceProvider).openExactAlarmSettings(),
+            icon: const Icon(Icons.alarm),
             label: Text(
-              l10n?.prarthanaHelpBattery ?? 'Open battery settings',
+              l10n?.prarthanaHelpExact ?? 'Open exact-alarm settings',
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           OutlinedButton.icon(
             onPressed: () =>
-                ref.read(alarmServiceProvider).openExactAlarmSettings(),
-            icon: const Icon(Icons.alarm),
+                ref.read(alarmServiceProvider).openBatterySettings(),
+            icon: const Icon(Icons.battery_saver_outlined),
             label: Text(
-              l10n?.prarthanaHelpExact ?? 'Open exact-alarm settings',
+              l10n?.prarthanaHelpBattery ?? 'Open app battery settings',
             ),
           ),
         ],

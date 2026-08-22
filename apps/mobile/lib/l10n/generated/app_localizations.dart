@@ -1069,14 +1069,26 @@ abstract class AppLocalizations {
   /// No description provided for @prarthanaBatteryTitle.
   ///
   /// In en, this message translates to:
-  /// **'Keep the alarm reliable'**
+  /// **'If a phone misses the alarm'**
   String get prarthanaBatteryTitle;
 
   /// No description provided for @prarthanaBatteryBody.
   ///
   /// In en, this message translates to:
-  /// **'Some phones stop background alarms. Allow Dhamma Path to ignore battery optimisation.'**
+  /// **'Some phones pause background apps. In App info, set Battery to Unrestricted. This is optional and only needed on some devices.'**
   String get prarthanaBatteryBody;
+
+  /// No description provided for @prarthanaExactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow exact alarms'**
+  String get prarthanaExactTitle;
+
+  /// No description provided for @prarthanaExactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Prarthana needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.'**
+  String get prarthanaExactBody;
 
   /// No description provided for @prarthanaHelpTitle.
   ///
@@ -1099,25 +1111,25 @@ abstract class AppLocalizations {
   /// No description provided for @prarthanaHelpStep2.
   ///
   /// In en, this message translates to:
-  /// **'Allow exact alarms and notifications if Android asks.'**
+  /// **'Allow notifications and exact alarms if Android asks.'**
   String get prarthanaHelpStep2;
 
   /// No description provided for @prarthanaHelpStep3.
   ///
   /// In en, this message translates to:
-  /// **'Turn off battery optimisation for Dhamma Path so the alarm is not killed.'**
+  /// **'If a phone still misses the alarm, open App info and set Battery to Unrestricted. This is optional and only needed on some devices.'**
   String get prarthanaHelpStep3;
 
   /// No description provided for @prarthanaHelpStep4.
   ///
   /// In en, this message translates to:
-  /// **'When it rings, Stop or Snooze 10 minutes. It works with the app closed.'**
+  /// **'When it rings, use Stop or Snooze on the notification. It works with the app closed.'**
   String get prarthanaHelpStep4;
 
   /// No description provided for @prarthanaHelpBattery.
   ///
   /// In en, this message translates to:
-  /// **'Open battery settings'**
+  /// **'Open app battery settings'**
   String get prarthanaHelpBattery;
 
   /// No description provided for @prarthanaHelpExact.

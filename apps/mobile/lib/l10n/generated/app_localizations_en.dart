@@ -516,11 +516,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prarthanaSetFailed => 'Could not set the prarthana.';
 
   @override
-  String get prarthanaBatteryTitle => 'Keep the alarm reliable';
+  String get prarthanaBatteryTitle => 'If a phone misses the alarm';
 
   @override
   String get prarthanaBatteryBody =>
-      'Some phones stop background alarms. Allow Dhamma Path to ignore battery optimisation.';
+      'Some phones pause background apps. In App info, set Battery to Unrestricted. This is optional and only needed on some devices.';
+
+  @override
+  String get prarthanaExactTitle => 'Allow exact alarms';
+
+  @override
+  String get prarthanaExactBody =>
+      'Daily Prarthana needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.';
 
   @override
   String get prarthanaHelpTitle => 'How Daily Prarthana works';
@@ -535,18 +542,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get prarthanaHelpStep2 =>
-      'Allow exact alarms and notifications if Android asks.';
+      'Allow notifications and exact alarms if Android asks.';
 
   @override
   String get prarthanaHelpStep3 =>
-      'Turn off battery optimisation for Dhamma Path so the alarm is not killed.';
+      'If a phone still misses the alarm, open App info and set Battery to Unrestricted. This is optional and only needed on some devices.';
 
   @override
   String get prarthanaHelpStep4 =>
-      'When it rings, Stop or Snooze 10 minutes. It works with the app closed.';
+      'When it rings, use Stop or Snooze on the notification. It works with the app closed.';
 
   @override
-  String get prarthanaHelpBattery => 'Open battery settings';
+  String get prarthanaHelpBattery => 'Open app battery settings';
 
   @override
   String get prarthanaHelpExact => 'Open exact-alarm settings';

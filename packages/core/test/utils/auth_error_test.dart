@@ -57,6 +57,13 @@ void main() {
       expect(failure.kind, AuthErrorKind.cancelled);
       expect(failure.shouldShow, isFalse);
     });
+
+    test('maps Google Sign-In client config errors', () {
+      expect(
+        classifyAuthError(_Coded('clientConfigurationError')).kind,
+        AuthErrorKind.playIntegrity,
+      );
+    });
   });
 }
 

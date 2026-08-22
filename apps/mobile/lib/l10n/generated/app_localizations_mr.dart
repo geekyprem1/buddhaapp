@@ -517,11 +517,18 @@ class AppLocalizationsMr extends AppLocalizations {
   String get prarthanaSetFailed => 'प्रार्थना सेट होऊ शकली नाही.';
 
   @override
-  String get prarthanaBatteryTitle => 'अलार्म विश्वासार्ह ठेवा';
+  String get prarthanaBatteryTitle => 'फोन अलार्म मिस केल्यास';
 
   @override
   String get prarthanaBatteryBody =>
-      'काही फोन बॅकग्राउंड अलार्म बंद करतात. धम्म पथला बॅटरी ऑप्टिमायझेशनमधून सूट द्या.';
+      'काही फोन बॅकग्राउंड अॅप थांबवतात. अॅप माहितीत बॅटरी Unrestricted करा. हे वैकल्पिक आहे आणि काही फोनवरच लागते.';
+
+  @override
+  String get prarthanaExactTitle => 'बरोबर वेळेच्या अलार्मला परवानगी द्या';
+
+  @override
+  String get prarthanaExactBody =>
+      'दैनिक प्रार्थनेसाठी Alarms & reminders ची परवानगी हवी, जेणेकरून निवडलेल्या वेळी अॅप बंद असतानाही अलार्म वाजेल.';
 
   @override
   String get prarthanaHelpTitle => 'दैनिक प्रार्थना कशी चालते';
@@ -535,17 +542,18 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get prarthanaHelpStep2 =>
-      'Android विचारले तर exact alarm आणि नोटिफिकेशनची परवानगी द्या.';
+      'Android विचारले तर नोटिफिकेशन आणि exact alarm ची परवानगी द्या.';
 
   @override
-  String get prarthanaHelpStep3 => 'धम्म पथसाठी बॅटरी ऑप्टिमायझेशन बंद करा.';
+  String get prarthanaHelpStep3 =>
+      'फोन अलार्म मिस केल्यास अॅप माहितीत बॅटरी Unrestricted करा. हे वैकल्पिक आहे आणि काही फोनवरच लागते.';
 
   @override
   String get prarthanaHelpStep4 =>
-      'वाजल्यावर Stop किंवा 10 मिनिटे Snooze. अॅप बंद असले तरी चालेल.';
+      'वाजल्यावर नोटिफिकेशनवर Stop किंवा Snooze दाबा. अॅप बंद असले तरी चालेल.';
 
   @override
-  String get prarthanaHelpBattery => 'बॅटरी सेटिंग उघडा';
+  String get prarthanaHelpBattery => 'अॅपची बॅटरी सेटिंग उघडा';
 
   @override
   String get prarthanaHelpExact => 'Exact-alarm सेटिंग उघडा';

@@ -224,35 +224,7 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
             audioUrl: url,
           );
       if (!mounted) return;
-      final service = ref.read(alarmServiceProvider);
-      if (!await service.isIgnoringBatteryOptimizations()) {
-        if (!mounted) return;
-        final open = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(
-              l10n?.prarthanaBatteryTitle ?? 'Keep the alarm reliable',
-            ),
-            content: Text(
-              l10n?.prarthanaBatteryBody ??
-                  'Some phones stop background alarms. Allow Dhamma Path to ignore battery optimisation.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: Text(l10n?.ringtonePermissionNotNow ?? 'Not now'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: Text(l10n?.prarthanaHelpBattery ?? 'Open settings'),
-              ),
-            ],
-          ),
-        );
-        if (open == true) {
-          await service.openBatterySettings();
-        }
-      }
+      await _promptAlarmAccess();
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(content: Text(l10n?.prarthanaSetSuccess ?? 'Prarthana set.')),
@@ -271,6 +243,46 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _promptAlarmAccess() async {
+    final l10n = AppLocalizations.of(context);
+    final service = ref.read(alarmServiceProvider);
+    if (!await service.canScheduleExact()) {
+      if (!mounted) return;
+      final open = await _confirmAccess(
+        title: l10n?.prarthanaExactTitle ?? 'Allow exact alarms',
+        body: l10n?.prarthanaExactBody ??
+            'Daily Prarthana needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.',
+      );
+      if (open == true) {
+        await service.openExactAlarmSettings();
+      }
+    }
+  }
+
+  Future<bool?> _confirmAccess({
+    required String title,
+    required String body,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n?.ringtonePermissionNotNow ?? 'Not now'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n?.ringtonePermissionAllow ?? 'Open settings'),
+          ),
+        ],
+      ),
+    );
   }
 }
 

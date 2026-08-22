@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -5,6 +7,20 @@ plugins {
     // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.reader().use { reader -> keystoreProperties.load(reader) }
+}
+
+fun releaseKeystoreReady(): Boolean {
+    val storeFileName = keystoreProperties.getProperty("storeFile") ?: return false
+    return !keystoreProperties.getProperty("keyAlias").isNullOrBlank() &&
+        !keystoreProperties.getProperty("keyPassword").isNullOrBlank() &&
+        !keystoreProperties.getProperty("storePassword").isNullOrBlank() &&
+        rootProject.file(storeFileName).isFile
 }
 
 android {
@@ -45,12 +61,36 @@ android {
         }
     }
 
+    signingConfigs {
+        if (releaseKeystoreReady()) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile")!!)
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (releaseKeystoreReady()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
+    }
+}
+
+// Prod Play uploads must not silently fall back to the debug key.
+gradle.taskGraph.whenReady {
+    val needsUploadKey = allTasks.any { it.name.contains("ProdRelease") }
+    if (needsUploadKey && !releaseKeystoreReady()) {
+        throw GradleException(
+            "Prod release requires apps/mobile/android/key.properties and the upload keystore. " +
+                "Copy key.properties.example to key.properties and generate upload-keystore.jks.",
+        )
     }
 }
 

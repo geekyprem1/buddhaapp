@@ -7,7 +7,7 @@ part of 'notifications_providers.dart';
 // **************************************************************************
 
 String _$adminNotificationCampaignsHash() =>
-    r'c1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4';
+    r'df4b415f52a9c87c306399dce51c228e7f835f90';
 
 /// See also [adminNotificationCampaigns].
 @ProviderFor(adminNotificationCampaigns)
@@ -27,7 +27,7 @@ final adminNotificationCampaignsProvider =
 typedef AdminNotificationCampaignsRef
     = AutoDisposeStreamProviderRef<List<NotificationCampaign>>;
 String _$adminNotificationCampaignHash() =>
-    r'd2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5';
+    r'93c4f081b02bc426ed9511c69e0c218e8c2919b8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -131,8 +131,8 @@ class AdminNotificationCampaignProvider
   @override
   Override overrideWith(
     FutureOr<NotificationCampaign?> Function(
-      AdminNotificationCampaignRef provider,
-    ) create,
+            AdminNotificationCampaignRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,

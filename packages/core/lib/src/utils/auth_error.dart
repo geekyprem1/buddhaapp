@@ -7,10 +7,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// …). The UI maps the key to a localised string; this file stays
 /// Flutter-widget-free so it is unit-testable in `packages/core`.
 class AuthFailure {
-  const AuthFailure(this.kind, this.l10nKey);
+  const AuthFailure(this.kind, this.l10nKey, {this.code});
 
   final AuthErrorKind kind;
   final String l10nKey;
+  final String? code;
 
   /// User-cancelled Google / reCAPTCHA flows must not show a snackbar.
   bool get shouldShow => kind != AuthErrorKind.cancelled;
@@ -45,6 +46,12 @@ AuthFailure classifyAuthError(Object error) {
         return const AuthFailure(
           AuthErrorKind.playIntegrity,
           'authErrorPlayIntegrity',
+        );
+      default:
+        return AuthFailure(
+          AuthErrorKind.unknown,
+          'authErrorGeneric',
+          code: error.code,
         );
     }
   }
@@ -102,9 +109,15 @@ AuthFailure _fromAuthCode(String code) {
     case 'captcha-check-failed':
     case 'play-integrity-check-failed':
     case 'app-check-token-error':
-      return const AuthFailure(
+    case 'clientConfigurationError':
+    case 'providerConfigurationError':
+    case '10':
+    case 'sign_in_failed':
+    case 'DEVELOPER_ERROR':
+      return AuthFailure(
         AuthErrorKind.playIntegrity,
         'authErrorPlayIntegrity',
+        code: code,
       );
     case 'user-disabled':
       return const AuthFailure(
@@ -112,7 +125,11 @@ AuthFailure _fromAuthCode(String code) {
         'authErrorUserDisabled',
       );
     default:
-      return const AuthFailure(AuthErrorKind.unknown, 'authErrorGeneric');
+      return AuthFailure(
+        AuthErrorKind.unknown,
+        'authErrorGeneric',
+        code: code,
+      );
   }
 }
 

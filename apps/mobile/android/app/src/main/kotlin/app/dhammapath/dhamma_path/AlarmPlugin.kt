@@ -34,10 +34,11 @@ class AlarmPlugin(private val activity: Activity) : MethodChannel.MethodCallHand
             }
             "openExactAlarmSettings" -> {
                 if (Build.VERSION.SDK_INT >= 31) {
-                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                        data = Uri.parse("package:${activity.packageName}")
-                    }
-                    activity.startActivity(intent)
+                    openSettings(
+                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                            data = Uri.parse("package:${activity.packageName}")
+                        },
+                    )
                 }
                 result.success(true)
             }
@@ -46,10 +47,12 @@ class AlarmPlugin(private val activity: Activity) : MethodChannel.MethodCallHand
                 result.success(pm.isIgnoringBatteryOptimizations(activity.packageName))
             }
             "openBatterySettings" -> {
-                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = Uri.parse("package:${activity.packageName}")
-                }
-                activity.startActivity(intent)
+                // App info only — do not use ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS.
+                openSettings(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:${activity.packageName}")
+                    },
+                )
                 result.success(true)
             }
             "syncAlarms" -> {
@@ -90,6 +93,18 @@ class AlarmPlugin(private val activity: Activity) : MethodChannel.MethodCallHand
                 result.success(true)
             }
             else -> result.notImplemented()
+        }
+    }
+
+    private fun openSettings(intent: Intent) {
+        try {
+            activity.startActivity(intent)
+        } catch (_: Exception) {
+            activity.startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:${activity.packageName}")
+                },
+            )
         }
     }
 

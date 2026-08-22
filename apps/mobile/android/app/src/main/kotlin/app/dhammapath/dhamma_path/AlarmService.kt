@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
@@ -64,7 +65,7 @@ class AlarmService : Service() {
                 currentLabel = intent?.getStringExtra(AlarmScheduler.EXTRA_LABEL)
                     ?: "Daily Prarthana"
                 snoozeMinutes = intent?.getIntExtra(AlarmScheduler.EXTRA_SNOOZE, 10) ?: 10
-                startForeground(NOTIFICATION_ID, buildNotification())
+                startAlarmForeground()
                 startPlayback()
                 launchRingActivity()
             }
@@ -123,6 +124,19 @@ class AlarmService : Service() {
         stopSelf()
     }
 
+    private fun startAlarmForeground() {
+        val notification = buildNotification()
+        if (Build.VERSION.SDK_INT >= 29) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
+    }
+
     private fun launchRingActivity() {
         val ring = Intent(this, AlarmRingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -130,11 +144,16 @@ class AlarmService : Service() {
             putExtra(AlarmScheduler.EXTRA_LABEL, currentLabel)
             putExtra(AlarmScheduler.EXTRA_SNOOZE, snoozeMinutes)
         }
-        startActivity(ring)
+        try {
+            startActivity(ring)
+        } catch (_: Exception) {
+            // Background activity starts are blocked; the heads-up notification is the path.
+        }
     }
 
     private fun buildNotification(): Notification {
         val ring = Intent(this, AlarmRingActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra(AlarmScheduler.EXTRA_ID, currentId)
             putExtra(AlarmScheduler.EXTRA_LABEL, currentLabel)
             putExtra(AlarmScheduler.EXTRA_SNOOZE, snoozeMinutes)
@@ -165,8 +184,8 @@ class AlarmService : Service() {
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setOngoing(true)
             .setSound(null)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(content)
-            .setFullScreenIntent(content, true)
             .addAction(0, "Stop", stop)
             .addAction(0, "Snooze 10 min", snooze)
             .build()

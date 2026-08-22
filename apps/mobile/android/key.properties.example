@@ -1,0 +1,9 @@
+# Copy this file to key.properties (gitignored) and fill in real values.
+# storeFile is relative to apps/mobile/android/
+#
+# Keep key.properties and the keystore in an offline backup. Losing the
+# upload key blocks Play updates until Google resets it.
+storePassword=
+keyPassword=
+keyAlias=upload
+storeFile=upload-keystore.jks

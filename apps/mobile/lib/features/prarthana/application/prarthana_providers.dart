@@ -48,7 +48,6 @@ class PrarthanaActions {
     );
     await _persist(stored);
     await _syncNative();
-    await _afterSchedulePermissions();
     final uid = _uid;
     if (uid != null) {
       await _ref.read(analyticsServiceProvider).prarthanaSet(
@@ -118,13 +117,6 @@ class PrarthanaActions {
   Future<void> _ensureNotificationPermission() async {
     if (await Permission.notification.isDenied) {
       await Permission.notification.request();
-    }
-  }
-
-  Future<void> _afterSchedulePermissions() async {
-    final service = _ref.read(alarmServiceProvider);
-    if (!await service.canScheduleExact()) {
-      await service.openExactAlarmSettings();
     }
   }
 

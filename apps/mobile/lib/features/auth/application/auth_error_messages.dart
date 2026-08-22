@@ -25,7 +25,10 @@ String authErrorMessage(AppLocalizations? l10n, AuthFailure failure) {
       return l10n?.authErrorUserDisabled ?? 'This account has been disabled.';
     case AuthErrorKind.cancelled:
     case AuthErrorKind.unknown:
-      return l10n?.authErrorGeneric ??
+      final generic = l10n?.authErrorGeneric ??
           'Something went wrong. Please try again.';
+      final code = failure.code;
+      if (code == null || code.isEmpty) return generic;
+      return '$generic ($code)';
   }
 }

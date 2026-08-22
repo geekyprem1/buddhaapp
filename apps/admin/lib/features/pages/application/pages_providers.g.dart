@@ -6,7 +6,7 @@ part of 'pages_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$adminStaticPagesHash() => r'e5f60718293a4b5c6d7e8f9012a3b4c5d6e7f809';
+String _$adminStaticPagesHash() => r'b0a8a64545287ef6ef042c093a78a800f9dc0ee2';
 
 /// See also [adminStaticPages].
 @ProviderFor(adminStaticPages)
@@ -24,7 +24,7 @@ final adminStaticPagesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AdminStaticPagesRef = AutoDisposeStreamProviderRef<List<StaticPage>>;
-String _$adminStaticPageHash() => r'f60718293a4b5c6d7e8f9012a3b4c5d6e7f8091a';
+String _$adminStaticPageHash() => r'9509c287a67ff9ac7767270d17cdba27254d25be';
 
 /// Copied from Dart SDK
 class _SystemHash {

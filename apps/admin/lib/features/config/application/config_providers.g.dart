@@ -6,7 +6,7 @@ part of 'config_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$adminAppConfigHash() => r'a1b2c3d4e5f60718293a4b5c6d7e8f9012a3b4c5';
+String _$adminAppConfigHash() => r'f7c2d1aebc594476b454d33715a1e7bc989ed9f4';
 
 /// See also [adminAppConfig].
 @ProviderFor(adminAppConfig)
@@ -23,7 +23,7 @@ final adminAppConfigProvider = AutoDisposeStreamProvider<AppConfig>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AdminAppConfigRef = AutoDisposeStreamProviderRef<AppConfig>;
-String _$adminHomeLayoutHash() => r'b2c3d4e5f60718293a4b5c6d7e8f9012a3b4c5d6';
+String _$adminHomeLayoutHash() => r'd4f515da1e54b34a22c67065ade45881b4319567';
 
 /// See also [adminHomeLayout].
 @ProviderFor(adminHomeLayout)
