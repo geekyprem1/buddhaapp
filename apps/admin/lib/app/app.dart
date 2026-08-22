@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/accessibility/application/zoom_controller.dart';
+import '../widgets/pinch_zoom_area.dart';
 import 'admin_strings.dart';
 import 'router.dart';
 
@@ -24,7 +25,7 @@ class DhammaPathAdminApp extends ConsumerWidget {
         final media = MediaQuery.of(context);
         return MediaQuery(
           data: media.copyWith(textScaler: TextScaler.linear(zoom)),
-          child: child ?? const SizedBox.shrink(),
+          child: PinchZoomArea(child: child ?? const SizedBox.shrink()),
         );
       },
     );

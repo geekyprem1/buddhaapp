@@ -35,6 +35,18 @@ class ZoomController extends _$ZoomController {
   void decrease() => _set(state - kZoomStep);
   void reset() => _set(_defaultZoom);
 
+  /// Live update while a two-finger pinch is in progress. Does not touch
+  /// storage — [commitZoom] persists the final value when the pinch ends.
+  void previewZoom(double value) {
+    final next = _clamp(double.parse(value.toStringAsFixed(3)));
+    if (next != state) state = next;
+  }
+
+  /// Persist the current scale (called once a pinch gesture finishes).
+  void commitZoom() {
+    ref.read(sharedPreferencesProvider).setDouble(_zoomPrefKey, state);
+  }
+
   void _set(double value) {
     final next = _clamp(double.parse(value.toStringAsFixed(2)));
     if (next == state) return;
