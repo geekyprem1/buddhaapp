@@ -78,7 +78,6 @@ abstract class AdminStrings {
   static const saved = 'Saved.';
   static const deleted = 'Deleted.';
   static const titleRequired = 'Add a title in at least one language.';
-  static const licenceHint = 'Licence provenance is required.';
   static const upload = 'Choose file';
   static const uploading = 'Uploading…';
   static const removeFile = 'Remove';
@@ -90,7 +89,6 @@ abstract class AdminStrings {
   static const featured = 'Featured';
   static const premium = 'Premium';
   static const source = 'Source';
-  static const licence = 'Licence';
   static const sortOrder = 'Sort order';
   static const teachersField = 'Teachers';
   static const categoryField = 'Category';
@@ -134,7 +132,7 @@ abstract class AdminStrings {
   static const bulkHint =
       'Pick many files at once. Each becomes a draft with its title taken '
       'from the filename. Thumbnails and durations are generated automatically; '
-      'open each item afterwards to set teacher, category, source and licence.';
+      'open each item afterwards to set teacher, category and source.';
   static const bulkUploadAll = 'Upload all';
   static const bulkClear = 'Clear finished';
   static const bulkEmpty = 'No files chosen yet.';

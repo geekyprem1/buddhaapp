@@ -37,7 +37,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   late final TextEditingController _artist;
   late final TextEditingController _album;
   late final TextEditingController _source;
-  late final TextEditingController _licence;
   late final TextEditingController _tags;
   late final TextEditingController _sort;
   late final TextEditingController _duration;
@@ -65,6 +64,9 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   String? _mediaUrl;
   String? _thumbUrl;
   String? _docId;
+  // Licence is no longer edited in the desk, but any existing value is kept
+  // as-is so re-saving an old item never wipes its stored licence.
+  String? _existingLicence;
   bool _draftCreated = false;
   bool _dirty = false;
   bool _loaded = false;
@@ -78,7 +80,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     _artist = TextEditingController();
     _album = TextEditingController();
     _source = TextEditingController();
-    _licence = TextEditingController();
     _tags = TextEditingController();
     _sort = TextEditingController(text: '0');
     _duration = TextEditingController();
@@ -105,7 +106,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       _artist,
       _album,
       _source,
-      _licence,
       _tags,
       _sort,
       _duration,
@@ -132,7 +132,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     _title = item.title;
     _artist.text = item.artist ?? '';
     _source.text = item.source ?? '';
-    _licence.text = item.licence ?? '';
+    _existingLicence = item.licence;
     _tags.text = item.tags.join(', ');
     _sort.text = '${item.sortOrder}';
     _status = item.status;
@@ -233,7 +233,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
           .where((s) => s.isNotEmpty)
           .toList(),
       source: _source.text.trim().isEmpty ? null : _source.text.trim(),
-      licence: _licence.text.trim().isEmpty ? null : _licence.text.trim(),
+      licence: _existingLicence,
       wallpaper: config.hasWallpaperMeta
           ? WallpaperMeta(
               kind: 'static',
@@ -275,12 +275,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
         null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(AdminStrings.titleRequired)),
-      );
-      return;
-    }
-    if (FieldValidators.licenceRequired(_licence.text) != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AdminStrings.licenceHint)),
       );
       return;
     }
@@ -500,14 +494,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                   enabled: canEdit,
                   decoration: const InputDecoration(
                     labelText: AdminStrings.source,
-                  ),
-                  onChanged: (_) => _markDirty(),
-                ),
-                TextField(
-                  controller: _licence,
-                  enabled: canEdit,
-                  decoration: const InputDecoration(
-                    labelText: AdminStrings.licence,
                   ),
                   onChanged: (_) => _markDirty(),
                 ),

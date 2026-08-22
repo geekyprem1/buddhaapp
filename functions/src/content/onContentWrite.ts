@@ -145,7 +145,6 @@ function validate(
     title && Object.values(title).some((v) => typeof v === "string" && v.trim());
   if (!hasTitle) missing.push("title");
   if (!data.source) missing.push("source");
-  if (!data.licence) missing.push("licence");
   if (!data.mediaUrl) missing.push("mediaUrl");
   if (missing.length > 0) {
     logger.warn("Published content is missing required fields", {
