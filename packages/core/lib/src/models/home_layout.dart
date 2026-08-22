@@ -6,6 +6,7 @@ abstract class HomeModuleIds {
   static const meditation = 'meditation';
   static const ringtone = 'ringtone';
   static const song = 'song';
+  static const vandana = 'vandana';
   static const prarthana = 'prarthana';
   static const status = 'status';
   static const buddhistCalendar = 'buddhist_calendar';
@@ -20,6 +21,7 @@ abstract class HomeModuleIds {
     meditation,
     ringtone,
     song,
+    vandana,
     buddhistCalendar,
     dailyPaliWord,
     chanting,
@@ -50,6 +52,7 @@ abstract class HomeModuleIds {
         meditation => 'Meditation',
         ringtone => 'Ringtone',
         song => 'Song',
+        vandana => 'Vandana',
         prarthana => 'Daily Prarthana',
         status => 'Trending Status',
         buddhistCalendar => 'Buddhist Calendar',
@@ -104,6 +107,7 @@ class HomeLayout {
       HomeModule(id: HomeModuleIds.meditation),
       HomeModule(id: HomeModuleIds.ringtone),
       HomeModule(id: HomeModuleIds.song),
+      HomeModule(id: HomeModuleIds.vandana),
       HomeModule(id: HomeModuleIds.buddhistCalendar),
       HomeModule(id: HomeModuleIds.dailyPaliWord),
       HomeModule(id: HomeModuleIds.chanting),
@@ -115,7 +119,8 @@ class HomeLayout {
     ],
   );
 
-  /// Drops unknown/duplicate ids and appends any missing catalogue modules.
+  /// Drops unknown/duplicate ids and inserts any missing catalogue modules
+  /// after the last already-present predecessor in [HomeModuleIds.all].
   HomeLayout normalize() {
     final seen = <String>{};
     final out = <HomeModule>[];
@@ -127,9 +132,15 @@ class HomeLayout {
       out.add(module);
     }
     for (final id in HomeModuleIds.all) {
-      if (seen.add(id)) {
-        out.add(HomeModule(id: id));
+      if (!seen.add(id)) continue;
+      final catalogueIndex = HomeModuleIds.all.indexOf(id);
+      var insertAt = out.length;
+      for (var i = 0; i < out.length; i++) {
+        if (HomeModuleIds.all.indexOf(out[i].id) < catalogueIndex) {
+          insertAt = i + 1;
+        }
       }
+      out.insert(insertAt, HomeModule(id: id));
     }
     return HomeLayout(modules: out);
   }

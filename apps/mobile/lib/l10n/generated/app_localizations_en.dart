@@ -106,6 +106,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeSong => 'Song';
 
   @override
+  String get homeVandana => 'Vandana';
+
+  @override
+  String get vandanaEmpty => 'No vandana yet.';
+
+  @override
   String get homeDailyPrarthana => 'Daily Prarthana';
 
   @override

@@ -33,6 +33,7 @@ void main() {
         HomeModuleIds.meditation,
         HomeModuleIds.ringtone,
         HomeModuleIds.song,
+        HomeModuleIds.vandana,
         HomeModuleIds.buddhistCalendar,
         HomeModuleIds.dailyPaliWord,
         HomeModuleIds.chanting,
@@ -42,6 +43,29 @@ void main() {
       ]);
       expect(sections[1].wide, isTrue);
       expect(sections[1].ids, [HomeModuleIds.prarthana]);
+    });
+
+    test('missing vandana slots in after song on a saved layout', () {
+      const layout = HomeLayout(
+        modules: [
+          HomeModule(id: HomeModuleIds.wallpaper),
+          HomeModule(id: HomeModuleIds.meditation),
+          HomeModule(id: HomeModuleIds.ringtone),
+          HomeModule(id: HomeModuleIds.song),
+          HomeModule(id: HomeModuleIds.buddhistCalendar),
+          HomeModule(id: HomeModuleIds.dailyPaliWord),
+          HomeModule(id: HomeModuleIds.chanting),
+          HomeModule(id: HomeModuleIds.tipitaka),
+          HomeModule(id: HomeModuleIds.dana),
+          HomeModule(id: HomeModuleIds.buddhistPlaces),
+          HomeModule(id: HomeModuleIds.prarthana),
+          HomeModule(id: HomeModuleIds.status),
+        ],
+      );
+      expect(
+        layout.normalize().modules.map((m) => m.id).toList(),
+        HomeModuleIds.all,
+      );
     });
 
     test('hidden modules drop out of sections', () {

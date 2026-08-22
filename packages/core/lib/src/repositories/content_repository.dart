@@ -5,8 +5,8 @@ import '../models/content_counters.dart';
 import '../models/content_item.dart';
 import '../utils/repo_guard.dart';
 
-/// Generic, type-parameterised repository over any of the seven content
-/// collections (wallpapers, ringtones, songs, meditations, chantings,
+/// Generic, type-parameterised repository over any content collection
+/// (wallpapers, ringtones, songs, vandanas, meditations, chantings,
 /// statuses, prarthanas) — they share one document shape, so they share one
 /// repository implementation (Architecture §6.2, §11 generic content module).
 class ContentRepository with RepoGuard {

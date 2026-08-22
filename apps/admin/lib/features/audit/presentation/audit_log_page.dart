@@ -23,6 +23,7 @@ const _entityTypes = <String>[
   'wallpapers',
   'ringtones',
   'songs',
+  'vandanas',
   'meditations',
   'statuses',
   'prarthanas',

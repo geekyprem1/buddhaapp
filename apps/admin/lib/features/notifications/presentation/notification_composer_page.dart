@@ -21,6 +21,7 @@ const _modules = <(String, String)>[
   ('wallpaper', 'Wallpapers'),
   ('ringtone', 'Ringtones'),
   ('song', 'Songs'),
+  ('vandana', 'Vandana'),
   ('meditation', 'Meditations'),
   ('chanting', 'Chanting'),
   ('status', 'Statuses'),

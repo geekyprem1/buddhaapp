@@ -21,6 +21,7 @@ export {
   onWallpaperWrite,
   onRingtoneWrite,
   onSongWrite,
+  onVandanaWrite,
   onMeditationWrite,
   onChantingWrite,
   onStatusWrite,

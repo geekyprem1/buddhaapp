@@ -6,11 +6,12 @@
 
 export type MediaKind = "image" | "audio";
 
-/** The seven admin-managed content collections (Architecture §6.2). */
+/** Admin-managed content collections (Architecture §6.2). */
 export const CONTENT_COLLECTIONS = [
   "wallpapers",
   "ringtones",
   "songs",
+  "vandanas",
   "meditations",
   "chantings",
   "statuses",
@@ -25,6 +26,7 @@ export const CONTENT_MEDIA_KIND: Record<ContentCollection, MediaKind> = {
   statuses: "image",
   ringtones: "audio",
   songs: "audio",
+  vandanas: "audio",
   meditations: "audio",
   chantings: "audio",
   prarthanas: "audio",
@@ -52,4 +54,6 @@ export const EVENT_TYPE_TO_COUNTER: Record<string, string> = {
   plays: "plays",
   song_play: "plays",
   song_complete: "plays",
+  vandana_play: "plays",
+  vandana_complete: "plays",
 };

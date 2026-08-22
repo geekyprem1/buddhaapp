@@ -166,6 +166,7 @@ function makeTrigger(collection: string) {
 export const onWallpaperWrite = makeTrigger("wallpapers");
 export const onRingtoneWrite = makeTrigger("ringtones");
 export const onSongWrite = makeTrigger("songs");
+export const onVandanaWrite = makeTrigger("vandanas");
 export const onMeditationWrite = makeTrigger("meditations");
 export const onChantingWrite = makeTrigger("chantings");
 export const onStatusWrite = makeTrigger("statuses");

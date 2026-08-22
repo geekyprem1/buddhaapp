@@ -18,6 +18,7 @@ const _modules = [
   ContentType.wallpaper,
   ContentType.ringtone,
   ContentType.song,
+  ContentType.vandana,
   ContentType.meditation,
   ContentType.chanting,
   ContentType.status,

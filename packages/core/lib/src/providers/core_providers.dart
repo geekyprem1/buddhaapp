@@ -121,6 +121,7 @@ abstract class ContentCollections {
   static const wallpapers = FirestoreCollections.wallpapers;
   static const ringtones = FirestoreCollections.ringtones;
   static const songs = FirestoreCollections.songs;
+  static const vandanas = FirestoreCollections.vandanas;
   static const meditations = FirestoreCollections.meditations;
   static const chantings = FirestoreCollections.chantings;
   static const statuses = FirestoreCollections.statuses;
@@ -132,6 +133,7 @@ abstract class ContentCollections {
         ContentType.wallpaper => wallpapers,
         ContentType.ringtone => ringtones,
         ContentType.song => songs,
+        ContentType.vandana => vandanas,
         ContentType.meditation => meditations,
         ContentType.chanting => chantings,
         ContentType.status => statuses,

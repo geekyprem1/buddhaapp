@@ -227,6 +227,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HomeModuleIds.meditation => Icons.self_improvement,
         HomeModuleIds.ringtone => Icons.music_note_outlined,
         HomeModuleIds.song => Icons.library_music_outlined,
+        HomeModuleIds.vandana => Icons.spa_outlined,
         HomeModuleIds.prarthana => Icons.notifications_active_outlined,
         HomeModuleIds.status => Icons.auto_awesome,
         HomeModuleIds.buddhistCalendar => Icons.calendar_month_outlined,
@@ -243,6 +244,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HomeModuleIds.meditation => l10n?.homeMeditation ?? 'Meditation',
         HomeModuleIds.ringtone => l10n?.homeRingtone ?? 'Ringtone',
         HomeModuleIds.song => l10n?.homeSong ?? 'Song',
+        HomeModuleIds.vandana => l10n?.homeVandana ?? 'Vandana',
         HomeModuleIds.prarthana =>
           l10n?.homeDailyPrarthana ?? 'Daily Prarthana',
         HomeModuleIds.status => l10n?.homeTrendingStatus ?? 'Trending Status',
@@ -282,6 +284,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HomeModuleIds.meditation => AppRoutes.meditations,
         HomeModuleIds.ringtone => AppRoutes.ringtones,
         HomeModuleIds.song => AppRoutes.songs,
+        HomeModuleIds.vandana => AppRoutes.vandanas,
         HomeModuleIds.chanting => AppRoutes.chantings,
         HomeModuleIds.buddhistCalendar => AppRoutes.buddhistCalendar,
         HomeModuleIds.prarthana => AppRoutes.prarthana,

@@ -45,6 +45,7 @@ abstract class AdminStrings {
   static const wallpapers = 'Wallpapers';
   static const ringtones = 'Ringtones';
   static const songs = 'Songs';
+  static const vandanas = 'Vandana';
   static const meditations = 'Meditations';
   static const chantings = 'Chanting';
   static const statuses = 'Statuses';

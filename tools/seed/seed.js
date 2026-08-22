@@ -185,6 +185,15 @@ const songs = [
   }),
 ];
 
+const vandanas = [
+  contentItem({
+    id: 'vn_001', type: 'vandana', teacherIds: ['buddha'], categoryId: null,
+    title: { en: 'Namo Tassa Bhagavato', hi: 'नमो तस्स भगवतो', mr: 'नमो तस्स भगवतो' },
+    artist: 'Anonymous', mediaUrl: PLACEHOLDER_AUDIO, thumbUrl: PLACEHOLDER_IMG('vn1', 200, 200),
+    extra: { audio: { durationSec: 240 } },
+  }),
+];
+
 const meditations = [
   contentItem({
     id: 'md_001', type: 'meditation', teacherIds: ['buddha'], categoryId: 'cat_med_anapana',
@@ -269,6 +278,7 @@ async function main() {
     wallpapers,
     ringtones,
     songs,
+    vandanas,
     meditations,
     statuses,
     prarthanas,
@@ -291,6 +301,7 @@ async function main() {
       { id: 'meditation', visible: true },
       { id: 'ringtone', visible: true },
       { id: 'song', visible: true },
+      { id: 'vandana', visible: true },
       { id: 'prarthana', visible: true },
       { id: 'status', visible: true },
     ],
@@ -360,7 +371,7 @@ async function main() {
   console.log('\nSeed complete.');
   console.log(
     `Wrote ${teachers.length} teachers, ${categories.length} categories, ` +
-      `${wallpapers.length + ringtones.length + songs.length + meditations.length + statuses.length + prarthanas.length} content items, 2 config docs.`,
+      `${wallpapers.length + ringtones.length + songs.length + vandanas.length + meditations.length + statuses.length + prarthanas.length} content items, 2 config docs.`,
   );
 }
 

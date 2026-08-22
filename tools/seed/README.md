@@ -32,6 +32,7 @@ against production.
 | `wallpapers` | 3 | |
 | `ringtones` | 2 | |
 | `songs` | 2 | |
+| `vandanas` | 1 | |
 | `meditations` | 3 | includes a 2-part series |
 | `statuses` | 1 | with a status layout (photo frame + name text rects) |
 | `prarthanas` | 1 | |

@@ -49,6 +49,21 @@
       { "fieldPath": "sortOrder", "order": "DESCENDING" }
     ]},
 
+    { "collectionGroup": "vandanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "vandanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "vandanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
+
     { "collectionGroup": "chantings", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "status", "order": "ASCENDING" },
       { "fieldPath": "sortOrder", "order": "DESCENDING" }
@@ -159,6 +174,14 @@
       { "fieldPath": "publishAt", "order": "ASCENDING" }
     ]},
     { "collectionGroup": "songs", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expireAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "vandanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "publishAt", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "vandanas", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "status", "order": "ASCENDING" },
       { "fieldPath": "expireAt", "order": "ASCENDING" }
     ]},

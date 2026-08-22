@@ -26,6 +26,7 @@ import '../features/prarthana/presentation/prarthana_setup_screen.dart';
 import '../features/ringtone/presentation/ringtone_help_screen.dart';
 import '../features/ringtone/presentation/ringtone_list_screen.dart';
 import '../features/song/presentation/song_list_screen.dart';
+import '../features/vandana/presentation/vandana_list_screen.dart';
 import '../features/splash/application/app_bootstrap.dart';
 import '../features/splash/presentation/force_update_screen.dart';
 import '../features/splash/presentation/maintenance_screen.dart';
@@ -55,6 +56,7 @@ abstract class AppRoutes {
   static const ringtones = '/ringtones';
   static const ringtoneHelp = '/ringtones/help';
   static const songs = '/songs';
+  static const vandanas = '/vandana';
   static const chantings = '/chanting';
   static const meditations = '/meditations';
   static const player = '/player';
@@ -244,6 +246,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.songs,
         builder: (context, state) => const SongListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.vandanas,
+        builder: (context, state) => const VandanaListScreen(),
       ),
       GoRoute(
         path: AppRoutes.chantings,

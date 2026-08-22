@@ -13,6 +13,7 @@ abstract class FirestoreCollections {
   static const wallpapers = 'wallpapers';
   static const ringtones = 'ringtones';
   static const songs = 'songs';
+  static const vandanas = 'vandanas';
   static const meditations = 'meditations';
   static const chantings = 'chantings';
   static const statuses = 'statuses';
@@ -35,12 +36,13 @@ abstract class FirestoreCollections {
   static const favourites = 'favourites';
   static const progress = 'progress';
 
-  /// All seven content-type collections in one list — used by the generic
-  /// content repository and by the admin `ContentTypeConfig` registry.
+  /// All admin-managed content-type collections in one list — used by the
+  /// generic content repository and by the admin `ContentTypeConfig` registry.
   static const List<String> contentCollections = [
     wallpapers,
     ringtones,
     songs,
+    vandanas,
     meditations,
     chantings,
     statuses,

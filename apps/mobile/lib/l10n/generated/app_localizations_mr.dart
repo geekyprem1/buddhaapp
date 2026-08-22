@@ -106,6 +106,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get homeSong => 'गाणे';
 
   @override
+  String get homeVandana => 'वंदना';
+
+  @override
+  String get vandanaEmpty => 'अजून कोणतीही वंदना नाही.';
+
+  @override
   String get homeDailyPrarthana => 'दैनिक प्रार्थना';
 
   @override

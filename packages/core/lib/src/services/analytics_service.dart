@@ -60,6 +60,12 @@ class AnalyticsService {
   Future<void> songComplete({required String id}) =>
       _log('song_complete', {'id': id});
 
+  Future<void> vandanaPlay({required String id}) =>
+      _log('vandana_play', {'id': id});
+
+  Future<void> vandanaComplete({required String id}) =>
+      _log('vandana_complete', {'id': id});
+
   Future<void> meditationPlay({
     required String id,
     required int durationListened,

@@ -292,6 +292,18 @@ abstract class AppLocalizations {
   /// **'Song'**
   String get homeSong;
 
+  /// No description provided for @homeVandana.
+  ///
+  /// In en, this message translates to:
+  /// **'Vandana'**
+  String get homeVandana;
+
+  /// No description provided for @vandanaEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No vandana yet.'**
+  String get vandanaEmpty;
+
   /// No description provided for @homeDailyPrarthana.
   ///
   /// In en, this message translates to:

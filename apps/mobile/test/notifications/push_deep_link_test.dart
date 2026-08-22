@@ -7,6 +7,8 @@ void main() {
     expect(parsePushData({'module': 'prarthana'}).route, '/prarthana');
     expect(parsePushData({'module': 'chanting'}).route, '/chanting');
     expect(parsePushData({'module': 'chantings'}).route, '/chanting');
+    expect(parsePushData({'module': 'vandana'}).route, '/vandana');
+    expect(parsePushData({'module': 'vandanas'}).route, '/vandana');
     expect(parsePushData({'module': 'unknown'}).route, '/home');
   });
 

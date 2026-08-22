@@ -107,6 +107,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get homeSong => 'गीत';
 
   @override
+  String get homeVandana => 'वंदना';
+
+  @override
+  String get vandanaEmpty => 'अभी कोई वंदना नहीं है।';
+
+  @override
   String get homeDailyPrarthana => 'दैनिक प्रार्थना';
 
   @override

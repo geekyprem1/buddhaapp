@@ -370,6 +370,7 @@ IconData _iconFor(String path) {
     AdminRoutes.wallpapers => Icons.image_outlined,
     AdminRoutes.ringtones => Icons.notifications_outlined,
     AdminRoutes.songs => Icons.library_music_outlined,
+    AdminRoutes.vandanas => Icons.spa_outlined,
     AdminRoutes.meditations => Icons.self_improvement,
     AdminRoutes.chantings => Icons.graphic_eq_rounded,
     AdminRoutes.statuses => Icons.photo_outlined,

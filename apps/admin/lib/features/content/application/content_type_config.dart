@@ -6,7 +6,7 @@ import '../../../app/admin_strings.dart';
 enum ContentMediaKind { image, audio }
 
 /// Declares which fields a content type exposes (Architecture §11, T1.17).
-/// Adding a seventh type means adding one object to [contentTypeConfigs].
+/// Adding a type means adding one object to [contentTypeConfigs].
 class ContentTypeConfig {
   const ContentTypeConfig({
     required this.type,
@@ -73,6 +73,16 @@ const contentTypeConfigs = <ContentTypeConfig>[
     collection: FirestoreCollections.songs,
     label: AdminStrings.songs,
     route: AdminRoutes.songs,
+    media: ContentMediaKind.audio,
+    artistLabel: AdminStrings.artistField,
+    hasAlbum: true,
+    hasLyrics: true,
+  ),
+  ContentTypeConfig(
+    type: ContentType.vandana,
+    collection: FirestoreCollections.vandanas,
+    label: AdminStrings.vandanas,
+    route: AdminRoutes.vandanas,
     media: ContentMediaKind.audio,
     artistLabel: AdminStrings.artistField,
     hasAlbum: true,

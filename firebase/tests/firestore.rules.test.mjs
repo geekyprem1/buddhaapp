@@ -86,6 +86,30 @@ describe('Firestore rules', () => {
     );
   });
 
+  it('applies the same published-read rules to vandanas', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'vandanas/v1'), {
+        status: 'published',
+        title: { en: 'Namo Tassa' },
+        counters: { views: 0, downloads: 0, shares: 0, plays: 0 },
+      });
+      await setDoc(doc(ctx.firestore(), 'vandanas/draft1'), {
+        status: 'draft',
+        title: { en: 'Hidden' },
+        counters: { views: 0, downloads: 0, shares: 0, plays: 0 },
+      });
+    });
+    await assertFails(getDoc(doc(anon(), 'vandanas/v1')));
+    await assertSucceeds(getDoc(doc(user(), 'vandanas/v1')));
+    await assertFails(getDoc(doc(user(), 'vandanas/draft1')));
+    await assertSucceeds(
+      setDoc(doc(role('ed1', 'content_manager'), 'vandanas/new1'), {
+        status: 'draft',
+        title: { en: 'Draft' },
+      }),
+    );
+  });
+
   it('blocks client writes to counters', async () => {
     await seedPublishedWallpaper();
     await assertFails(

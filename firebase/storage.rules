@@ -38,6 +38,10 @@ service firebase.storage {
       allow read: if isSignedIn();
       allow write: if isContentEditor();
     }
+    match /vandanas/{itemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
     match /meditations/{itemId}/{fileName} {
       allow read: if isSignedIn();
       allow write: if isContentEditor();
