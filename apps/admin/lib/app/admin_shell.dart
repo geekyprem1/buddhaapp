@@ -9,6 +9,7 @@ import '../features/auth/application/admin_session.dart';
 import 'admin_access.dart';
 import 'admin_strings.dart';
 import '../widgets/responsive_layout.dart';
+import '../widgets/zoom_controls.dart';
 
 /// Collapsible left nav + top bar (AR-8.1). Collapses to icons below 1100px.
 class AdminShell extends ConsumerWidget {
@@ -284,6 +285,8 @@ class _TopBar extends StatelessWidget {
                   icon: const Icon(Icons.menu),
                 ),
               const Spacer(),
+              ZoomControls(compact: compact),
+              const SizedBox(width: 12),
               if (!compact && role.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(

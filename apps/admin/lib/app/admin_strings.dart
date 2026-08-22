@@ -33,6 +33,12 @@ abstract class AdminStrings {
   static const cancel = 'Cancel';
   static const confirm = 'Confirm';
 
+  static const zoom = 'Text zoom';
+  static const zoomIn = 'Increase text size';
+  static const zoomOut = 'Decrease text size';
+  static const zoomReset = 'Reset text size';
+  static const zoomTooltip = 'Text size — for easier reading';
+
   static const dashboard = 'Dashboard';
   static const teachers = 'Teachers';
   static const categories = 'Categories';
