@@ -6,7 +6,7 @@ part of 'auth_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authControllerHash() => r'3664cb25a812f9c9082cc0dc2a006a527e34e675';
+String _$authControllerHash() => r'e9cdf16aa9cba87d987bf0c25d647e105d6508fe';
 
 /// Drives the Login → OTP flow (PRD FR-2.1–2.9).
 ///

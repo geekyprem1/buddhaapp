@@ -97,4 +97,13 @@ extension ContentItemX on ContentItem {
       status == ContentStatus.published && deletedAt == null;
 
   bool get isAudio => audio != null;
+
+  /// True when `onMediaUpload` has written WebP derivatives onto the doc.
+  bool get hasProcessedImage {
+    bool pointsAt(String? value, String needle) =>
+        value != null && value.contains(needle);
+    return pointsAt(thumbUrl, '/thumb.webp') ||
+        pointsAt(mediaUrl, '/full.webp') ||
+        pointsAt(storagePath, '/full.webp');
+  }
 }

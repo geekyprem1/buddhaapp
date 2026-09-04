@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,17 +7,16 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../splash/application/app_bootstrap.dart';
 import '../application/audio_providers.dart';
+import '../application/dhamma_audio_handler.dart';
+import '../application/player_format.dart';
 
-/// Persistent bar that survives navigation (T2.35). Hidden when nothing
-/// is loaded.
+/// Persistent bar over the bottom of every screen while audio is loaded
+/// (T2.35). Overlay (not a Column sibling) so it always has bounded width.
 class MiniPlayer extends ConsumerWidget {
   const MiniPlayer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (ref.watch(miniPlayerSuppressedProvider)) {
-      return const SizedBox.shrink();
-    }
     final boot = ref.watch(appBootstrapProvider);
     final gate = boot.valueOrNull?.gate;
     if (boot.isLoading ||
@@ -25,81 +24,186 @@ class MiniPlayer extends ConsumerWidget {
         gate == AppGate.maintenance) {
       return const SizedBox.shrink();
     }
+    final handler = dhammaAudioHandlerOrNull;
+    if (handler == null) return const SizedBox.shrink();
 
     final media = ref.watch(currentMediaItemProvider).valueOrNull;
-    final playback = ref.watch(audioPlaybackStateProvider).valueOrNull;
     if (media == null) return const SizedBox.shrink();
 
-    final playing = playback?.playing ?? false;
-    final handler = ref.read(audioHandlerProvider);
+    final router = ref.watch(appRouterProvider);
 
+    final playing =
+        ref.watch(audioPlaybackStateProvider).valueOrNull?.playing ?? false;
+    final position =
+        ref.watch(audioPositionProvider).valueOrNull ?? Duration.zero;
+    final duration = media.duration ?? Duration.zero;
+    final progress = sliderValue(position, duration);
+
+    // Rebuild on every navigation so the bar reappears the moment the user
+    // leaves the full player screen (e.g. presses back). Without listening to
+    // the router, the mini player only re-evaluates its visibility when an
+    // audio provider happens to tick, so it would stay hidden after going back.
+    return ListenableBuilder(
+      listenable: router.routerDelegate,
+      builder: (context, child) {
+        if (_isFullPlayerOpen(router)) return const SizedBox.shrink();
+        return child!;
+      },
+      child: _buildBar(
+        context: context,
+        router: router,
+        handler: handler,
+        media: media,
+        playing: playing,
+        progress: progress,
+      ),
+    );
+  }
+
+  Widget _buildBar({
+    required BuildContext context,
+    required GoRouter router,
+    required DhammaAudioHandler handler,
+    required MediaItem media,
+    required bool playing,
+    required double progress,
+  }) {
     return Material(
       color: AppColors.surface,
-      elevation: 8,
-      child: InkWell(
-        onTap: () => context.push(AppRoutes.player),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 64,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: media.artUri == null
-                          ? const ColoredBox(color: AppColors.disabled)
-                          : CachedNetworkImage(
-                              imageUrl: media.artUri.toString(),
-                              fit: BoxFit.cover,
-                            ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            media.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                        Flexible(
-                          child: Text(
-                            media.artist ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: playing ? 'Pause' : 'Play',
-                    onPressed: () =>
-                        playing ? handler.pause() : handler.play(),
-                    icon: Icon(
-                      playing ? Icons.pause_circle_filled : Icons.play_circle_fill,
-                      color: AppColors.primary,
-                      size: 36,
-                    ),
-                  ),
-                ],
+      elevation: 12,
+      clipBehavior: Clip.hardEdge,
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          width: double.infinity,
+          child: Column(
+            children: [
+              LinearProgressIndicator(
+                minHeight: 2,
+                value: progress,
+                backgroundColor: AppColors.disabled,
+                color: AppColors.primary,
               ),
-            ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      _Art(url: media.artUri?.toString()),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => router.push(AppRoutes.player),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                media.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                              Text(
+                                media.artist ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // No `tooltip:` on these buttons — the mini player is
+                      // rendered outside the app's Navigator/Overlay (it lives
+                      // in the MaterialApp.router builder), and Tooltip requires
+                      // an Overlay ancestor, which would throw "No Overlay
+                      // widget found." and break the whole bar.
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: handler.skipToPrevious,
+                        icon: const Icon(Icons.skip_previous),
+                      ),
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () =>
+                            playing ? handler.pause() : handler.play(),
+                        icon: Icon(
+                          playing
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
+                          color: AppColors.primary,
+                          size: 32,
+                        ),
+                      ),
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: handler.skipToNext,
+                        icon: const Icon(Icons.skip_next),
+                      ),
+                      // Stops playback and clears the current item, which
+                      // dismisses the mini player (see DhammaAudioHandler.stop).
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: handler.stop,
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+bool _isFullPlayerOpen(GoRouter router) {
+  try {
+    final config = router.routerDelegate.currentConfiguration;
+    if (config.uri.path == AppRoutes.player) return true;
+    for (final match in config.matches) {
+      if (match is ImperativeRouteMatch &&
+          match.matches.uri.path == AppRoutes.player) {
+        return true;
+      }
+    }
+  } catch (_) {}
+  return false;
+}
+
+class _Art extends StatelessWidget {
+  const _Art({required this.url});
+
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: url == null || url!.isEmpty
+            ? const ColoredBox(
+                color: AppColors.disabled,
+                child: Icon(Icons.music_note, size: 20),
+              )
+            : Image.network(
+                url!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const ColoredBox(
+                  color: AppColors.disabled,
+                  child: Icon(Icons.music_note, size: 20),
+                ),
+              ),
       ),
     );
   }

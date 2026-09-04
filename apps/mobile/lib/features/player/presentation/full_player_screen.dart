@@ -7,32 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/audio_providers.dart';
 import '../application/media_item_mapper.dart';
+import '../application/player_format.dart';
 import 'sleep_timer_sheet.dart';
 
-class FullPlayerScreen extends ConsumerStatefulWidget {
+class FullPlayerScreen extends ConsumerWidget {
   const FullPlayerScreen({super.key});
 
   @override
-  ConsumerState<FullPlayerScreen> createState() => _FullPlayerScreenState();
-}
-
-class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(miniPlayerSuppressedProvider.notifier).setSuppressed(true);
-    });
-  }
-
-  @override
-  void dispose() {
-    ref.read(miniPlayerSuppressedProvider.notifier).setSuppressed(false);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final media = ref.watch(currentMediaItemProvider).valueOrNull;
     final playback = ref.watch(audioPlaybackStateProvider).valueOrNull;
@@ -112,7 +94,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
                   const SizedBox(height: AppSpacing.lg),
                   if (buffering) const LinearProgressIndicator(),
                   Slider(
-                    value: _sliderValue(position, duration),
+                    value: sliderValue(position, duration),
                     onChanged: duration.inMilliseconds == 0
                         ? null
                         : (v) => handler.seek(
@@ -125,8 +107,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(_fmt(position)),
-                      Text(_fmt(duration)),
+                      Text(formatPlayerTime(position)),
+                      Text(formatPlayerTime(duration)),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -210,8 +192,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
                   ),
                   if (showSleep && sleepLeft != null)
                     Text(
-                      l10n?.sleepTimerRemaining(_fmt(sleepLeft)) ??
-                          'Sleep in ${_fmt(sleepLeft)}',
+                      l10n?.sleepTimerRemaining(formatPlayerTime(sleepLeft)) ??
+                          'Sleep in ${formatPlayerTime(sleepLeft)}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -226,18 +208,4 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
       ),
     );
   }
-}
-
-double _sliderValue(Duration position, Duration duration) {
-  if (duration.inMilliseconds <= 0) return 0;
-  final v = position.inMilliseconds / duration.inMilliseconds;
-  return v.clamp(0.0, 1.0);
-}
-
-String _fmt(Duration d) {
-  final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-  final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-  final h = d.inHours;
-  if (h > 0) return '$h:$m:$s';
-  return '$m:$s';
 }

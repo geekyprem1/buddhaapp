@@ -30,11 +30,20 @@ class DhammaPathApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       builder: (context, child) {
-        return Column(
+        return Stack(
+          fit: StackFit.expand,
           children: [
-            const OfflineBanner(),
-            Expanded(child: child ?? const SizedBox.shrink()),
-            const MiniPlayer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const OfflineBanner(),
+                Expanded(child: child ?? const SizedBox.shrink()),
+              ],
+            ),
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: MiniPlayer(),
+            ),
           ],
         );
       },

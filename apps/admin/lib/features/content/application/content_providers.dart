@@ -5,8 +5,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'content_providers.g.dart';
 
 @riverpod
-Future<List<ContentItem>> adminContentList(Ref ref, String collection) {
-  return ref.watch(contentRepositoryProvider(collection)).fetchAdminPage();
+Stream<List<ContentItem>> adminContentList(Ref ref, String collection) {
+  return ref.watch(contentRepositoryProvider(collection)).watchAdminPage();
 }
 
 @riverpod

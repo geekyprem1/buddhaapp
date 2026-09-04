@@ -90,11 +90,11 @@ async function processImage(
     updatedAt: FieldValue.serverTimestamp(),
   };
   if (collection === "wallpapers" && width && height) {
-    patch.wallpaper = {
-      width,
-      height,
-      orientation: height >= width ? "portrait" : "landscape",
-    };
+    // Dotted paths merge into the existing `wallpaper` map so we don't wipe
+    // `kind` (or any other field the admin form already wrote).
+    patch["wallpaper.width"] = width;
+    patch["wallpaper.height"] = height;
+    patch["wallpaper.orientation"] = height >= width ? "portrait" : "landscape";
   }
   await getFirestore().collection(collection).doc(itemId).update(patch);
 }
@@ -153,7 +153,8 @@ async function processAudio(
     updatedAt: FieldValue.serverTimestamp(),
   };
   if (durationSec != null) {
-    patch.audio = { durationSec };
+    // Dotted path merges into existing `audio` (album, lyrics, …).
+    patch["audio.durationSec"] = durationSec;
   }
 
   await getFirestore().collection(collection).doc(itemId).update(patch);

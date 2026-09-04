@@ -52,13 +52,15 @@ class ContentCard extends StatelessWidget {
                   Expanded(child: thumb)
                 else
                   AspectRatio(aspectRatio: aspectRatio, child: thumb),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                if (title.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ],
                 if (subtitle != null)
                   Text(
                     subtitle!,

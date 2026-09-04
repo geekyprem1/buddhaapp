@@ -29,6 +29,22 @@ abstract class StoragePaths {
 
   static String notificationImage(String campaignId, [String ext = 'jpg']) =>
       'notifications/$campaignId/image.$ext';
+
+  /// Recover `{collection}/{itemId}/{file}` from a Firebase download URL.
+  /// Returns null when [url] is not a Storage download URL.
+  static String? fromDownloadUrl(String url) {
+    final match = RegExp(r'/o/([^?]+)').firstMatch(url);
+    if (match == null) return null;
+    return Uri.decodeComponent(match.group(1)!);
+  }
+
+  /// If [urlOrPath] is a download URL, return the object path; if it already
+  /// looks like a storage path, return it unchanged.
+  static String? coercePath(String? urlOrPath) {
+    if (urlOrPath == null || urlOrPath.isEmpty) return null;
+    if (!urlOrPath.startsWith('http')) return urlOrPath;
+    return fromDownloadUrl(urlOrPath);
+  }
 }
 
 /// A live resumable upload with progress and cancel (PRD AR-8.2).

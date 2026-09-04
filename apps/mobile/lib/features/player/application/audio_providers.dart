@@ -11,28 +11,28 @@ DhammaAudioHandler audioHandler(Ref ref) => dhammaAudioHandler;
 
 @riverpod
 Stream<MediaItem?> currentMediaItem(Ref ref) {
-  return ref.watch(audioHandlerProvider).mediaItem;
+  final handler = dhammaAudioHandlerOrNull;
+  if (handler == null) return const Stream<MediaItem?>.empty();
+  return handler.mediaItem;
 }
 
 @riverpod
 Stream<PlaybackState> audioPlaybackState(Ref ref) {
-  return ref.watch(audioHandlerProvider).playbackState;
+  final handler = dhammaAudioHandlerOrNull;
+  if (handler == null) return const Stream<PlaybackState>.empty();
+  return handler.playbackState;
 }
 
 @riverpod
 Stream<Duration> audioPosition(Ref ref) {
-  return ref.watch(audioHandlerProvider).positionStream;
+  final handler = dhammaAudioHandlerOrNull;
+  if (handler == null) return const Stream<Duration>.empty();
+  return handler.positionStream;
 }
 
 @riverpod
 Stream<Duration?> sleepTimerRemaining(Ref ref) {
-  return ref.watch(audioHandlerProvider).sleepTimer.remainingStream;
-}
-
-@Riverpod(keepAlive: true)
-class MiniPlayerSuppressed extends _$MiniPlayerSuppressed {
-  @override
-  bool build() => false;
-
-  void setSuppressed(bool value) => state = value;
+  final handler = dhammaAudioHandlerOrNull;
+  if (handler == null) return const Stream<Duration?>.empty();
+  return handler.sleepTimer.remainingStream;
 }

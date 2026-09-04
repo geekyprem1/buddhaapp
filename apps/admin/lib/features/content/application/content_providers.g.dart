@@ -6,7 +6,7 @@ part of 'content_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$adminContentListHash() => r'634cacbedb3fbbb5fa89cf6d339ea31fb7667dcd';
+String _$adminContentListHash() => r'7a26ed318f4af588510f900eae53e7260a9548de';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -73,7 +73,7 @@ class AdminContentListFamily extends Family<AsyncValue<List<ContentItem>>> {
 
 /// See also [adminContentList].
 class AdminContentListProvider
-    extends AutoDisposeFutureProvider<List<ContentItem>> {
+    extends AutoDisposeStreamProvider<List<ContentItem>> {
   /// See also [adminContentList].
   AdminContentListProvider(
     String collection,
@@ -108,7 +108,7 @@ class AdminContentListProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<ContentItem>> Function(AdminContentListRef provider) create,
+    Stream<List<ContentItem>> Function(AdminContentListRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -125,7 +125,7 @@ class AdminContentListProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<ContentItem>> createElement() {
+  AutoDisposeStreamProviderElement<List<ContentItem>> createElement() {
     return _AdminContentListProviderElement(this);
   }
 
@@ -145,13 +145,13 @@ class AdminContentListProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin AdminContentListRef on AutoDisposeFutureProviderRef<List<ContentItem>> {
+mixin AdminContentListRef on AutoDisposeStreamProviderRef<List<ContentItem>> {
   /// The parameter `collection` of this provider.
   String get collection;
 }
 
 class _AdminContentListProviderElement
-    extends AutoDisposeFutureProviderElement<List<ContentItem>>
+    extends AutoDisposeStreamProviderElement<List<ContentItem>>
     with AdminContentListRef {
   _AdminContentListProviderElement(super.provider);
 

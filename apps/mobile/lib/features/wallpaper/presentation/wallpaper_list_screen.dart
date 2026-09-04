@@ -27,10 +27,11 @@ class WallpaperListScreen extends ConsumerWidget {
       gridColumns: 2,
       emptyMessage: 'No wallpapers yet.',
       itemBuilder: (context, item, index) {
-        final language = Localizations.localeOf(context).languageCode;
         return ContentCard(
           thumbUrl: item.thumbUrl ?? item.mediaUrl,
-          title: item.title.resolve(language),
+          // Bulk-upload titles are filenames ("78", "22"). Wallpapers are
+          // visual — don't show that under the preview.
+          title: '',
           aspectRatio: 0.7,
           overlay: Align(
             alignment: Alignment.bottomCenter,

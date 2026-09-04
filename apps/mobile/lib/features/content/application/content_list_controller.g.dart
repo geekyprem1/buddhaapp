@@ -7,7 +7,7 @@ part of 'content_list_controller.dart';
 // **************************************************************************
 
 String _$contentListControllerHash() =>
-    r'449dd38d9e7144c8bd3280ed2f14c61b4b1b7ec7';
+    r'e28f3cfb1f8ea5d625a8362afd891beb6932b6f3';
 
 /// Copied from Dart SDK
 class _SystemHash {

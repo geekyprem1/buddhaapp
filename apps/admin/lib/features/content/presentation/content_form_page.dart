@@ -63,7 +63,13 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   bool _watermark = true;
   String? _mediaUrl;
   String? _thumbUrl;
+  String? _storagePath;
   String? _docId;
+  int? _wallpaperWidth;
+  int? _wallpaperHeight;
+  bool _mediaDirty = false;
+  int _mediaListenGen = 0;
+  int? _existingDurationSec;
   // Licence is no longer edited in the desk, but any existing value is kept
   // as-is so re-saving an old item never wipes its stored licence.
   String? _existingLicence;
@@ -147,8 +153,12 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
         config.media == ContentMediaKind.audio && item.thumbUrl == item.mediaUrl
             ? null
             : item.thumbUrl;
+    _storagePath = StoragePaths.coercePath(item.storagePath) ??
+        StoragePaths.coercePath(item.mediaUrl);
+    _mediaDirty = false;
     final audio = item.audio;
     if (audio != null) {
+      _existingDurationSec = audio.durationSec;
       _duration.text = audio.durationSec?.toString() ?? '';
       _series.text = audio.seriesId ?? '';
       _part.text = audio.partNumber?.toString() ?? '';
@@ -160,6 +170,8 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     }
     if (item.wallpaper != null) {
       _orientation.text = item.wallpaper!.orientation;
+      _wallpaperWidth = item.wallpaper!.width;
+      _wallpaperHeight = item.wallpaper!.height;
     }
     final status = item.statusMeta;
     if (status != null) {
@@ -197,7 +209,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     AudioMeta? audio;
     if (config.hasAudioMeta) {
       audio = AudioMeta(
-        durationSec: int.tryParse(_duration.text),
+        durationSec: int.tryParse(_duration.text) ?? _existingDurationSec,
         seriesId: _series.text.trim().isEmpty ? null : _series.text.trim(),
         partNumber: int.tryParse(_part.text),
         level: _level.text.trim().isEmpty ? null : _level.text.trim(),
@@ -221,7 +233,7 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       thumbUrl: config.media == ContentMediaKind.image
           ? (_thumbUrl ?? _mediaUrl)
           : _thumbUrl,
-      storagePath: _mediaUrl,
+      storagePath: _storagePath,
       language: config.media == ContentMediaKind.audio ? 'en' : null,
       status: _status,
       sortOrder: int.tryParse(_sort.text) ?? 0,
@@ -240,6 +252,8 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
               orientation: _orientation.text.trim().isEmpty
                   ? 'portrait'
                   : _orientation.text.trim(),
+              width: _wallpaperWidth,
+              height: _wallpaperHeight,
             )
           : null,
       audio: audio,
@@ -261,6 +275,33 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     );
   }
 
+  Future<void> _listenForProcessedMedia() async {
+    final gen = ++_mediaListenGen;
+    final id = _docId;
+    if (id == null) return;
+    final repo = ref.read(contentRepositoryProvider(config.collection));
+    for (var i = 0; i < 15; i++) {
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted || gen != _mediaListenGen) return;
+      final latest = await repo.getById(id);
+      if (latest == null || !latest.hasProcessedImage) continue;
+      setState(() {
+        _mediaUrl = latest.mediaUrl ?? _mediaUrl;
+        _thumbUrl = latest.thumbUrl ?? _thumbUrl;
+        _storagePath = StoragePaths.coercePath(latest.storagePath) ??
+            latest.storagePath ??
+            _storagePath;
+        _wallpaperWidth = latest.wallpaper?.width ?? _wallpaperWidth;
+        _wallpaperHeight = latest.wallpaper?.height ?? _wallpaperHeight;
+        if (latest.wallpaper != null) {
+          _orientation.text = latest.wallpaper!.orientation;
+        }
+        _mediaDirty = false;
+      });
+      return;
+    }
+  }
+
   Future<void> _back() async {
     if (_dirty && !await UnsavedChangesGuard.confirmLeave(context)) return;
     if (mounted) context.go(config.route);
@@ -279,13 +320,36 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       return;
     }
     setState(() => _saving = true);
-    final item = _buildItem();
+    var item = _buildItem();
     final repo = ref.read(contentRepositoryProvider(config.collection));
     try {
       if (widget.isNew && !_draftCreated) {
         await repo.createWithId(item);
       } else {
-        await repo.update(item);
+        if (_mediaDirty) {
+          final latest = await repo.getById(item.id);
+          if (latest != null && latest.hasProcessedImage) {
+            item = item.copyWith(
+              mediaUrl: latest.mediaUrl,
+              thumbUrl: latest.thumbUrl,
+              storagePath: StoragePaths.coercePath(latest.storagePath) ??
+                  latest.storagePath,
+              wallpaper: latest.wallpaper ?? item.wallpaper,
+            );
+            _mediaDirty = false;
+            _mediaUrl = item.mediaUrl;
+            _thumbUrl = item.thumbUrl;
+            _storagePath = item.storagePath;
+            _wallpaperWidth = item.wallpaper?.width;
+            _wallpaperHeight = item.wallpaper?.height;
+          }
+        }
+        final unchanged = <String>[
+          if (!_mediaDirty) ...['mediaUrl', 'storagePath'],
+          if (!_mediaDirty && config.media == ContentMediaKind.image)
+            'thumbUrl',
+        ];
+        await repo.update(item, unchangedKeys: unchanged);
       }
       ref.invalidate(adminContentListProvider(config.collection));
       if (!mounted) return;
@@ -462,11 +526,20 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
               onUploaded: (url) {
                 setState(() {
                   _mediaUrl = url;
+                  _storagePath = StoragePaths.coercePath(url);
                   if (config.media == ContentMediaKind.image) {
-                    _thumbUrl ??= url;
+                    // Always refresh — `??=` kept a previous original's
+                    // download token after a re-upload rotated it (403).
+                    _thumbUrl = url;
+                    _wallpaperWidth = null;
+                    _wallpaperHeight = null;
                   }
+                  _mediaDirty = true;
                   _dirty = true;
                 });
+                if (config.media == ContentMediaKind.image) {
+                  _listenForProcessedMedia();
+                }
               },
             ),
             if (config.media == ContentMediaKind.audio) ...[

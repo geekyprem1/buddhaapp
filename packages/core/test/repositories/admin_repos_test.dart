@@ -206,6 +206,80 @@ void main() {
         'notifications/n1/image.png',
       );
     });
+
+    test('fromDownloadUrl recovers the object path', () {
+      const url =
+          'https://firebasestorage.googleapis.com/v0/b/dhamma-path-prod.firebasestorage.app/o/wallpapers%2Fabc%2Foriginal.jpeg?alt=media&token=dead';
+      expect(
+        StoragePaths.fromDownloadUrl(url),
+        'wallpapers/abc/original.jpeg',
+      );
+      expect(StoragePaths.coercePath(url), 'wallpapers/abc/original.jpeg');
+      expect(
+        StoragePaths.coercePath('wallpapers/abc/full.webp'),
+        'wallpapers/abc/full.webp',
+      );
+      expect(StoragePaths.coercePath(null), isNull);
+    });
+  });
+
+  group('ContentRepository', () {
+    test('update can leave media fields untouched', () async {
+      await firestore.collection('wallpapers').doc('wp_1').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Lotus'},
+        'status': 'published',
+        'mediaUrl': 'https://example.com/full.webp',
+        'thumbUrl': 'https://example.com/thumb.webp',
+        'storagePath': 'wallpapers/wp_1/full.webp',
+        'sortOrder': 0,
+      });
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      await repo.update(
+        const ContentItem(
+          id: 'wp_1',
+          type: ContentType.wallpaper,
+          title: LocalisedText(en: 'Lotus bloom'),
+          mediaUrl: null,
+          thumbUrl: 'https://stale.example/original.jpeg',
+          storagePath: 'https://stale.example/original.jpeg',
+        ),
+        unchangedKeys: ['mediaUrl', 'thumbUrl', 'storagePath'],
+      );
+      final saved = await repo.getById('wp_1');
+      expect(saved?.title.en, 'Lotus bloom');
+      expect(saved?.mediaUrl, 'https://example.com/full.webp');
+      expect(saved?.thumbUrl, 'https://example.com/thumb.webp');
+      expect(saved?.storagePath, 'wallpapers/wp_1/full.webp');
+    });
+
+    test('watchAdminPage emits after a later media patch', () async {
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      await firestore.collection('wallpapers').doc('wp_1').set({
+        'type': 'wallpaper',
+        'title': {'en': '9'},
+        'status': 'published',
+        'sortOrder': 1,
+      });
+      final stream = repo.watchAdminPage();
+      final first = await stream.first;
+      expect(first.single.thumbUrl, isNull);
+
+      await firestore.collection('wallpapers').doc('wp_1').update({
+        'thumbUrl': 'https://example.com/thumb.webp',
+        'mediaUrl': 'https://example.com/full.webp',
+      });
+      final next = await stream.firstWhere(
+        (rows) => rows.single.thumbUrl != null,
+      );
+      expect(next.single.thumbUrl, 'https://example.com/thumb.webp');
+    });
   });
 
   group('AnalyticsService', () {

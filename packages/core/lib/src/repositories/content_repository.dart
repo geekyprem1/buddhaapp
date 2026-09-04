@@ -111,6 +111,19 @@ class ContentRepository with RepoGuard {
     });
   }
 
+  /// Live admin list. Used so `onMediaUpload`'s `thumbUrl` / `mediaUrl` patch
+  /// shows up without a manual refresh.
+  Stream<List<ContentItem>> watchAdminPage({int pageSize = 100}) {
+    return guardedStream(
+      'content.watchAdminPage',
+      _collection
+          .orderBy('sortOrder', descending: true)
+          .limit(pageSize)
+          .snapshots()
+          .map((snap) => snap.docs.map(_fromDoc).toList()),
+    );
+  }
+
   Future<ContentItem?> getById(String id) {
     return guardedRead('content.getById', () async {
       final doc = await _collection.doc(id).get();
@@ -140,11 +153,17 @@ class ContentRepository with RepoGuard {
     );
   }
 
-  Future<void> update(ContentItem item) {
+  Future<void> update(
+    ContentItem item, {
+    Iterable<String> unchangedKeys = const [],
+  }) {
     final data = item.toJson()
       ..remove('id')
       ..remove('counters')
       ..['updatedAt'] = DateTime.now();
+    for (final key in unchangedKeys) {
+      data.remove(key);
+    }
     return guardedWrite(
       'content.update',
       () => _collection.doc(item.id).update(data),

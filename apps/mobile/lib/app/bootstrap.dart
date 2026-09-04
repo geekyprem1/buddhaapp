@@ -143,15 +143,17 @@ void _installCrashHooks() {
     return true;
   };
   ErrorWidget.builder = (details) {
+    // Avoid [Center] — it expands to the incoming max constraint and will
+    // blow up a tight slot (e.g. the mini-player bar) with a yellow/black
+    // overflow stripe.
+    debugPrint('ErrorWidget: ${details.exceptionAsString()}');
     return const Material(
       color: AppColors.background,
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppSpacing.lg),
-          child: Text(
-            'Something went wrong.',
-            textAlign: TextAlign.center,
-          ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Text(
+          'Something went wrong.',
+          textAlign: TextAlign.center,
         ),
       ),
     );

@@ -6,7 +6,7 @@ part of 'app_bootstrap.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appBootstrapHash() => r'fc5b6c919c6ba425d8ff4cf2a5de6ef7356c67d1';
+String _$appBootstrapHash() => r'5bbb551a338a9a382bbbac3ea0d56547860b7ee1';
 
 /// See also [appBootstrap].
 @ProviderFor(appBootstrap)

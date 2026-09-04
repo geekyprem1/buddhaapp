@@ -94,22 +94,5 @@ final sleepTimerRemainingProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SleepTimerRemainingRef = AutoDisposeStreamProviderRef<Duration?>;
-String _$miniPlayerSuppressedHash() =>
-    r'ea10daa849adbd317e505eaba07e806f27a9e217';
-
-/// See also [MiniPlayerSuppressed].
-@ProviderFor(MiniPlayerSuppressed)
-final miniPlayerSuppressedProvider =
-    NotifierProvider<MiniPlayerSuppressed, bool>.internal(
-  MiniPlayerSuppressed.new,
-  name: r'miniPlayerSuppressedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$miniPlayerSuppressedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$MiniPlayerSuppressed = Notifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

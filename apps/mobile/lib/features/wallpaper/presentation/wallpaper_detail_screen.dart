@@ -111,7 +111,6 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final language = Localizations.localeOf(context).languageCode;
     final items = widget.gallery.items;
 
     return Scaffold(
@@ -119,11 +118,7 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text(
-          _item.title.resolve(language),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: Text(l10n?.homeWallpaper ?? 'Wallpapers'),
       ),
       body: Column(
         children: [

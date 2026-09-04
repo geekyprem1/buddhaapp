@@ -45,6 +45,29 @@ void main() {
       expect(decoded.title.resolve('hi'), 'Draft');
     });
 
+    test('hasProcessedImage detects Function-written WebP URLs', () {
+      const pending = ContentItem(
+        id: 'wp_a',
+        type: ContentType.wallpaper,
+        title: LocalisedText(en: 'Pending'),
+        mediaUrl:
+            'https://firebasestorage.googleapis.com/v0/b/x/o/wallpapers%2Fa%2Foriginal.jpeg?alt=media',
+      );
+      const processed = ContentItem(
+        id: 'wp_a',
+        type: ContentType.wallpaper,
+        title: LocalisedText(en: 'Ready'),
+        mediaUrl:
+            'https://firebasestorage.googleapis.com/v0/b/x/o/wallpapers%2Fa%2Ffull.webp?alt=media',
+        thumbUrl:
+            'https://firebasestorage.googleapis.com/v0/b/x/o/wallpapers%2Fa%2Fthumb.webp?alt=media',
+        storagePath: 'wallpapers/a/full.webp',
+      );
+
+      expect(pending.hasProcessedImage, isFalse);
+      expect(processed.hasProcessedImage, isTrue);
+    });
+
     test('LocalisedText resolves with fallback to English', () {
       const text = LocalisedText(en: 'Hello');
       expect(text.resolve('mr'), 'Hello');

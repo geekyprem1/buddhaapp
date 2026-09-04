@@ -251,35 +251,19 @@ class _ContentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final thumbUrl = item.thumbUrl;
-    final previewUrl = media == ContentMediaKind.image
-        ? (thumbUrl != null && thumbUrl.isNotEmpty ? thumbUrl : item.mediaUrl)
-        : (thumbUrl != null && thumbUrl.isNotEmpty && thumbUrl != item.mediaUrl
-            ? thumbUrl
-            : null);
+    final urls = contentRowPreviewUrls(item, media);
+    final emptyIcon = media == ContentMediaKind.audio
+        ? Icons.audiotrack_outlined
+        : Icons.image_outlined;
 
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(12),
       child: ListTile(
         onTap: onOpen,
-        leading: previewUrl == null || previewUrl.isEmpty
-            ? Icon(
-                media == ContentMediaKind.audio
-                    ? Icons.audiotrack_outlined
-                    : Icons.image_outlined,
-              )
-            : ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.network(
-                  previewUrl,
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.broken_image_outlined),
-                ),
-              ),
+        leading: urls.isEmpty
+            ? Icon(emptyIcon)
+            : _FallbackNetworkThumb(urls: urls, emptyIcon: emptyIcon),
         title: Text(
           item.title.resolve('en'),
           maxLines: 1,
@@ -332,6 +316,77 @@ class _ContentRow extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Prefer `thumbUrl`, then `mediaUrl`. Audio rows only preview a dedicated
+/// thumbnail — never the audio file itself.
+@visibleForTesting
+List<String> contentRowPreviewUrls(ContentItem item, ContentMediaKind media) {
+  if (media == ContentMediaKind.image) {
+    final urls = <String>[];
+    for (final url in [item.thumbUrl, item.mediaUrl]) {
+      if (url != null && url.isNotEmpty && !urls.contains(url)) {
+        urls.add(url);
+      }
+    }
+    return urls;
+  }
+  final thumb = item.thumbUrl;
+  if (thumb != null && thumb.isNotEmpty && thumb != item.mediaUrl) {
+    return [thumb];
+  }
+  return const [];
+}
+
+/// Tries each URL in order. A stale Firebase download token 403s; falling
+/// through to `mediaUrl` is what keeps the wallpaper list populated after a
+/// re-upload left `thumbUrl` pointing at a rotated token.
+class _FallbackNetworkThumb extends StatefulWidget {
+  const _FallbackNetworkThumb({required this.urls, required this.emptyIcon});
+
+  final List<String> urls;
+  final IconData emptyIcon;
+
+  @override
+  State<_FallbackNetworkThumb> createState() => _FallbackNetworkThumbState();
+}
+
+class _FallbackNetworkThumbState extends State<_FallbackNetworkThumb> {
+  var _index = 0;
+
+  @override
+  void didUpdateWidget(covariant _FallbackNetworkThumb oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.urls != widget.urls) _index = 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_index >= widget.urls.length) {
+      return Icon(widget.emptyIcon);
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: Image.network(
+        widget.urls[_index],
+        width: 48,
+        height: 48,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && _index < widget.urls.length) {
+              setState(() => _index++);
+            }
+          });
+          return SizedBox(
+            width: 48,
+            height: 48,
+            child: Icon(widget.emptyIcon, size: 20),
+          );
+        },
       ),
     );
   }

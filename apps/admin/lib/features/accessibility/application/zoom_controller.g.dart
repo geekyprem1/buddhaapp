@@ -25,7 +25,7 @@ final sharedPreferencesProvider = Provider<SharedPreferences>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SharedPreferencesRef = ProviderRef<SharedPreferences>;
-String _$zoomControllerHash() => r'a12d1fcde612a31170f51f62031ca7138bb605b6';
+String _$zoomControllerHash() => r'e4c18c5f8e1fba518bac0b3f5333a6df217c0801';
 
 /// See also [ZoomController].
 @ProviderFor(ZoomController)

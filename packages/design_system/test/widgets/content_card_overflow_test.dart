@@ -42,6 +42,22 @@ void main() {
     expect(find.byType(ContentCard), findsOneWidget);
   });
 
+  testWidgets('ContentCard hides an empty title', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: const Scaffold(
+          body: ContentCard(
+            thumbUrl: null,
+            title: '',
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Text), findsNothing);
+  });
+
   testWidgets('teacher chip row fits a 48dp strip', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

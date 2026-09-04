@@ -22,6 +22,10 @@ class DhammaAudioHandler extends BaseAudioHandler
     // FR-10.5 — persist the play position periodically so meditations can be
     // resumed later. Throttled to one write every few seconds.
     _player.positionStream.listen(_maybeSaveProgress);
+    // Firestore `audio.durationSec` is often missing (bulk upload / form
+    // save). just_audio learns the length once the file header is read —
+    // copy it onto the current MediaItem so the seek bar can enable.
+    _player.durationStream.listen(_onDuration);
   }
 
   final AudioPlayer _player = AudioPlayer();
@@ -97,18 +101,29 @@ class DhammaAudioHandler extends BaseAudioHandler
     final url = mediaUrlOf(item);
     if (url == null || url.isEmpty) return;
     try {
-      await _player.setUrl(url);
+      final loaded = await _player.setUrl(url);
       _retrying = false;
+      _applyDuration(loaded ?? _player.duration);
     } catch (_) {
       if (_retrying) rethrow;
       _retrying = true;
       await Future<void>.delayed(const Duration(seconds: 1));
-      await _player.setUrl(url);
+      final loaded = await _player.setUrl(url);
       _retrying = false;
+      _applyDuration(loaded ?? _player.duration);
     }
     if (startAt != null && startAt > Duration.zero) {
       await _player.seek(startAt);
     }
+  }
+
+  void _onDuration(Duration? duration) => _applyDuration(duration);
+
+  void _applyDuration(Duration? duration) {
+    if (duration == null || duration <= Duration.zero) return;
+    final current = mediaItem.value;
+    if (current == null || current.duration == duration) return;
+    mediaItem.add(current.copyWith(duration: duration));
   }
 
   /// Throttled position persistence for the current meditation.
@@ -204,6 +219,11 @@ class DhammaAudioHandler extends BaseAudioHandler
     sleepTimer.cancel();
     await _player.stop();
     await super.stop();
+    // Clear the current item and queue so the mini player (which is shown
+    // whenever there is a current MediaItem) dismisses itself. Without this,
+    // stopping/finishing playback leaves a stale item and the bar lingers.
+    mediaItem.add(null);
+    queue.add(const []);
   }
 
   @override
@@ -330,6 +350,8 @@ Future<DhammaAudioHandler> initAudioHandler() async {
   );
   return _handler!;
 }
+
+DhammaAudioHandler? get dhammaAudioHandlerOrNull => _handler;
 
 DhammaAudioHandler get dhammaAudioHandler {
   final handler = _handler;
