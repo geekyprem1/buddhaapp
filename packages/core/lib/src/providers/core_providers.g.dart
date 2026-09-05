@@ -108,6 +108,23 @@ final teacherRepositoryProvider = Provider<TeacherRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TeacherRepositoryRef = ProviderRef<TeacherRepository>;
+String _$wisdomRepositoryHash() => r'222b700c4a925b61a968a51ff4479968eed661b6';
+
+/// See also [wisdomRepository].
+@ProviderFor(wisdomRepository)
+final wisdomRepositoryProvider = Provider<WisdomRepository>.internal(
+  wisdomRepository,
+  name: r'wisdomRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$wisdomRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef WisdomRepositoryRef = ProviderRef<WisdomRepository>;
 String _$categoryRepositoryHash() =>
     r'456a5ad6317a837626b1ef88e128af8350acdc1f';
 
@@ -512,6 +529,188 @@ final activeTeachersProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveTeachersRef = AutoDisposeStreamProviderRef<List<Teacher>>;
+String _$activeWisdomsHash() => r'eea80ca7bab6dd05c0c7613f4ed341e4eea12856';
+
+/// Active Today Wisdom cards ordered by `sortOrder`. The home hero picks
+/// one per day from this list.
+///
+/// Copied from [activeWisdoms].
+@ProviderFor(activeWisdoms)
+final activeWisdomsProvider = AutoDisposeStreamProvider<List<Wisdom>>.internal(
+  activeWisdoms,
+  name: r'activeWisdomsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$activeWisdomsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ActiveWisdomsRef = AutoDisposeStreamProviderRef<List<Wisdom>>;
+String _$activeCategoriesHash() => r'ee1a0dfeb2bb582079681167f0b8e17a35e8a4d5';
+
+/// Active categories for one content module, ordered by `sortOrder`.
+/// Powers the category chip row under the teacher row on every mobile
+/// content list screen — admin-created categories appear here
+/// automatically (PRD FR-7.10, FR-10.6).
+///
+/// Copied from [activeCategories].
+@ProviderFor(activeCategories)
+const activeCategoriesProvider = ActiveCategoriesFamily();
+
+/// Active categories for one content module, ordered by `sortOrder`.
+/// Powers the category chip row under the teacher row on every mobile
+/// content list screen — admin-created categories appear here
+/// automatically (PRD FR-7.10, FR-10.6).
+///
+/// Copied from [activeCategories].
+class ActiveCategoriesFamily extends Family<AsyncValue<List<Category>>> {
+  /// Active categories for one content module, ordered by `sortOrder`.
+  /// Powers the category chip row under the teacher row on every mobile
+  /// content list screen — admin-created categories appear here
+  /// automatically (PRD FR-7.10, FR-10.6).
+  ///
+  /// Copied from [activeCategories].
+  const ActiveCategoriesFamily();
+
+  /// Active categories for one content module, ordered by `sortOrder`.
+  /// Powers the category chip row under the teacher row on every mobile
+  /// content list screen — admin-created categories appear here
+  /// automatically (PRD FR-7.10, FR-10.6).
+  ///
+  /// Copied from [activeCategories].
+  ActiveCategoriesProvider call(
+    String module,
+  ) {
+    return ActiveCategoriesProvider(
+      module,
+    );
+  }
+
+  @override
+  ActiveCategoriesProvider getProviderOverride(
+    covariant ActiveCategoriesProvider provider,
+  ) {
+    return call(
+      provider.module,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'activeCategoriesProvider';
+}
+
+/// Active categories for one content module, ordered by `sortOrder`.
+/// Powers the category chip row under the teacher row on every mobile
+/// content list screen — admin-created categories appear here
+/// automatically (PRD FR-7.10, FR-10.6).
+///
+/// Copied from [activeCategories].
+class ActiveCategoriesProvider
+    extends AutoDisposeStreamProvider<List<Category>> {
+  /// Active categories for one content module, ordered by `sortOrder`.
+  /// Powers the category chip row under the teacher row on every mobile
+  /// content list screen — admin-created categories appear here
+  /// automatically (PRD FR-7.10, FR-10.6).
+  ///
+  /// Copied from [activeCategories].
+  ActiveCategoriesProvider(
+    String module,
+  ) : this._internal(
+          (ref) => activeCategories(
+            ref as ActiveCategoriesRef,
+            module,
+          ),
+          from: activeCategoriesProvider,
+          name: r'activeCategoriesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeCategoriesHash,
+          dependencies: ActiveCategoriesFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveCategoriesFamily._allTransitiveDependencies,
+          module: module,
+        );
+
+  ActiveCategoriesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.module,
+  }) : super.internal();
+
+  final String module;
+
+  @override
+  Override overrideWith(
+    Stream<List<Category>> Function(ActiveCategoriesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ActiveCategoriesProvider._internal(
+        (ref) => create(ref as ActiveCategoriesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        module: module,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<Category>> createElement() {
+    return _ActiveCategoriesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ActiveCategoriesProvider && other.module == module;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, module.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ActiveCategoriesRef on AutoDisposeStreamProviderRef<List<Category>> {
+  /// The parameter `module` of this provider.
+  String get module;
+}
+
+class _ActiveCategoriesProviderElement
+    extends AutoDisposeStreamProviderElement<List<Category>>
+    with ActiveCategoriesRef {
+  _ActiveCategoriesProviderElement(super.provider);
+
+  @override
+  String get module => (origin as ActiveCategoriesProvider).module;
+}
+
 String _$firestoreHash() => r'864285def6284159b44f9598dcde96347e0c1dce';
 
 /// Direct Firestore instance, exposed for edge cases (e.g. cursor-based

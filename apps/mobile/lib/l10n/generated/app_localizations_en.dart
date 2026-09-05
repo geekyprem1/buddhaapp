@@ -118,6 +118,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeShareApp => 'Share App';
 
   @override
+  String get todayWisdom => 'Today\'s Wisdom';
+
+  @override
+  String get todayWisdomReadMore => 'Read more';
+
+  @override
   String get homeTrendingStatus => 'Trending Status';
 
   @override

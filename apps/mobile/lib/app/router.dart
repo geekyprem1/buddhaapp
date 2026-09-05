@@ -28,6 +28,7 @@ import '../features/ringtone/presentation/ringtone_list_screen.dart';
 import '../features/song/presentation/song_list_screen.dart';
 import '../features/vandana/presentation/vandana_list_screen.dart';
 import '../features/splash/application/app_bootstrap.dart';
+import '../features/wisdom/presentation/wisdom_detail_screen.dart';
 import '../features/splash/presentation/force_update_screen.dart';
 import '../features/splash/presentation/maintenance_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
@@ -51,6 +52,7 @@ abstract class AppRoutes {
   static const onboardingPersonInfo = '/onboarding/person-info';
   static const onboardingTeacher = '/onboarding/teacher';
   static const home = '/home';
+  static const wisdomDetail = '/wisdom';
   static const buddhistCalendar = '/buddhist-calendar';
   static const wallpapers = '/wallpapers';
   static const ringtones = '/ringtones';
@@ -199,6 +201,13 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.wisdomDetail,
+        builder: (context, state) {
+          final id = state.extra as String? ?? '';
+          return WisdomDetailScreen(wisdomId: id);
+        },
       ),
       GoRoute(
         path: AppRoutes.buddhistCalendar,

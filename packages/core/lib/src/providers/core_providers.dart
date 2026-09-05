@@ -5,8 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../constants/firestore_collections.dart';
 import '../models/app_user.dart';
+import '../models/category.dart';
 import '../models/content_item.dart';
 import '../models/teacher.dart';
+import '../models/wisdom.dart';
 import '../repositories/admin_user_repository.dart';
 import '../repositories/audit_repository.dart';
 import '../repositories/category_repository.dart';
@@ -19,6 +21,7 @@ import '../repositories/progress_repository.dart';
 import '../repositories/static_page_repository.dart';
 import '../repositories/teacher_repository.dart';
 import '../repositories/user_repository.dart';
+import '../repositories/wisdom_repository.dart';
 import '../services/admin_functions_service.dart';
 import '../services/analytics_service.dart';
 import '../services/auth_functions_service.dart';
@@ -46,6 +49,9 @@ EventsRepository eventsRepository(Ref ref) => EventsRepository();
 
 @Riverpod(keepAlive: true)
 TeacherRepository teacherRepository(Ref ref) => TeacherRepository();
+
+@Riverpod(keepAlive: true)
+WisdomRepository wisdomRepository(Ref ref) => WisdomRepository();
 
 @Riverpod(keepAlive: true)
 CategoryRepository categoryRepository(Ref ref) => CategoryRepository();
@@ -106,6 +112,22 @@ Stream<AppUser?> currentAppUser(Ref ref) {
 @riverpod
 Stream<List<Teacher>> activeTeachers(Ref ref) {
   return ref.watch(teacherRepositoryProvider).watchActiveTeachers();
+}
+
+/// Active Today Wisdom cards ordered by `sortOrder`. The home hero picks
+/// one per day from this list.
+@riverpod
+Stream<List<Wisdom>> activeWisdoms(Ref ref) {
+  return ref.watch(wisdomRepositoryProvider).watchActiveWisdoms();
+}
+
+/// Active categories for one content module, ordered by `sortOrder`.
+/// Powers the category chip row under the teacher row on every mobile
+/// content list screen — admin-created categories appear here
+/// automatically (PRD FR-7.10, FR-10.6).
+@riverpod
+Stream<List<Category>> activeCategories(Ref ref, String module) {
+  return ref.watch(categoryRepositoryProvider).watchByModule(module);
 }
 
 /// Direct Firestore instance, exposed for edge cases (e.g. cursor-based

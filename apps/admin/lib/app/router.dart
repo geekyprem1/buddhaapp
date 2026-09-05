@@ -23,6 +23,8 @@ import '../features/notifications/presentation/notifications_list_page.dart';
 import '../features/pages/presentation/page_editor_page.dart';
 import '../features/pages/presentation/pages_list_page.dart';
 import '../features/users/presentation/users_list_page.dart';
+import '../features/wisdom/presentation/wisdom_form_page.dart';
+import '../features/wisdom/presentation/wisdom_list_page.dart';
 import '../features/teachers/presentation/teacher_form_page.dart';
 import '../features/teachers/presentation/teachers_list_page.dart';
 import '../widgets/idle_timeout_listener.dart';
@@ -115,6 +117,22 @@ GoRouter adminRouter(Ref ref) {
             ],
           ),
           ..._contentRoutes(),
+          GoRoute(
+            path: AdminRoutes.wisdom,
+            builder: (context, state) => const WisdomListPage(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const WisdomFormPage(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => WisdomFormPage(
+                  wisdomId: state.pathParameters['id'],
+                ),
+              ),
+            ],
+          ),
           GoRoute(
             path: AdminRoutes.users,
             builder: (context, state) => const UsersListPage(),

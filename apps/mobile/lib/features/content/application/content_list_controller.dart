@@ -34,7 +34,8 @@ class PagedContent {
 }
 
 /// Generic paginated list controller, one instance per
-/// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+/// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+/// means "All teachers", `categoryId == null` means "All categories".
 ///
 /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
 /// subsequent pages using the cursor from the previous query. The same
@@ -48,7 +49,11 @@ class ContentListController extends _$ContentListController {
       ref.read(contentRepositoryProvider(collection));
 
   @override
-  Future<PagedContent> build(String collection, String? teacherId) async {
+  Future<PagedContent> build(
+    String collection,
+    String? teacherId, {
+    String? categoryId,
+  }) async {
     return _fetchPage();
   }
 
@@ -57,6 +62,7 @@ class ContentListController extends _$ContentListController {
   }) async {
     final snap = await _repo.fetchPublishedPageRaw(
       teacherId: teacherId,
+      categoryId: categoryId,
       pageSize: _pageSize,
       startAfter: startAfter,
     );

@@ -118,6 +118,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get homeShareApp => 'अॅप शेअर करा';
 
   @override
+  String get todayWisdom => 'आजचे ज्ञान';
+
+  @override
+  String get todayWisdomReadMore => 'अधिक वाचा';
+
+  @override
   String get homeTrendingStatus => 'ट्रेंडिंग स्टेटस';
 
   @override

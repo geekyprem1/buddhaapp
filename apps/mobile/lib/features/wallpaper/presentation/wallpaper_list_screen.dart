@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/content_list_controller.dart';
+import '../../content/application/category_filter_providers.dart';
 import '../../content/application/teacher_filter_providers.dart';
 import '../../content/presentation/content_list_scaffold.dart';
 import '../application/wallpaper_gallery.dart';
@@ -68,11 +69,15 @@ class WallpaperListScreen extends ConsumerWidget {
             final teacherId = ref.read(
               contentTeacherFilterProvider(ContentType.wallpaper),
             );
+            final categoryId = ref.read(
+              contentCategoryFilterProvider(ContentType.wallpaper),
+            );
             final items = ref
                     .read(
                       contentListControllerProvider(
                         FirestoreCollections.wallpapers,
                         teacherId,
+                        categoryId: categoryId,
                       ),
                     )
                     .valueOrNull

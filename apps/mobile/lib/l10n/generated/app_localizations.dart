@@ -316,6 +316,18 @@ abstract class AppLocalizations {
   /// **'Share App'**
   String get homeShareApp;
 
+  /// No description provided for @todayWisdom.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Wisdom'**
+  String get todayWisdom;
+
+  /// No description provided for @todayWisdomReadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read more'**
+  String get todayWisdomReadMore;
+
   /// No description provided for @homeTrendingStatus.
   ///
   /// In en, this message translates to:

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/content_list_controller.dart';
+import '../../content/application/category_filter_providers.dart';
 import '../../content/application/teacher_filter_providers.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../content/presentation/content_list_scaffold.dart';
@@ -31,11 +32,15 @@ class ChantingListScreen extends ConsumerWidget {
             final teacherId = ref.read(
               contentTeacherFilterProvider(ContentType.chanting),
             );
+            final categoryId = ref.read(
+              contentCategoryFilterProvider(ContentType.chanting),
+            );
             final queue = ref
                     .read(
                       contentListControllerProvider(
                         FirestoreCollections.chantings,
                         teacherId,
+                        categoryId: categoryId,
                       ),
                     )
                     .valueOrNull

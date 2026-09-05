@@ -119,6 +119,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get homeShareApp => 'ऐप शेयर करें';
 
   @override
+  String get todayWisdom => 'आज का ज्ञान';
+
+  @override
+  String get todayWisdomReadMore => 'और पढ़ें';
+
+  @override
   String get homeTrendingStatus => 'ट्रेंडिंग स्टेटस';
 
   @override

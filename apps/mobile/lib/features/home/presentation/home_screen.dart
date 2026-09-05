@@ -8,6 +8,7 @@ import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../notifications/application/fcm_coordinator.dart';
 import '../../profile/application/profile_providers.dart';
+import '../../wisdom/presentation/wisdom_hero_card.dart';
 import '../application/home_providers.dart';
 import 'feature_coming_soon_screen.dart';
 
@@ -101,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.watch(homeLayoutProvider).valueOrNull ?? HomeLayout.defaults;
           return CustomScrollView(
             slivers: [
+              const SliverToBoxAdapter(child: WisdomHeroCard()),
               for (var i = 0; i < layout.sections.length; i++)
                 ..._sectionSlivers(
                   context,

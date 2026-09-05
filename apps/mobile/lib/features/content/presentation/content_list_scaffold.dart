@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
+import '../application/category_filter_providers.dart';
 import '../application/content_list_controller.dart';
 import '../application/teacher_filter_providers.dart';
 
 /// Reusable scaffold for the four content list screens (wallpaper, ringtone,
 /// song, meditation). Owns the shared chrome — app bar, the
-/// `All | <teachers> | ⊕` filter row, pagination, and loading/empty/error
-/// states — and delegates only the per-item rendering to [itemBuilder]
+/// `All | <teachers> | ⊕` filter row, the `All | <categories>` row fed by
+/// the admin-managed `categories` collection, pagination, and
+/// loading/empty/error states — and delegates only the per-item rendering
+/// to [itemBuilder]
 /// (Architecture §5.1; DRY per the generic content module principle §11).
 class ContentListScaffold extends ConsumerStatefulWidget {
   const ContentListScaffold({
@@ -70,10 +73,14 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 400) {
       final teacherId = ref.read(contentTeacherFilterProvider(widget.module));
+      final categoryId = ref.read(contentCategoryFilterProvider(widget.module));
       ref
           .read(
-            contentListControllerProvider(widget.collection, teacherId)
-                .notifier,
+            contentListControllerProvider(
+              widget.collection,
+              teacherId,
+              categoryId: categoryId,
+            ).notifier,
           )
           .loadMore();
     }
@@ -83,9 +90,20 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final teacherId = ref.watch(contentTeacherFilterProvider(widget.module));
+    final categoryId = ref.watch(contentCategoryFilterProvider(widget.module));
     final chips = ref.watch(selectedTeacherChipsProvider);
+    final categoryChips = ref.watch(moduleCategoryChipsProvider(widget.module));
     final asyncContent = ref.watch(
-      contentListControllerProvider(widget.collection, teacherId),
+      contentListControllerProvider(
+        widget.collection,
+        teacherId,
+        categoryId: categoryId,
+      ),
+    );
+    final controller = contentListControllerProvider(
+      widget.collection,
+      teacherId,
+      categoryId: categoryId,
     );
 
     return Scaffold(
@@ -111,34 +129,30 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
               // ⊕ teacher picker sheet — wired in a later task (FR-5.7).
             },
           ),
+          if (categoryChips.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            TeacherFilterChipRow(
+              teachers: categoryChips,
+              selectedTeacherId: categoryId,
+              onSelect: (id) => ref
+                  .read(contentCategoryFilterProvider(widget.module).notifier)
+                  .select(id),
+            ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: asyncContent.when(
               loading: () => _buildLoading(),
               error: (e, _) => ErrorState(
                 message: l10n?.errorLoadFailed ?? 'Could not load content.',
-                onRetry: () => ref
-                    .read(
-                      contentListControllerProvider(
-                        widget.collection,
-                        teacherId,
-                      ).notifier,
-                    )
-                    .refresh(),
+                onRetry: () => ref.read(controller.notifier).refresh(),
               ),
               data: (paged) {
                 if (paged.items.isEmpty) {
                   return EmptyState(message: widget.emptyMessage);
                 }
                 return RefreshIndicator(
-                  onRefresh: () => ref
-                      .read(
-                        contentListControllerProvider(
-                          widget.collection,
-                          teacherId,
-                        ).notifier,
-                      )
-                      .refresh(),
+                  onRefresh: () => ref.read(controller.notifier).refresh(),
                   child: widget.gridColumns != null
                       ? _buildGrid(paged)
                       : _buildList(paged),

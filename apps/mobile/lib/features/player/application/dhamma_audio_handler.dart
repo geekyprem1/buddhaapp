@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:audio_service/audio_service.dart';
 import 'package:core/core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'media_item_mapper.dart';
 import 'sleep_timer.dart';
@@ -63,6 +65,12 @@ class DhammaAudioHandler extends BaseAudioHandler
     List<ContentItem>? queue,
     String language = 'en',
   }) async {
+    // Android 13+ hides the notification-panel mini player until the
+    // runtime notification permission is granted. The home screen asks once
+    // and it can be skipped — so ask here too, otherwise minimising the app
+    // plays audio with no controls. Never blocks playback.
+    await _ensureMediaNotificationPermission();
+
     final playable = (queue ?? [item])
         .where((e) => e.mediaUrl != null && e.mediaUrl!.isNotEmpty)
         .toList();
@@ -81,6 +89,27 @@ class DhammaAudioHandler extends BaseAudioHandler
     final resumeAt = await _savedResumePosition(playable[index]);
     await _loadIndex(index, startAt: resumeAt);
     await play();
+  }
+
+  /// Best-effort runtime permission for the media notification (Android
+  /// 13+ only — older versions and iOS grant it implicitly for playback).
+  /// Skipped when already decided (granted / permanently denied /
+  /// restricted) so playback never stalls on a dialog.
+  Future<void> _ensureMediaNotificationPermission() async {
+    if (!Platform.isAndroid) return;
+    try {
+      final status = await Permission.notification.status;
+      if (status.isGranted ||
+          status.isPermanentlyDenied ||
+          status.isRestricted ||
+          status.isLimited) {
+        return;
+      }
+      await Permission.notification.request();
+    } catch (_) {
+      // Platform channel unavailable (unit tests, background isolate) —
+      // playback must never fail because of a permission check.
+    }
   }
 
   /// The stored resume point for a meditation, or `null` if none/ineligible.

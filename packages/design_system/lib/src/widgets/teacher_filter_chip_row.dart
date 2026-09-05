@@ -13,12 +13,14 @@ class TeacherChipData {
 /// list screen (Architecture §5.1, PRD FR-5.7). `null` teacher id means
 /// "All". The `+` chip opens a picker to add more teachers to the user's
 /// selection — that behaviour is wired by the caller via [onAddTeacher].
+/// Pass `null` for [onAddTeacher] to hide the `+` chip (e.g. the category
+/// filter row, where the full active set is always shown).
 class TeacherFilterChipRow extends StatelessWidget {
   const TeacherFilterChipRow({
     required this.teachers,
     required this.selectedTeacherId,
     required this.onSelect,
-    required this.onAddTeacher,
+    this.onAddTeacher,
     super.key,
   });
 
@@ -29,7 +31,9 @@ class TeacherFilterChipRow extends StatelessWidget {
   /// `null` represents "All".
   final String? selectedTeacherId;
   final ValueChanged<String?> onSelect;
-  final VoidCallback onAddTeacher;
+
+  /// `null` hides the `+` chip.
+  final VoidCallback? onAddTeacher;
 
   @override
   Widget build(BuildContext context) {
@@ -53,15 +57,16 @@ class TeacherFilterChipRow extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.sm),
           ],
-          Semantics(
-            label: 'Add another teacher',
-            button: true,
-            child: IconButton(
-              onPressed: onAddTeacher,
-              visualDensity: VisualDensity.compact,
-              icon: const Icon(Icons.add_circle_outline),
+          if (onAddTeacher != null)
+            Semantics(
+              label: 'Add another teacher',
+              button: true,
+              child: IconButton(
+                onPressed: onAddTeacher,
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.add_circle_outline),
+              ),
             ),
-          ),
         ],
       ),
     );

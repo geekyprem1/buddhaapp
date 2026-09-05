@@ -26,6 +26,7 @@ export 'src/models/localised_text.dart';
 export 'src/models/notification_campaign.dart';
 export 'src/models/static_page.dart';
 export 'src/models/teacher.dart';
+export 'src/models/wisdom.dart';
 
 // Utils
 export 'src/utils/alarm_schedule.dart';
@@ -52,6 +53,7 @@ export 'src/repositories/progress_repository.dart';
 export 'src/repositories/static_page_repository.dart';
 export 'src/repositories/teacher_repository.dart';
 export 'src/repositories/user_repository.dart';
+export 'src/repositories/wisdom_repository.dart';
 
 // Services
 export 'src/services/admin_functions_service.dart';

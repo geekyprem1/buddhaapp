@@ -73,5 +73,25 @@ void main() {
       await tester.tap(find.text('All'));
       expect(selected, isNull);
     });
+
+    testWidgets('hides the add chip when onAddTeacher is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          TeacherFilterChipRow(
+            teachers: const [
+              TeacherChipData(id: 'cat_wp_calm', label: 'Calm'),
+            ],
+            selectedTeacherId: null,
+            onSelect: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.text('All'), findsOneWidget);
+      expect(find.text('Calm'), findsOneWidget);
+      expect(find.byIcon(Icons.add_circle_outline), findsNothing);
+    });
   });
 }

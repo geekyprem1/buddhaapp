@@ -16,6 +16,9 @@ abstract class StoragePaths {
   static String teacherSignature(String teacherId, [String ext = 'webp']) =>
       'teachers/$teacherId/signature.$ext';
 
+  static String wisdomImage(String wisdomId, [String ext = 'webp']) =>
+      'wisdoms/$wisdomId/image.$ext';
+
   static String contentOriginal(String collection, String itemId, String ext) =>
       '$collection/$itemId/original.$ext';
   static String contentFull(String collection, String itemId) =>

@@ -7,7 +7,7 @@ part of 'content_list_controller.dart';
 // **************************************************************************
 
 String _$contentListControllerHash() =>
-    r'e28f3cfb1f8ea5d625a8362afd891beb6932b6f3';
+    r'a6cf0653394619ca2ecaba8d01e64f23bcd94184';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -34,15 +34,18 @@ abstract class _$ContentListController
     extends BuildlessAutoDisposeAsyncNotifier<PagedContent> {
   late final String collection;
   late final String? teacherId;
+  late final String? categoryId;
 
   FutureOr<PagedContent> build(
     String collection,
-    String? teacherId,
-  );
+    String? teacherId, {
+    String? categoryId,
+  });
 }
 
 /// Generic paginated list controller, one instance per
-/// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+/// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+/// means "All teachers", `categoryId == null` means "All categories".
 ///
 /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
 /// subsequent pages using the cursor from the previous query. The same
@@ -54,7 +57,8 @@ abstract class _$ContentListController
 const contentListControllerProvider = ContentListControllerFamily();
 
 /// Generic paginated list controller, one instance per
-/// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+/// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+/// means "All teachers", `categoryId == null` means "All categories".
 ///
 /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
 /// subsequent pages using the cursor from the previous query. The same
@@ -64,7 +68,8 @@ const contentListControllerProvider = ContentListControllerFamily();
 /// Copied from [ContentListController].
 class ContentListControllerFamily extends Family<AsyncValue<PagedContent>> {
   /// Generic paginated list controller, one instance per
-  /// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+  /// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+  /// means "All teachers", `categoryId == null` means "All categories".
   ///
   /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
   /// subsequent pages using the cursor from the previous query. The same
@@ -75,7 +80,8 @@ class ContentListControllerFamily extends Family<AsyncValue<PagedContent>> {
   const ContentListControllerFamily();
 
   /// Generic paginated list controller, one instance per
-  /// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+  /// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+  /// means "All teachers", `categoryId == null` means "All categories".
   ///
   /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
   /// subsequent pages using the cursor from the previous query. The same
@@ -85,11 +91,13 @@ class ContentListControllerFamily extends Family<AsyncValue<PagedContent>> {
   /// Copied from [ContentListController].
   ContentListControllerProvider call(
     String collection,
-    String? teacherId,
-  ) {
+    String? teacherId, {
+    String? categoryId,
+  }) {
     return ContentListControllerProvider(
       collection,
       teacherId,
+      categoryId: categoryId,
     );
   }
 
@@ -100,6 +108,7 @@ class ContentListControllerFamily extends Family<AsyncValue<PagedContent>> {
     return call(
       provider.collection,
       provider.teacherId,
+      categoryId: provider.categoryId,
     );
   }
 
@@ -119,7 +128,8 @@ class ContentListControllerFamily extends Family<AsyncValue<PagedContent>> {
 }
 
 /// Generic paginated list controller, one instance per
-/// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+/// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+/// means "All teachers", `categoryId == null` means "All categories".
 ///
 /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
 /// subsequent pages using the cursor from the previous query. The same
@@ -131,7 +141,8 @@ class ContentListControllerProvider
     extends AutoDisposeAsyncNotifierProviderImpl<ContentListController,
         PagedContent> {
   /// Generic paginated list controller, one instance per
-  /// (collection, teacherId) pair (FR-6.6). `teacherId == null` means "All".
+  /// (collection, teacherId, categoryId) triple (FR-6.6). `teacherId == null`
+  /// means "All teachers", `categoryId == null` means "All categories".
   ///
   /// `build()` loads the first page as an `AsyncValue`; [loadMore] appends
   /// subsequent pages using the cursor from the previous query. The same
@@ -141,11 +152,13 @@ class ContentListControllerProvider
   /// Copied from [ContentListController].
   ContentListControllerProvider(
     String collection,
-    String? teacherId,
-  ) : this._internal(
+    String? teacherId, {
+    String? categoryId,
+  }) : this._internal(
           () => ContentListController()
             ..collection = collection
-            ..teacherId = teacherId,
+            ..teacherId = teacherId
+            ..categoryId = categoryId,
           from: contentListControllerProvider,
           name: r'contentListControllerProvider',
           debugGetCreateSourceHash:
@@ -157,6 +170,7 @@ class ContentListControllerProvider
               ContentListControllerFamily._allTransitiveDependencies,
           collection: collection,
           teacherId: teacherId,
+          categoryId: categoryId,
         );
 
   ContentListControllerProvider._internal(
@@ -168,10 +182,12 @@ class ContentListControllerProvider
     required super.from,
     required this.collection,
     required this.teacherId,
+    required this.categoryId,
   }) : super.internal();
 
   final String collection;
   final String? teacherId;
+  final String? categoryId;
 
   @override
   FutureOr<PagedContent> runNotifierBuild(
@@ -180,6 +196,7 @@ class ContentListControllerProvider
     return notifier.build(
       collection,
       teacherId,
+      categoryId: categoryId,
     );
   }
 
@@ -190,7 +207,8 @@ class ContentListControllerProvider
       override: ContentListControllerProvider._internal(
         () => create()
           ..collection = collection
-          ..teacherId = teacherId,
+          ..teacherId = teacherId
+          ..categoryId = categoryId,
         from: from,
         name: null,
         dependencies: null,
@@ -198,6 +216,7 @@ class ContentListControllerProvider
         debugGetCreateSourceHash: null,
         collection: collection,
         teacherId: teacherId,
+        categoryId: categoryId,
       ),
     );
   }
@@ -212,7 +231,8 @@ class ContentListControllerProvider
   bool operator ==(Object other) {
     return other is ContentListControllerProvider &&
         other.collection == collection &&
-        other.teacherId == teacherId;
+        other.teacherId == teacherId &&
+        other.categoryId == categoryId;
   }
 
   @override
@@ -220,6 +240,7 @@ class ContentListControllerProvider
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, collection.hashCode);
     hash = _SystemHash.combine(hash, teacherId.hashCode);
+    hash = _SystemHash.combine(hash, categoryId.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -234,6 +255,9 @@ mixin ContentListControllerRef
 
   /// The parameter `teacherId` of this provider.
   String? get teacherId;
+
+  /// The parameter `categoryId` of this provider.
+  String? get categoryId;
 }
 
 class _ContentListControllerProviderElement
@@ -245,6 +269,9 @@ class _ContentListControllerProviderElement
   String get collection => (origin as ContentListControllerProvider).collection;
   @override
   String? get teacherId => (origin as ContentListControllerProvider).teacherId;
+  @override
+  String? get categoryId =>
+      (origin as ContentListControllerProvider).categoryId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

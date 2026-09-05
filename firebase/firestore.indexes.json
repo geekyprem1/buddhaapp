@@ -93,6 +93,11 @@
       { "fieldPath": "audio.seriesId", "order": "ASCENDING" },
       { "fieldPath": "audio.partNumber", "order": "ASCENDING" }
     ]},
+    { "collectionGroup": "meditations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
 
     { "collectionGroup": "statuses", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "status", "order": "ASCENDING" },
@@ -127,6 +132,11 @@
       { "fieldPath": "teacherIds", "arrayConfig": "CONTAINS" },
       { "fieldPath": "sortOrder", "order": "DESCENDING" }
     ]},
+    { "collectionGroup": "prarthanas", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "DESCENDING" }
+    ]},
 
     { "collectionGroup": "teachers", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "isActive", "order": "ASCENDING" },
@@ -134,6 +144,10 @@
     ]},
     { "collectionGroup": "categories", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "module", "order": "ASCENDING" },
+      { "fieldPath": "isActive", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "wisdoms", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "isActive", "order": "ASCENDING" },
       { "fieldPath": "sortOrder", "order": "ASCENDING" }
     ]},

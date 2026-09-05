@@ -22,7 +22,7 @@ ContentItem _$ContentItemFromJson(Map<String, dynamic> json) {
 mixin _$ContentItem {
   String get id => throw _privateConstructorUsedError;
 
-  /// wallpaper | ringtone | song | meditation | status | prarthana
+  /// wallpaper | ringtone | song | vandana | meditation | chanting | status | prarthana
   String get type => throw _privateConstructorUsedError;
   List<String> get teacherIds => throw _privateConstructorUsedError;
   String? get categoryId => throw _privateConstructorUsedError;
@@ -582,7 +582,7 @@ class _$ContentItemImpl implements _ContentItem {
   @override
   final String id;
 
-  /// wallpaper | ringtone | song | meditation | status | prarthana
+  /// wallpaper | ringtone | song | vandana | meditation | chanting | status | prarthana
   @override
   final String type;
   final List<String> _teacherIds;
@@ -816,7 +816,7 @@ abstract class _ContentItem implements ContentItem {
   @override
   String get id;
 
-  /// wallpaper | ringtone | song | meditation | status | prarthana
+  /// wallpaper | ringtone | song | vandana | meditation | chanting | status | prarthana
   @override
   String get type;
   @override
