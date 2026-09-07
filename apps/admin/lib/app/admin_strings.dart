@@ -115,6 +115,12 @@ abstract class AdminStrings {
   static const wisdomImage = 'Card image';
   static const wisdomUploadIdRequired =
       'Set an English title or id before uploading the image.';
+  static const videos = 'Videos';
+  static const videoUrlField = 'YouTube URL';
+  static const videoUrlHint =
+      'Paste a YouTube link (e.g. https://youtu.be/xxxxxxxxxxx)';
+  static const videoUrlInvalid = 'Enter a valid YouTube URL.';
+  static const videoPreview = 'Thumbnail preview';
   static const teacherUploadIdRequired =
       'Set an English name or id before uploading files.';
   static const portrait = 'Portrait';

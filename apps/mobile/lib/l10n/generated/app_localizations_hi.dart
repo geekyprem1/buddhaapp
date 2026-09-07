@@ -119,6 +119,33 @@ class AppLocalizationsHi extends AppLocalizations {
   String get homeShareApp => 'ऐप शेयर करें';
 
   @override
+  String get homeVideo => 'वीडियो';
+
+  @override
+  String get homeVideoSubtitle => 'देखें और सीखें';
+
+  @override
+  String get videosEmpty => 'अभी कोई वीडियो नहीं है।';
+
+  @override
+  String get videoOpenFailed => 'वीडियो नहीं खुल सका।';
+
+  @override
+  String get navHome => 'होम';
+
+  @override
+  String get navCalendar => 'कैलेंडर';
+
+  @override
+  String get navPractice => 'अभ्यास';
+
+  @override
+  String get navExplore => 'खोजें';
+
+  @override
+  String get navProfile => 'प्रोफ़ाइल';
+
+  @override
   String get todayWisdom => 'आज का ज्ञान';
 
   @override

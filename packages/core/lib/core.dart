@@ -26,6 +26,7 @@ export 'src/models/localised_text.dart';
 export 'src/models/notification_campaign.dart';
 export 'src/models/static_page.dart';
 export 'src/models/teacher.dart';
+export 'src/models/video.dart';
 export 'src/models/wisdom.dart';
 
 // Utils
@@ -35,6 +36,7 @@ export 'src/utils/auth_error.dart';
 export 'src/utils/repo_guard.dart';
 export 'src/utils/retry.dart';
 export 'src/utils/timestamp_converter.dart';
+export 'src/utils/youtube_utils.dart';
 
 // Validators
 export 'src/validators/field_validators.dart';
@@ -53,6 +55,7 @@ export 'src/repositories/progress_repository.dart';
 export 'src/repositories/static_page_repository.dart';
 export 'src/repositories/teacher_repository.dart';
 export 'src/repositories/user_repository.dart';
+export 'src/repositories/video_repository.dart';
 export 'src/repositories/wisdom_repository.dart';
 
 // Services

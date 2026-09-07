@@ -316,6 +316,60 @@ abstract class AppLocalizations {
   /// **'Share App'**
   String get homeShareApp;
 
+  /// No description provided for @homeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get homeVideo;
+
+  /// No description provided for @homeVideoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch & learn'**
+  String get homeVideoSubtitle;
+
+  /// No description provided for @videosEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No videos yet.'**
+  String get videosEmpty;
+
+  /// No description provided for @videoOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the video.'**
+  String get videoOpenFailed;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get navCalendar;
+
+  /// No description provided for @navPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get navPractice;
+
+  /// No description provided for @navExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get navExplore;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
   /// No description provided for @todayWisdom.
   ///
   /// In en, this message translates to:

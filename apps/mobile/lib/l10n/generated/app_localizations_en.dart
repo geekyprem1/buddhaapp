@@ -118,6 +118,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeShareApp => 'Share App';
 
   @override
+  String get homeVideo => 'Videos';
+
+  @override
+  String get homeVideoSubtitle => 'Watch & learn';
+
+  @override
+  String get videosEmpty => 'No videos yet.';
+
+  @override
+  String get videoOpenFailed => 'Could not open the video.';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navCalendar => 'Calendar';
+
+  @override
+  String get navPractice => 'Practice';
+
+  @override
+  String get navExplore => 'Discover';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
   String get todayWisdom => 'Today\'s Wisdom';
 
   @override

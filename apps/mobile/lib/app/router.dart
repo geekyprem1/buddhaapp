@@ -8,7 +8,9 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/otp_screen.dart';
 import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
 import '../features/chanting/presentation/chanting_list_screen.dart';
+import '../features/explore/presentation/explore_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/video/presentation/video_list_screen.dart';
 import '../features/meditation/presentation/meditation_list_screen.dart';
 import '../features/onboarding/presentation/language_screen.dart';
 import '../features/onboarding/presentation/person_info_screen.dart';
@@ -36,6 +38,7 @@ import '../features/status/presentation/status_list_screen.dart';
 import '../features/wallpaper/application/wallpaper_gallery.dart';
 import '../features/wallpaper/presentation/wallpaper_detail_screen.dart';
 import '../features/wallpaper/presentation/wallpaper_list_screen.dart';
+import 'main_shell.dart';
 
 part 'router.g.dart';
 
@@ -52,6 +55,8 @@ abstract class AppRoutes {
   static const onboardingPersonInfo = '/onboarding/person-info';
   static const onboardingTeacher = '/onboarding/teacher';
   static const home = '/home';
+  static const explore = '/explore';
+  static const videos = '/videos';
   static const wisdomDetail = '/wisdom';
   static const buddhistCalendar = '/buddhist-calendar';
   static const wallpapers = '/wallpapers';
@@ -198,9 +203,51 @@ GoRouter appRouter(Ref ref) {
         path: AppRoutes.onboardingTeacher,
         builder: (context, state) => const TeacherSelectScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.buddhistCalendar,
+                builder: (context, state) => const BuddhistCalendarScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.prarthana,
+                builder: (context, state) => const PrarthanaListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.explore,
+                builder: (context, state) => const ExploreScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.wisdomDetail,
@@ -208,14 +255,6 @@ GoRouter appRouter(Ref ref) {
           final id = state.extra as String? ?? '';
           return WisdomDetailScreen(wisdomId: id);
         },
-      ),
-      GoRoute(
-        path: AppRoutes.buddhistCalendar,
-        builder: (context, state) => const BuddhistCalendarScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.profileEdit,
@@ -261,6 +300,10 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) => const VandanaListScreen(),
       ),
       GoRoute(
+        path: AppRoutes.videos,
+        builder: (context, state) => const VideoListScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.chantings,
         builder: (context, state) => const ChantingListScreen(),
       ),
@@ -275,10 +318,6 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.statuses,
         builder: (context, state) => const StatusListScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.prarthana,
-        builder: (context, state) => const PrarthanaListScreen(),
       ),
       GoRoute(
         path: AppRoutes.prarthanaHelp,

@@ -118,6 +118,33 @@ class AppLocalizationsMr extends AppLocalizations {
   String get homeShareApp => 'अॅप शेअर करा';
 
   @override
+  String get homeVideo => 'व्हिडिओ';
+
+  @override
+  String get homeVideoSubtitle => 'पाहा आणि शिका';
+
+  @override
+  String get videosEmpty => 'अजून कोणताही व्हिडिओ नाही.';
+
+  @override
+  String get videoOpenFailed => 'व्हिडिओ उघडता आला नाही.';
+
+  @override
+  String get navHome => 'होम';
+
+  @override
+  String get navCalendar => 'दिनदर्शिका';
+
+  @override
+  String get navPractice => 'सराव';
+
+  @override
+  String get navExplore => 'शोधा';
+
+  @override
+  String get navProfile => 'प्रोफाइल';
+
+  @override
   String get todayWisdom => 'आजचे ज्ञान';
 
   @override

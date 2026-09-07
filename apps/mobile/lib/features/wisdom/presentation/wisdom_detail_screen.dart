@@ -50,8 +50,8 @@ class WisdomDetailScreen extends ConsumerWidget {
                 if (wisdom.imageUrl != null)
                   CachedNetworkImage(
                     imageUrl: wisdom.imageUrl!,
-                    height: 240,
-                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    fit: BoxFit.fitWidth,
                     errorWidget: (context, _, __) => const SizedBox(height: 72),
                   ),
                 Padding(

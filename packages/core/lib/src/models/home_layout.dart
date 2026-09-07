@@ -7,6 +7,7 @@ abstract class HomeModuleIds {
   static const ringtone = 'ringtone';
   static const song = 'song';
   static const vandana = 'vandana';
+  static const video = 'video';
   static const prarthana = 'prarthana';
   static const status = 'status';
   static const buddhistCalendar = 'buddhist_calendar';
@@ -22,6 +23,7 @@ abstract class HomeModuleIds {
     ringtone,
     song,
     vandana,
+    video,
     buddhistCalendar,
     dailyPaliWord,
     chanting,
@@ -53,6 +55,7 @@ abstract class HomeModuleIds {
         ringtone => 'Ringtone',
         song => 'Song',
         vandana => 'Vandana',
+        video => 'Videos',
         prarthana => 'Daily Prarthana',
         status => 'Trending Status',
         buddhistCalendar => 'Buddhist Calendar',
@@ -108,6 +111,7 @@ class HomeLayout {
       HomeModule(id: HomeModuleIds.ringtone),
       HomeModule(id: HomeModuleIds.song),
       HomeModule(id: HomeModuleIds.vandana),
+      HomeModule(id: HomeModuleIds.video),
       HomeModule(id: HomeModuleIds.buddhistCalendar),
       HomeModule(id: HomeModuleIds.dailyPaliWord),
       HomeModule(id: HomeModuleIds.chanting),

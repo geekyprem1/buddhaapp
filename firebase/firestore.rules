@@ -69,6 +69,11 @@ service cloud.firestore {
       allow write: if isContentEditor();
     }
 
+    match /videos/{videoId} {
+      allow read: if isSignedIn() && (resource.data.isActive == true || isAdmin());
+      allow write: if isContentEditor();
+    }
+
     // --- Content collections (wallpapers, ringtones, songs, vandanas,
     //     meditations, chantings, statuses, prarthanas) share the same
     //     shape and rules.

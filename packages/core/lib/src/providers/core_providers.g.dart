@@ -125,6 +125,23 @@ final wisdomRepositoryProvider = Provider<WisdomRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef WisdomRepositoryRef = ProviderRef<WisdomRepository>;
+String _$videoRepositoryHash() => r'2f1efea7d4b1abed4577e9e4afd0dde4ea93a71a';
+
+/// See also [videoRepository].
+@ProviderFor(videoRepository)
+final videoRepositoryProvider = Provider<VideoRepository>.internal(
+  videoRepository,
+  name: r'videoRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$videoRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef VideoRepositoryRef = ProviderRef<VideoRepository>;
 String _$categoryRepositoryHash() =>
     r'456a5ad6317a837626b1ef88e128af8350acdc1f';
 
@@ -549,6 +566,24 @@ final activeWisdomsProvider = AutoDisposeStreamProvider<List<Wisdom>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveWisdomsRef = AutoDisposeStreamProviderRef<List<Wisdom>>;
+String _$activeVideosHash() => r'03973666498144a9ef968a5be173efc910df188c';
+
+/// Active YouTube videos ordered by `sortOrder`, for the app's Videos screen.
+///
+/// Copied from [activeVideos].
+@ProviderFor(activeVideos)
+final activeVideosProvider = AutoDisposeStreamProvider<List<Video>>.internal(
+  activeVideos,
+  name: r'activeVideosProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$activeVideosHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ActiveVideosRef = AutoDisposeStreamProviderRef<List<Video>>;
 String _$activeCategoriesHash() => r'ee1a0dfeb2bb582079681167f0b8e17a35e8a4d5';
 
 /// Active categories for one content module, ordered by `sortOrder`.

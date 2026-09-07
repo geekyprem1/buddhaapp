@@ -22,7 +22,7 @@ final audioHandlerProvider = Provider<DhammaAudioHandler>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AudioHandlerRef = ProviderRef<DhammaAudioHandler>;
-String _$currentMediaItemHash() => r'1df8b06622fdc696a1d56695ce68a66d2cf788a6';
+String _$currentMediaItemHash() => r'ca8b5f0ca04d4c113b7ff7737e5a2524f36e9e4d';
 
 /// See also [currentMediaItem].
 @ProviderFor(currentMediaItem)
@@ -40,7 +40,7 @@ final currentMediaItemProvider = AutoDisposeStreamProvider<MediaItem?>.internal(
 // ignore: unused_element
 typedef CurrentMediaItemRef = AutoDisposeStreamProviderRef<MediaItem?>;
 String _$audioPlaybackStateHash() =>
-    r'e8ee5586244e59aa7e05a208c76b88cef1eae4ee';
+    r'9de904a472dfb27228a0193b7e6e0a88dfaae6d5';
 
 /// See also [audioPlaybackState].
 @ProviderFor(audioPlaybackState)
@@ -58,7 +58,7 @@ final audioPlaybackStateProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AudioPlaybackStateRef = AutoDisposeStreamProviderRef<PlaybackState>;
-String _$audioPositionHash() => r'7202aee0082f42f3c7ec7387166395370d043aca';
+String _$audioPositionHash() => r'2fecfda26d878a51762b6d6f86ca27a347770bcb';
 
 /// See also [audioPosition].
 @ProviderFor(audioPosition)
@@ -76,7 +76,7 @@ final audioPositionProvider = AutoDisposeStreamProvider<Duration>.internal(
 // ignore: unused_element
 typedef AudioPositionRef = AutoDisposeStreamProviderRef<Duration>;
 String _$sleepTimerRemainingHash() =>
-    r'd8b72d1a9a479a304253c58fc319c6834809e68c';
+    r'934d86072ab4ebce902367cea4925b9834aac934';
 
 /// See also [sleepTimerRemaining].
 @ProviderFor(sleepTimerRemaining)

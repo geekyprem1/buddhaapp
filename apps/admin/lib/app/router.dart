@@ -23,6 +23,8 @@ import '../features/notifications/presentation/notifications_list_page.dart';
 import '../features/pages/presentation/page_editor_page.dart';
 import '../features/pages/presentation/pages_list_page.dart';
 import '../features/users/presentation/users_list_page.dart';
+import '../features/video/presentation/video_form_page.dart';
+import '../features/video/presentation/video_list_page.dart';
 import '../features/wisdom/presentation/wisdom_form_page.dart';
 import '../features/wisdom/presentation/wisdom_list_page.dart';
 import '../features/teachers/presentation/teacher_form_page.dart';
@@ -129,6 +131,22 @@ GoRouter adminRouter(Ref ref) {
                 path: ':id',
                 builder: (context, state) => WisdomFormPage(
                   wisdomId: state.pathParameters['id'],
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: AdminRoutes.videos,
+            builder: (context, state) => const VideoListPage(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const VideoFormPage(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => VideoFormPage(
+                  videoId: state.pathParameters['id'],
                 ),
               ),
             ],

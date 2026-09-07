@@ -43,20 +43,27 @@ class MiniPlayer extends ConsumerWidget {
     // leaves the full player screen (e.g. presses back). Without listening to
     // the router, the mini player only re-evaluates its visibility when an
     // audio provider happens to tick, so it would stay hidden after going back.
+    final bar = _buildBar(
+      context: context,
+      router: router,
+      handler: handler,
+      media: media,
+      playing: playing,
+      progress: progress,
+    );
     return ListenableBuilder(
       listenable: router.routerDelegate,
-      builder: (context, child) {
+      builder: (context, _) {
         if (_isFullPlayerOpen(router)) return const SizedBox.shrink();
-        return child!;
+        // On the main tabbed screens the NavigationBar sits at the bottom, so
+        // lift the mini player above it. On pushed full-screen routes there's
+        // no nav bar, so it stays pinned to the bottom.
+        final bottom = _isOnMainTab(router) ? _kNavBarHeight : 0.0;
+        return Padding(
+          padding: EdgeInsets.only(bottom: bottom),
+          child: bar,
+        );
       },
-      child: _buildBar(
-        context: context,
-        router: router,
-        handler: handler,
-        media: media,
-        playing: playing,
-        progress: progress,
-      ),
     );
   }
 
@@ -162,6 +169,29 @@ class MiniPlayer extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+/// Material 3 [NavigationBar] content height (excludes the system bottom
+/// inset, which the mini player already accounts for via its own SafeArea).
+const double _kNavBarHeight = 80;
+
+/// The five bottom-nav tab roots. When the current location is one of these,
+/// the NavigationBar is visible and the mini player must sit above it.
+const _mainTabRoutes = <String>{
+  AppRoutes.home,
+  AppRoutes.buddhistCalendar,
+  AppRoutes.prarthana,
+  AppRoutes.explore,
+  AppRoutes.profile,
+};
+
+bool _isOnMainTab(GoRouter router) {
+  try {
+    return _mainTabRoutes
+        .contains(router.routerDelegate.currentConfiguration.uri.path);
+  } catch (_) {
+    return false;
   }
 }
 
