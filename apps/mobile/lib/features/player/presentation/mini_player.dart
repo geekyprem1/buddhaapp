@@ -76,7 +76,7 @@ class MiniPlayer extends ConsumerWidget {
     required double progress,
   }) {
     return Material(
-      color: AppColors.surface,
+      color: Theme.of(context).colorScheme.surface,
       elevation: 12,
       clipBehavior: Clip.hardEdge,
       child: SafeArea(

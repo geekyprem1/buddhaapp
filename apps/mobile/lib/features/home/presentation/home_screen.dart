@@ -71,7 +71,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userValue = ref.watch(currentAppUserProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           l10n?.appName ?? AppConstants.appName,

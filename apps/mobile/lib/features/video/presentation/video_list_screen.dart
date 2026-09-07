@@ -3,27 +3,15 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 /// Videos screen — a scrollable list of admin-curated YouTube videos, each
-/// shown as a thumbnail card. Tapping opens the video in the YouTube app or
-/// the browser.
+/// shown as a thumbnail card. Tapping opens the in-app player.
 class VideoListScreen extends ConsumerWidget {
   const VideoListScreen({super.key});
-
-  Future<void> _open(BuildContext context, AppLocalizations? l10n, Video v) async {
-    final uri = Uri.parse(v.watchUrl);
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n?.videoOpenFailed ?? 'Could not open the video.'),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +19,6 @@ class VideoListScreen extends ConsumerWidget {
     final async = ref.watch(activeVideosProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           l10n?.homeVideo ?? 'Videos',
@@ -61,7 +48,7 @@ class VideoListScreen extends ConsumerWidget {
               return _VideoCard(
                 title: v.title.resolve(language),
                 thumbnailUrl: v.thumbnailUrl,
-                onTap: () => _open(context, l10n, v),
+                onTap: () => context.push(AppRoutes.videoPlayer, extra: v),
               );
             },
           );

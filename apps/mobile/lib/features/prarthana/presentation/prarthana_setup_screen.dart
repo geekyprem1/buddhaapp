@@ -54,7 +54,6 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n?.homeDailyPrarthana ?? 'Daily Prarthana'),
       ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 
 import '../services/error_reporter.dart';
@@ -17,13 +19,21 @@ mixin RepoGuard {
   }
 
   Stream<T> guardedStream<T>(String op, Stream<T> stream) {
-    return stream.handleError((Object error, StackTrace stack) {
-      ErrorReporter.instance.record(
-        error,
-        stack,
-        reason: _reason(op, error),
-      );
-    });
+    // Record the error to Crashlytics AND forward it downstream, so the UI can
+    // show an error state / retry instead of hanging on an endless spinner
+    // (e.g. a missing composite index or a transient network failure).
+    return stream.transform(
+      StreamTransformer<T, T>.fromHandlers(
+        handleError: (Object error, StackTrace stack, EventSink<T> sink) {
+          ErrorReporter.instance.record(
+            error,
+            stack,
+            reason: _reason(op, error),
+          );
+          sink.addError(error, stack);
+        },
+      ),
+    );
   }
 
   Future<T> _guard<T>(

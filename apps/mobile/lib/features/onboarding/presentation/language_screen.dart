@@ -56,7 +56,6 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
     final state = ref.watch(onboardingControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -127,10 +126,12 @@ class _LanguageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(AppRadius.card),
             border: Border.all(
-              color: selected ? AppColors.primary : AppColors.divider,
+              color: selected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).dividerColor,
               width: selected ? 2 : 1,
             ),
           ),

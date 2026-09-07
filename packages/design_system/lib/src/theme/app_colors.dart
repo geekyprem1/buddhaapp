@@ -26,4 +26,24 @@ abstract class AppColors {
   static const error = Color(0xFFB3261E);
   static const success = Color(0xFF2E7D32);
   static const divider = Color(0xFFE0D3B8);
+
+  // --- Dark theme tokens ---
+  // Warm near-black palette so the maroon/gold brand still feels at home.
+
+  /// Warm near-black scaffold background for dark mode.
+  static const backgroundDark = Color(0xFF141210);
+
+  /// Slightly lifted warm dark surface for cards / sheets in dark mode.
+  static const surfaceDark = Color(0xFF201C19);
+
+  /// Lightened maroon for buttons/accents so they stay legible on dark.
+  static const primaryDark = Color(0xFFCB5C5C);
+
+  /// Warm off-white primary text for dark mode.
+  static const textPrimaryDark = Color(0xFFF3ECE0);
+
+  /// Muted warm grey secondary text for dark mode.
+  static const textSecondaryDark = Color(0xFFB2A99C);
+
+  static const dividerDark = Color(0xFF3A342F);
 }

@@ -1,5 +1,4 @@
 import 'package:core/core.dart';
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +19,6 @@ class ExploreScreen extends ConsumerWidget {
         ref.watch(homeLayoutProvider).valueOrNull ?? HomeLayout.defaults;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           l10n?.navExplore ?? 'Discover',

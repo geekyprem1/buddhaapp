@@ -107,7 +107,6 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           widget.title,

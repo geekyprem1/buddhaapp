@@ -145,6 +145,18 @@ class AppLocalizationsMr extends AppLocalizations {
   String get navProfile => 'प्रोफाइल';
 
   @override
+  String get themeAppearance => 'स्वरूप';
+
+  @override
+  String get themeSystem => 'सिस्टम डीफॉल्ट';
+
+  @override
+  String get themeLight => 'लाइट';
+
+  @override
+  String get themeDark => 'डार्क';
+
+  @override
   String get todayWisdom => 'आजचे ज्ञान';
 
   @override

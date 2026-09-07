@@ -146,6 +146,18 @@ class AppLocalizationsHi extends AppLocalizations {
   String get navProfile => 'प्रोफ़ाइल';
 
   @override
+  String get themeAppearance => 'दिखावट';
+
+  @override
+  String get themeSystem => 'सिस्टम डिफ़ॉल्ट';
+
+  @override
+  String get themeLight => 'लाइट';
+
+  @override
+  String get themeDark => 'डार्क';
+
+  @override
   String get todayWisdom => 'आज का ज्ञान';
 
   @override

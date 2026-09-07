@@ -56,7 +56,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(l10n?.profileEdit ?? 'Edit Profile')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),

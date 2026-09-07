@@ -77,7 +77,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(l10n?.otpScreenTitle ?? 'Verify OTP')),
       body: SafeArea(
         child: Padding(

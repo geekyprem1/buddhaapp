@@ -21,7 +21,6 @@ class ChangeLanguageScreen extends ConsumerWidget {
         ref.watch(currentAppUserProvider).valueOrNull?.language ?? 'en';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n?.profileChangeLanguage ?? 'Change Language'),
       ),

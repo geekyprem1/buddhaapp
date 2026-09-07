@@ -8,6 +8,7 @@ import '../features/player/presentation/mini_player.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'offline_banner.dart';
 import 'router.dart';
+import 'theme_controller.dart';
 
 /// Root widget for Dhamma Path. Wraps the app in the shared theme,
 /// localisation delegates (Architecture §12) and the go_router-based auth
@@ -20,10 +21,13 @@ class DhammaPathApp extends ConsumerWidget {
     ref.watch(fcmCoordinatorProvider);
     final router = ref.watch(appRouterProvider);
     final language = ref.watch(currentAppUserProvider).valueOrNull?.language;
+    final themeMode = ref.watch(themeModeControllerProvider);
     return MaterialApp.router(
       title: 'Dhamma Path',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: themeMode,
       locale: language == null ? null : Locale(language),
       scaffoldMessengerKey: rootMessengerKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

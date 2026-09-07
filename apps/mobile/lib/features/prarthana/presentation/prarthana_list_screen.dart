@@ -19,7 +19,6 @@ class PrarthanaListScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final alarms = ref.watch(userAlarmsProvider);
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           l10n?.homeDailyPrarthana ?? 'Daily Prarthana',

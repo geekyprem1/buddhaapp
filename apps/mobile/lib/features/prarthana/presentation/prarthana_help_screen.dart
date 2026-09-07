@@ -23,7 +23,6 @@ class PrarthanaHelpScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n?.prarthanaHelpTitle ?? 'How Daily Prarthana works'),
       ),

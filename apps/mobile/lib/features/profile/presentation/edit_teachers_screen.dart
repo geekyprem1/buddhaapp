@@ -28,7 +28,6 @@ class _EditTeachersScreenState extends ConsumerState<EditTeachersScreen> {
     final teachers = ref.watch(activeTeachersProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n?.profileMyTeachers ?? 'My Teachers'),
       ),

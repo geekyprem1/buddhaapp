@@ -22,7 +22,6 @@ class RingtoneHelpScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n?.ringtoneHelpTitle ?? 'How to set a ringtone'),
       ),

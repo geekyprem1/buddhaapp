@@ -97,6 +97,98 @@ abstract class AppTheme {
     );
   }
 
+  /// Dark theme for the mobile app. Keeps the maroon/gold brand on a warm
+  /// near-black surface. Screens must rely on theme colours (scaffold, card,
+  /// appbar, textTheme) rather than hardcoded light tokens so they adapt.
+  static ThemeData dark() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.dark,
+      primary: AppColors.primaryDark,
+      onPrimary: Colors.white,
+      secondary: AppColors.accent,
+      surface: AppColors.surfaceDark,
+      onSurface: AppColors.textPrimaryDark,
+      error: AppColors.error,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: AppColors.backgroundDark,
+      textTheme: AppTypography.textTheme(color: AppColors.textPrimaryDark),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.backgroundDark,
+        foregroundColor: AppColors.textPrimaryDark,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.surfaceDark,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        margin: const EdgeInsets.symmetric(
+          vertical: AppSpacing.sm,
+          horizontal: 0,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryDark,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: AppColors.surfaceDark,
+          disabledForegroundColor: AppColors.textSecondaryDark,
+          minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        selectedColor: AppColors.primaryDark,
+        labelStyle: const TextStyle(color: AppColors.textPrimaryDark),
+        secondaryLabelStyle: const TextStyle(color: Colors.white),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999),
+          side: const BorderSide(color: AppColors.dividerDark),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.surfaceDark,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.md,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.dividerDark),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primaryDark, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.dividerDark,
+        thickness: 1,
+      ),
+    );
+  }
+
   /// Desktop-dense variant of [light] for the admin panel (AR-8.1).
   /// Same tokens, tighter radii and left-aligned chrome so tables fit.
   static ThemeData admin() {

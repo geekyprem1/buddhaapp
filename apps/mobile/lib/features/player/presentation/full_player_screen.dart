@@ -25,7 +25,6 @@ class FullPlayerScreen extends ConsumerWidget {
 
     if (media == null) {
       return Scaffold(
-        backgroundColor: AppColors.background,
         appBar: AppBar(),
         body: const Center(child: Text('Nothing is playing.')),
       );
@@ -39,7 +38,6 @@ class FullPlayerScreen extends ConsumerWidget {
     final shuffle = playback?.shuffleMode == AudioServiceShuffleMode.all;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Now playing', overflow: TextOverflow.ellipsis),
       ),

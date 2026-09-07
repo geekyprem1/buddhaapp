@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../app/router.dart';
+import '../../../app/theme_controller.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../status/application/status_providers.dart';
 import '../application/profile_providers.dart';
@@ -19,9 +20,9 @@ class ProfileScreen extends ConsumerWidget {
     final user = ref.watch(currentAppUserProvider).valueOrNull;
     final avatar = ref.watch(statusAvatarProvider);
     final version = ref.watch(packageInfoProvider).valueOrNull;
+    final themeMode = ref.watch(themeModeControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(l10n?.profileTitle ?? 'Profile')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -110,6 +111,24 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.language,
             label: l10n?.profileChangeLanguage ?? 'Change Language',
             onTap: () => context.push(AppRoutes.profileLanguage),
+          ),
+          _row(
+            icon: Icons.dark_mode_outlined,
+            label: l10n?.themeAppearance ?? 'Appearance',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _themeLabel(l10n, themeMode),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+            onTap: () => _pickTheme(context, ref),
           ),
           _row(
             icon: Icons.alarm,
@@ -212,6 +231,64 @@ class ProfileScreen extends ConsumerWidget {
       enabled: onTap != null,
       onTap: onTap,
     );
+  }
+
+  String _themeLabel(AppLocalizations? l10n, ThemeMode mode) => switch (mode) {
+        ThemeMode.light => l10n?.themeLight ?? 'Light',
+        ThemeMode.dark => l10n?.themeDark ?? 'Dark',
+        ThemeMode.system => l10n?.themeSystem ?? 'System default',
+      };
+
+  Future<void> _pickTheme(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final current = ref.read(themeModeControllerProvider);
+    final options = <(ThemeMode, String, IconData)>[
+      (
+        ThemeMode.system,
+        l10n?.themeSystem ?? 'System default',
+        Icons.brightness_auto_outlined,
+      ),
+      (ThemeMode.light, l10n?.themeLight ?? 'Light', Icons.light_mode_outlined),
+      (ThemeMode.dark, l10n?.themeDark ?? 'Dark', Icons.dark_mode_outlined),
+    ];
+    final choice = await showModalBottomSheet<ThemeMode>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n?.themeAppearance ?? 'Appearance',
+                  style: Theme.of(ctx).textTheme.titleMedium,
+                ),
+              ),
+            ),
+            for (final option in options)
+              ListTile(
+                leading: Icon(option.$3),
+                title: Text(option.$2),
+                trailing: option.$1 == current
+                    ? Icon(Icons.check, color: Theme.of(ctx).colorScheme.primary)
+                    : null,
+                onTap: () => Navigator.of(ctx).pop(option.$1),
+              ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    );
+    if (choice != null) {
+      await ref.read(themeModeControllerProvider.notifier).setMode(choice);
+    }
   }
 
   Future<void> _pickAvatar(BuildContext context, WidgetRef ref) async {

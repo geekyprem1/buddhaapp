@@ -17,7 +17,6 @@ class ForceUpdateScreen extends ConsumerWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),

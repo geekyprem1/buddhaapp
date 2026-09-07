@@ -11,6 +11,7 @@ import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/explore/presentation/explore_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/video/presentation/video_list_screen.dart';
+import '../features/video/presentation/video_player_screen.dart';
 import '../features/meditation/presentation/meditation_list_screen.dart';
 import '../features/onboarding/presentation/language_screen.dart';
 import '../features/onboarding/presentation/person_info_screen.dart';
@@ -57,6 +58,7 @@ abstract class AppRoutes {
   static const home = '/home';
   static const explore = '/explore';
   static const videos = '/videos';
+  static const videoPlayer = '/videos/play';
   static const wisdomDetail = '/wisdom';
   static const buddhistCalendar = '/buddhist-calendar';
   static const wallpapers = '/wallpapers';
@@ -302,6 +304,18 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.videos,
         builder: (context, state) => const VideoListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.videoPlayer,
+        builder: (context, state) {
+          final video = state.extra as Video?;
+          if (video == null) {
+            return const Scaffold(
+              body: Center(child: Text('Video not found.')),
+            );
+          }
+          return VideoPlayerScreen(video: video);
+        },
       ),
       GoRoute(
         path: AppRoutes.chantings,

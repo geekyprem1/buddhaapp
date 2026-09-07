@@ -41,7 +41,6 @@ class _TeacherSelectScreenState extends ConsumerState<TeacherSelectScreen> {
     final onboardingState = ref.watch(onboardingControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),

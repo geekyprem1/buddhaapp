@@ -17,7 +17,6 @@ class StaticPageScreen extends ConsumerWidget {
     final language = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           page.valueOrNull?.title.resolve(language) ?? slug,

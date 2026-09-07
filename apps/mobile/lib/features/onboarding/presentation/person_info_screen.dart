@@ -79,7 +79,6 @@ class _PersonInfoScreenState extends ConsumerState<PersonInfoScreen> {
     final state = ref.watch(onboardingControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n?.personInfoScreenTitle ?? 'Person Information'),
       ),
