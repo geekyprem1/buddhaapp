@@ -1,95 +1,336 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
-import '../../content/application/content_list_controller.dart';
 import '../../content/application/category_filter_providers.dart';
-import '../../content/application/teacher_filter_providers.dart';
-import '../../content/presentation/content_list_scaffold.dart';
-import '../application/wallpaper_gallery.dart';
+import '../../content/application/content_list_controller.dart';
 import 'set_wallpaper_sheet.dart';
 
-/// Wallpapers list (PRD FR-7.1, 7.2) — grid of previews. Tap opens detail;
-/// the overlaid Set button opens the Home/Lock/Both sheet.
-class WallpaperListScreen extends ConsumerWidget {
+/// Wallpapers — full-screen vertical "reel". One wallpaper fills the screen;
+/// swipe up/down for the next/previous. A category chip row sits at the top,
+/// and the only per-image action is "Set wallpaper". Pages load on demand from
+/// the paginated content controller as the user nears the end (FR-7.1, 7.2).
+class WallpaperListScreen extends ConsumerStatefulWidget {
   const WallpaperListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WallpaperListScreen> createState() =>
+      _WallpaperListScreenState();
+}
+
+class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
+  final _pages = PageController();
+
+  // No teacher filtering in the reel; category comes from the chip row.
+  static const _teacherId = null;
+
+  ContentListControllerProvider _providerFor(String? categoryId) =>
+      contentListControllerProvider(
+        FirestoreCollections.wallpapers,
+        _teacherId,
+        categoryId: categoryId,
+      );
+
+  @override
+  void dispose() {
+    _pages.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index, PagedContent paged, String? categoryId) {
+    AppHaptics.selection(); // premium tick as each wallpaper snaps into view
+    // Prefetch the next page as the user approaches the end of the list.
+    if (index >= paged.items.length - 2 &&
+        paged.hasMore &&
+        !paged.isLoadingMore) {
+      ref.read(_providerFor(categoryId).notifier).loadMore();
+    }
+  }
+
+  void _selectCategory(String? categoryId) {
+    AppHaptics.tap();
+    ref
+        .read(contentCategoryFilterProvider(ContentType.wallpaper).notifier)
+        .select(categoryId);
+    // New filtered list — jump back to the top.
+    if (_pages.hasClients) _pages.jumpToPage(0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return ContentListScaffold(
-      module: ContentType.wallpaper,
-      collection: FirestoreCollections.wallpapers,
-      title: l10n?.homeWallpaper ?? 'Wallpapers',
-      gridColumns: 2,
-      emptyMessage: 'No wallpapers yet.',
-      itemBuilder: (context, item, index) {
-        return ContentCard(
-          thumbUrl: item.thumbUrl ?? item.mediaUrl,
-          // Bulk-upload titles are filenames ("78", "22"). Wallpapers are
-          // visual — don't show that under the preview.
-          title: '',
-          aspectRatio: 0.7,
-          overlay: Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: const Size(0, 40),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  onPressed: () {
+    final categoryId =
+        ref.watch(contentCategoryFilterProvider(ContentType.wallpaper));
+    final categoryChips =
+        ref.watch(moduleCategoryChipsProvider(ContentType.wallpaper));
+    final async = ref.watch(_providerFor(categoryId));
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: async.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+              error: (_, __) => Center(
+                child: Text(
+                  l10n?.errorLoadFailed ?? 'Could not load content.',
+                  style: const TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              data: (paged) {
+                if (paged.items.isEmpty) {
+                  return Center(
+                    child: Text(
+                      l10n?.homeWallpaper ?? 'No wallpapers yet.',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                }
+                return PageView.builder(
+                  controller: _pages,
+                  scrollDirection: Axis.vertical,
+                  itemCount: paged.items.length,
+                  onPageChanged: (i) => _onPageChanged(i, paged, categoryId),
+                  itemBuilder: (context, i) {
+                    final item = paged.items[i];
                     final url = item.mediaUrl ?? item.thumbUrl;
-                    if (url == null) return;
-                    showSetWallpaperSheet(
-                      context: context,
-                      ref: ref,
+                    return _WallpaperPage(
                       imageUrl: url,
-                      itemId: item.id,
+                      onSet: url == null
+                          ? null
+                          : () => showSetWallpaperSheet(
+                                context: context,
+                                ref: ref,
+                                imageUrl: url,
+                                itemId: item.id,
+                              ),
+                      setLabel: l10n?.setWallpaperTitle ?? 'Set wallpaper',
                     );
                   },
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(l10n?.setWallpaperTitle ?? 'Set wallpaper'),
+                );
+              },
+            ),
+          ),
+          // Top chrome: back button + category chips over a soft scrim.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: _TopBar(
+              categories: categoryChips,
+              selectedCategoryId: categoryId,
+              onSelect: _selectCategory,
+              onBack: () => context.pop(),
+              allLabel: l10n?.filterAll ?? 'All',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Back button + horizontal category chips, styled for a dark full-screen
+/// backdrop, over a top gradient scrim.
+class _TopBar extends StatelessWidget {
+  const _TopBar({
+    required this.categories,
+    required this.selectedCategoryId,
+    required this.onSelect,
+    required this.onBack,
+    required this.allLabel,
+  });
+
+  final List<TeacherChipData> categories;
+  final String? selectedCategoryId;
+  final ValueChanged<String?> onSelect;
+  final VoidCallback onBack;
+  final String allLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.black54, Colors.transparent],
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 12),
+          child: Row(
+            children: [
+              const SizedBox(width: 4),
+              _CircleIconButton(icon: Icons.arrow_back, onPressed: onBack),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    children: [
+                      _DarkChip(
+                        label: allLabel,
+                        selected: selectedCategoryId == null,
+                        onTap: () => onSelect(null),
+                      ),
+                      for (final c in categories) ...[
+                        const SizedBox(width: 8),
+                        _DarkChip(
+                          label: c.label,
+                          selected: selectedCategoryId == c.id,
+                          onTap: () => onSelect(c.id),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DarkChip extends StatelessWidget {
+  const _DarkChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? Colors.white : Colors.black.withValues(alpha: 0.35),
+      shape: StadiumBorder(
+        side: BorderSide(
+          color: selected ? Colors.white : Colors.white54,
+        ),
+      ),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.black : Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One full-bleed wallpaper page with the Set button pinned to the bottom.
+class _WallpaperPage extends StatelessWidget {
+  const _WallpaperPage({
+    required this.imageUrl,
+    required this.onSet,
+    required this.setLabel,
+  });
+
+  final String? imageUrl;
+  final VoidCallback? onSet;
+  final String setLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (imageUrl != null)
+          CachedNetworkImage(
+            imageUrl: imageUrl!,
+            fit: BoxFit.cover,
+            placeholder: (_, __) => const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
+            errorWidget: (_, __, ___) => const Center(
+              child: Icon(Icons.broken_image_outlined, color: Colors.white54),
+            ),
+          )
+        else
+          const Center(
+            child: Icon(Icons.image_not_supported, color: Colors.white54),
+          ),
+        // Bottom scrim so the button stays legible over bright images.
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 200,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black54],
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onSet,
+                  icon: const Icon(Icons.wallpaper),
+                  label: Text(setLabel),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
                   ),
                 ),
               ),
             ),
           ),
-          onTap: () {
-            final teacherId = ref.read(
-              contentTeacherFilterProvider(ContentType.wallpaper),
-            );
-            final categoryId = ref.read(
-              contentCategoryFilterProvider(ContentType.wallpaper),
-            );
-            final items = ref
-                    .read(
-                      contentListControllerProvider(
-                        FirestoreCollections.wallpapers,
-                        teacherId,
-                        categoryId: categoryId,
-                      ),
-                    )
-                    .valueOrNull
-                    ?.items ??
-                [item];
-            context.push(
-              AppRoutes.wallpaperDetail,
-              extra: WallpaperGallery(items: items, initialIndex: index),
-            );
-          },
-        );
-      },
+        ),
+      ],
+    );
+  }
+}
+
+class _CircleIconButton extends StatelessWidget {
+  const _CircleIconButton({required this.icon, required this.onPressed});
+
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black38,
+      shape: const CircleBorder(),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.white),
+        onPressed: onPressed,
+      ),
     );
   }
 }

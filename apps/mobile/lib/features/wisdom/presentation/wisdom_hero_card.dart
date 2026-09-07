@@ -31,10 +31,10 @@ class WisdomHeroCard extends ConsumerWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => context.push(
-            AppRoutes.wisdomDetail,
-            extra: wisdom.id,
-          ),
+          onTap: () {
+            AppHaptics.tap();
+            context.push(AppRoutes.wisdomDetail, extra: wisdom.id);
+          },
           child: CachedNetworkImage(
             imageUrl: wisdom.imageUrl!,
             width: double.infinity,

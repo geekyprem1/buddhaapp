@@ -112,7 +112,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get vandanaEmpty => 'अजून कोणतीही वंदना नाही.';
 
   @override
-  String get homeDailyPrarthana => 'दैनिक प्रार्थना';
+  String get homeDailyPrarthana => 'दैनिक सराव';
 
   @override
   String get homeShareApp => 'अॅप शेअर करा';
@@ -189,6 +189,18 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get calendarUposatha => 'उपोसथ';
+
+  @override
+  String get calendarNewMoon => 'अमावस्या';
+
+  @override
+  String get calendarFirstQuarter => 'शुक्ल अष्टमी';
+
+  @override
+  String get calendarFullMoon => 'पौर्णिमा';
+
+  @override
+  String get calendarLastQuarter => 'कृष्ण अष्टमी';
 
   @override
   String get calendarFestival => 'बौद्ध उत्सव';
@@ -399,7 +411,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get notifPermissionBody =>
-      'दैनिक प्रार्थना आणि धम्म अपडेटसाठी सूचनांना परवानगी द्या.';
+      'दैनिक सराव आणि धम्म अपडेटसाठी सूचनांना परवानगी द्या.';
 
   @override
   String get notifPermissionAllow => 'परवानगी द्या';
@@ -579,10 +591,10 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get prarthanaExactBody =>
-      'दैनिक प्रार्थनेसाठी Alarms & reminders ची परवानगी हवी, जेणेकरून निवडलेल्या वेळी अॅप बंद असतानाही अलार्म वाजेल.';
+      'दैनिक सरावासाठी Alarms & reminders ची परवानगी हवी, जेणेकरून निवडलेल्या वेळी अॅप बंद असतानाही अलार्म वाजेल.';
 
   @override
-  String get prarthanaHelpTitle => 'दैनिक प्रार्थना कशी चालते';
+  String get prarthanaHelpTitle => 'दैनिक सराव कसा चालतो';
 
   @override
   String get prarthanaHelpIntro =>

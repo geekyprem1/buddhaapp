@@ -307,7 +307,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeDailyPrarthana.
   ///
   /// In en, this message translates to:
-  /// **'Daily Prarthana'**
+  /// **'Daily Practice'**
   String get homeDailyPrarthana;
 
   /// No description provided for @homeShareApp.
@@ -459,6 +459,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uposatha'**
   String get calendarUposatha;
+
+  /// No description provided for @calendarNewMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'New Moon'**
+  String get calendarNewMoon;
+
+  /// No description provided for @calendarFirstQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'First Quarter'**
+  String get calendarFirstQuarter;
+
+  /// No description provided for @calendarFullMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Moon'**
+  String get calendarFullMoon;
+
+  /// No description provided for @calendarLastQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Quarter'**
+  String get calendarLastQuarter;
 
   /// No description provided for @calendarFestival.
   ///
@@ -853,7 +877,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifPermissionBody.
   ///
   /// In en, this message translates to:
-  /// **'Allow notifications for Daily Prarthana reminders and Dhamma updates.'**
+  /// **'Allow notifications for Daily Practice reminders and Dhamma updates.'**
   String get notifPermissionBody;
 
   /// No description provided for @notifPermissionAllow.
@@ -1189,13 +1213,13 @@ abstract class AppLocalizations {
   /// No description provided for @prarthanaExactBody.
   ///
   /// In en, this message translates to:
-  /// **'Daily Prarthana needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.'**
+  /// **'Daily Practice needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.'**
   String get prarthanaExactBody;
 
   /// No description provided for @prarthanaHelpTitle.
   ///
   /// In en, this message translates to:
-  /// **'How Daily Prarthana works'**
+  /// **'How Daily Practice works'**
   String get prarthanaHelpTitle;
 
   /// No description provided for @prarthanaHelpIntro.

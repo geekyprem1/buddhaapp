@@ -105,7 +105,7 @@ String moduleLabel(AppLocalizations? l10n, String id) => switch (id) {
       HomeModuleIds.song => l10n?.homeSong ?? 'Song',
       HomeModuleIds.vandana => l10n?.homeVandana ?? 'Vandana',
       HomeModuleIds.video => l10n?.homeVideo ?? 'Videos',
-      HomeModuleIds.prarthana => l10n?.homeDailyPrarthana ?? 'Daily Prarthana',
+      HomeModuleIds.prarthana => l10n?.homeDailyPrarthana ?? 'Daily Practice',
       HomeModuleIds.status => l10n?.homeTrendingStatus ?? 'Trending Status',
       HomeModuleIds.buddhistCalendar =>
         l10n?.homeBuddhistCalendar ?? 'Buddhist Calendar',

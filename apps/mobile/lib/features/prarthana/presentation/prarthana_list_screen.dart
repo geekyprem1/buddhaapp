@@ -21,7 +21,7 @@ class PrarthanaListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          l10n?.homeDailyPrarthana ?? 'Daily Prarthana',
+          l10n?.homeDailyPrarthana ?? 'Daily Practice',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

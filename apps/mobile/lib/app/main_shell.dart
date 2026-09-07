@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +13,7 @@ class MainShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   void _onTap(int index) {
+    AppHaptics.selection();
     // Re-tapping the active tab returns it to its branch's initial location.
     navigationShell.goBranch(
       index,

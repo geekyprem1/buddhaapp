@@ -114,7 +114,7 @@ Future<void> applyRingtoneKind({
       return;
     }
     await _commitSet(ref, pending);
-    await HapticFeedback.mediumImpact();
+    AppHaptics.success();
     messenger.showSnackBar(
       SnackBar(
         content: Text(
@@ -182,7 +182,7 @@ Future<void> completePendingRingtoneSet({
 
   try {
     await _commitSet(ref, pending);
-    await HapticFeedback.mediumImpact();
+    AppHaptics.success();
     if (!context.mounted) return;
     messenger.showSnackBar(
       SnackBar(
@@ -253,7 +253,7 @@ Future<void> _download(
   }
   try {
     await ref.read(ringtoneServiceProvider).saveToDevice(url: url);
-    await HapticFeedback.lightImpact();
+    AppHaptics.light();
     messenger.showSnackBar(
       SnackBar(content: Text(l10n?.ringtoneSaved ?? 'Saved to your device.')),
     );

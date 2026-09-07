@@ -48,7 +48,10 @@ class VideoListScreen extends ConsumerWidget {
               return _VideoCard(
                 title: v.title.resolve(language),
                 thumbnailUrl: v.thumbnailUrl,
-                onTap: () => context.push(AppRoutes.videoPlayer, extra: v),
+                onTap: () {
+                  AppHaptics.impact();
+                  context.push(AppRoutes.videoPlayer, extra: v);
+                },
               );
             },
           );

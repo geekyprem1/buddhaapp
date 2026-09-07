@@ -24,7 +24,7 @@ class PrarthanaHelpScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.prarthanaHelpTitle ?? 'How Daily Prarthana works'),
+        title: Text(l10n?.prarthanaHelpTitle ?? 'How Daily Practice works'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),

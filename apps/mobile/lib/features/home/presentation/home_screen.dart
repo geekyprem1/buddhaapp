@@ -41,7 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           title: Text(l10n?.notifPermissionTitle ?? 'Stay in the loop'),
           content: Text(
             l10n?.notifPermissionBody ??
-                'Allow notifications for Daily Prarthana reminders and Dhamma updates.',
+                'Allow notifications for Daily Practice reminders and Dhamma updates.',
           ),
           actions: [
             TextButton(

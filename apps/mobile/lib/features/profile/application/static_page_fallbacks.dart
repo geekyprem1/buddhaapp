@@ -12,10 +12,10 @@ StaticPage? fallbackStaticPage(String slug) {
         ),
         body: LocalisedText(
           en: 'Dhamma Path brings Buddhist wallpapers, ringtones, songs, '
-              'meditation and daily prarthana into one respectful app.',
-          hi: 'धम्म पथ बौद्ध वॉलपेपर, रिंगटोन, गीत, ध्यान और दैनिक प्रार्थना '
+              'meditation and daily practice into one respectful app.',
+          hi: 'धम्म पथ बौद्ध वॉलपेपर, रिंगटोन, गीत, ध्यान और दैनिक अभ्यास '
               'को एक सम्मानजनक ऐप में लाता है।',
-          mr: 'धम्म पथ बौद्ध वॉलपेपर, रिंगटोन, गाणी, ध्यान आणि दैनिक प्रार्थना '
+          mr: 'धम्म पथ बौद्ध वॉलपेपर, रिंगटोन, गाणी, ध्यान आणि दैनिक सराव '
               'एका सन्माननीय अॅपमध्ये आणतो.',
         ),
       );
@@ -71,11 +71,11 @@ StaticPage? fallbackStaticPage(String slug) {
         slug: StaticPageSlugs.help,
         title: LocalisedText(en: 'Help', hi: 'सहायता', mr: 'मदत'),
         body: LocalisedText(
-          en: 'Daily Prarthana uses an on-device alarm. Allow exact alarms '
+          en: 'Daily Practice uses an on-device alarm. Allow exact alarms '
               'if Android asks. Ringtones need Write Settings permission.',
-          hi: 'दैनिक प्रार्थना फ़ोन पर अलार्म से चलती है। रिंगटोन के लिए '
+          hi: 'दैनिक अभ्यास फ़ोन पर अलार्म से चलता है। रिंगटोन के लिए '
               'Write Settings अनुमति चाहिए।',
-          mr: 'दैनिक प्रार्थना फोनवरील अलार्मने वाजते. रिंगटोनसाठी '
+          mr: 'दैनिक सराव फोनवरील अलार्मने वाजतो. रिंगटोनसाठी '
               'Write Settings परवानगी लागते.',
         ),
       );

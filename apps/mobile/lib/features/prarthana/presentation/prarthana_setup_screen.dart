@@ -55,7 +55,7 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.homeDailyPrarthana ?? 'Daily Prarthana'),
+        title: Text(l10n?.homeDailyPrarthana ?? 'Daily Practice'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -215,7 +215,7 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
         prarthanaId: _prarthanaId,
         prarthanaLocalPath: existing?.prarthanaLocalPath,
         isEnabled: true,
-        label: existing?.label ?? 'Daily Prarthana',
+        label: existing?.label ?? 'Daily Practice',
         createdAt: existing?.createdAt ?? DateTime.now(),
       );
       await ref.read(prarthanaActionsProvider).save(

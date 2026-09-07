@@ -39,10 +39,13 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
         title: Text(l10n?.calendarTitle ?? 'Buddhist Calendar'),
         actions: [
           TextButton(
-            onPressed: () => setState(() {
-              _displayedMonth = DateTime(today.year, today.month);
-              _selectedDate = today;
-            }),
+            onPressed: () {
+              AppHaptics.tap();
+              setState(() {
+                _displayedMonth = DateTime(today.year, today.month);
+                _selectedDate = today;
+              });
+            },
             child: Text(l10n?.calendarToday ?? 'Today'),
           ),
         ],
@@ -108,8 +111,13 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     DateTime today,
   ) {
     final material = MaterialLocalizations.of(context);
-    final sundayFirst = material.narrowWeekdays;
-    final weekdays = [...sundayFirst.skip(1), sundayFirst.first];
+    // Build a Monday-first header that is guaranteed to match the Monday-first
+    // grid from BuddhistCalendarService.monthGrid, regardless of the locale's
+    // firstDayOfWeek. `narrowWeekdays` is always Sunday-indexed (0 = Sunday),
+    // so we pick indices Mon..Sun explicitly instead of relying on skip/reorder.
+    const mondayFirstIndices = [1, 2, 3, 4, 5, 6, 0]; // Mon,Tue,...,Sat,Sun
+    final narrow = material.narrowWeekdays;
+    final weekdays = [for (final i in mondayFirstIndices) narrow[i]];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -182,10 +190,13 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
       label: MaterialLocalizations.of(context).formatFullDate(day),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.card),
-        onTap: () => setState(() {
-          _selectedDate = day;
-          if (isOutside) _displayedMonth = DateTime(day.year, day.month);
-        }),
+        onTap: () {
+          AppHaptics.tap();
+          setState(() {
+            _selectedDate = day;
+            if (isOutside) _displayedMonth = DateTime(day.year, day.month);
+          });
+        },
         child: Container(
           margin: const EdgeInsets.all(2),
           decoration: BoxDecoration(
@@ -274,6 +285,7 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     AppLocalizations? l10n,
     BuddhistObservance event,
   ) {
+    final description = event.description;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -291,11 +303,13 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _eventTitle(l10n, event.kind),
+                    _eventTitle(l10n, event),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(_eventDescription(l10n, event.kind)),
+                  if (description != null && description.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(description),
+                  ],
                   if (event.isEstimated) ...[
                     const SizedBox(height: AppSpacing.sm),
                     _estimatedBadge(l10n),
@@ -328,15 +342,18 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
           color: event.isFestival ? Colors.amber.shade700 : AppColors.primary,
         ),
       ),
-      title: Text(_eventTitle(l10n, event.kind)),
+      title: Text(_eventTitle(l10n, event)),
       subtitle: Text(
         MaterialLocalizations.of(context).formatFullDate(event.date),
       ),
       trailing: event.isEstimated ? _estimatedBadge(l10n) : null,
-      onTap: () => setState(() {
-        _selectedDate = event.date;
-        _displayedMonth = DateTime(event.date.year, event.date.month);
-      }),
+      onTap: () {
+        AppHaptics.tap();
+        setState(() {
+          _selectedDate = event.date;
+          _displayedMonth = DateTime(event.date.year, event.date.month);
+        });
+      },
     );
   }
 
@@ -391,66 +408,27 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     );
   }
 
-  String _eventTitle(
-    AppLocalizations? l10n,
-    BuddhistObservanceKind kind,
-  ) {
-    return switch (kind) {
+  /// Named full-moon events show their own title; plain uposath days show the
+  /// moon-phase label + "Uposatha".
+  String _eventTitle(AppLocalizations? l10n, BuddhistObservance event) {
+    final title = event.title;
+    if (title != null && title.isNotEmpty) return title;
+    final uposatha = l10n?.calendarUposatha ?? 'Uposatha';
+    return switch (event.kind) {
       BuddhistObservanceKind.uposathaNewMoon =>
-        l10n?.calendarNewMoonUposatha ?? 'New Moon Uposatha',
+        '${l10n?.calendarNewMoon ?? 'New Moon'} · $uposatha',
       BuddhistObservanceKind.uposathaFirstQuarter =>
-        l10n?.calendarFirstQuarterUposatha ?? 'First Quarter Uposatha',
+        '${l10n?.calendarFirstQuarter ?? 'First Quarter'} · $uposatha',
       BuddhistObservanceKind.uposathaFullMoon =>
-        l10n?.calendarFullMoonUposatha ?? 'Full Moon Uposatha',
+        '${l10n?.calendarFullMoon ?? 'Full Moon'} · $uposatha',
       BuddhistObservanceKind.uposathaLastQuarter =>
-        l10n?.calendarLastQuarterUposatha ?? 'Last Quarter Uposatha',
-      BuddhistObservanceKind.maghaPuja =>
-        l10n?.calendarMaghaPuja ?? 'Magha Puja (Sangha Day)',
-      BuddhistObservanceKind.parinirvanaDay =>
-        l10n?.calendarParinirvanaDay ?? 'Parinirvana Day',
-      BuddhistObservanceKind.vesak =>
-        l10n?.calendarVesak ?? 'Vesak (Buddha Day)',
-      BuddhistObservanceKind.asalhaPuja =>
-        l10n?.calendarAsalhaPuja ?? 'Asalha Puja (Dhamma Day)',
-      BuddhistObservanceKind.pavarana =>
-        l10n?.calendarPavarana ?? 'Pavarana Day',
-      BuddhistObservanceKind.dhammaChakraPravartanDay =>
-        l10n?.calendarDhammaChakraDay ?? 'Dhammachakra Pravartan Day',
-      BuddhistObservanceKind.bodhiDay => l10n?.calendarBodhiDay ?? 'Bodhi Day',
-    };
-  }
-
-  String _eventDescription(
-    AppLocalizations? l10n,
-    BuddhistObservanceKind kind,
-  ) {
-    return switch (kind) {
-      BuddhistObservanceKind.uposathaNewMoon ||
-      BuddhistObservanceKind.uposathaFirstQuarter ||
-      BuddhistObservanceKind.uposathaFullMoon ||
-      BuddhistObservanceKind.uposathaLastQuarter =>
-        l10n?.calendarUposathaDescription ??
-            'A day for deeper practice, meditation and observing precepts.',
-      BuddhistObservanceKind.maghaPuja => l10n?.calendarMaghaDescription ??
-          "Remembers the gathering of the Buddha's disciples.",
-      BuddhistObservanceKind.parinirvanaDay =>
-        l10n?.calendarParinirvanaDescription ??
-            "Commemorates the Buddha's final Nibbana.",
-      BuddhistObservanceKind.vesak => l10n?.calendarVesakDescription ??
-          "Honours the Buddha's birth, awakening and final Nibbana.",
-      BuddhistObservanceKind.asalhaPuja => l10n?.calendarAsalhaDescription ??
-          "Remembers the Buddha's first teaching.",
-      BuddhistObservanceKind.pavarana => l10n?.calendarPavaranaDescription ??
-          'Marks the end of the rains retreat.',
-      BuddhistObservanceKind.dhammaChakraPravartanDay =>
-        l10n?.calendarDhammaChakraDescription ??
-            'Commemorates the Buddhist conversion at Deekshabhoomi.',
-      BuddhistObservanceKind.bodhiDay => l10n?.calendarBodhiDescription ??
-          "Commemorates the Buddha's awakening.",
+        '${l10n?.calendarLastQuarter ?? 'Last Quarter'} · $uposatha',
+      BuddhistObservanceKind.fullMoonEvent => uposatha,
     };
   }
 
   void _changeMonth(int offset) {
+    AppHaptics.selection();
     setState(() {
       _displayedMonth = DateTime(
         _displayedMonth.year,

@@ -112,7 +112,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vandanaEmpty => 'No vandana yet.';
 
   @override
-  String get homeDailyPrarthana => 'Daily Prarthana';
+  String get homeDailyPrarthana => 'Daily Practice';
 
   @override
   String get homeShareApp => 'Share App';
@@ -188,6 +188,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarUposatha => 'Uposatha';
+
+  @override
+  String get calendarNewMoon => 'New Moon';
+
+  @override
+  String get calendarFirstQuarter => 'First Quarter';
+
+  @override
+  String get calendarFullMoon => 'Full Moon';
+
+  @override
+  String get calendarLastQuarter => 'Last Quarter';
 
   @override
   String get calendarFestival => 'Festival';
@@ -397,7 +409,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifPermissionBody =>
-      'Allow notifications for Daily Prarthana reminders and Dhamma updates.';
+      'Allow notifications for Daily Practice reminders and Dhamma updates.';
 
   @override
   String get notifPermissionAllow => 'Allow';
@@ -578,10 +590,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get prarthanaExactBody =>
-      'Daily Prarthana needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.';
+      'Daily Practice needs Alarms & reminders so it can ring at the time you chose, even when the app is closed.';
 
   @override
-  String get prarthanaHelpTitle => 'How Daily Prarthana works';
+  String get prarthanaHelpTitle => 'How Daily Practice works';
 
   @override
   String get prarthanaHelpIntro =>

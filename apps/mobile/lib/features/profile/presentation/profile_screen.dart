@@ -132,7 +132,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           _row(
             icon: Icons.alarm,
-            label: l10n?.homeDailyPrarthana ?? 'Daily Prarthana',
+            label: l10n?.homeDailyPrarthana ?? 'Daily Practice',
             onTap: () => context.push(AppRoutes.prarthana),
           ),
           SwitchListTile(
@@ -229,7 +229,12 @@ class ProfileScreen extends ConsumerWidget {
       title: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: trailing ?? const Icon(Icons.chevron_right),
       enabled: onTap != null,
-      onTap: onTap,
+      onTap: onTap == null
+          ? null
+          : () {
+              AppHaptics.tap();
+              onTap();
+            },
     );
   }
 
@@ -287,6 +292,7 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
     if (choice != null) {
+      AppHaptics.selection();
       await ref.read(themeModeControllerProvider.notifier).setMode(choice);
     }
   }

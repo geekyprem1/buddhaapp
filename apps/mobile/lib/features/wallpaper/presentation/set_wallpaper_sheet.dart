@@ -1,7 +1,6 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
@@ -59,7 +58,7 @@ Future<void> _set(
           url: url,
           target: target,
         );
-    await HapticFeedback.mediumImpact();
+    AppHaptics.success();
     messenger.showSnackBar(
       SnackBar(content: Text(l10n?.wallpaperSetSuccess ?? 'Wallpaper set.')),
     );
@@ -69,6 +68,7 @@ Future<void> _set(
         );
   } catch (e, st) {
     await ErrorReporter.instance.record(e, st, reason: 'wallpaper.set');
+    AppHaptics.error();
     messenger.showSnackBar(
       SnackBar(
         content: Text(l10n?.wallpaperSetFailed ?? 'Could not set wallpaper.'),

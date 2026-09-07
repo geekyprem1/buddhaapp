@@ -2,6 +2,9 @@
 /// panel). See docs/PRD.md §10 and docs/ARCHITECTURE.md §2.
 library;
 
+// Utils
+export 'src/utils/app_haptics.dart';
+
 // Theme
 export 'src/theme/app_colors.dart';
 export 'src/theme/app_spacing.dart';
