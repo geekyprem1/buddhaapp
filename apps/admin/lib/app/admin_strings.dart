@@ -42,6 +42,9 @@ abstract class AdminStrings {
   static const dashboard = 'Dashboard';
   static const teachers = 'Teachers';
   static const categories = 'Categories';
+  static const allCategories = 'All categories';
+  static const uncategorized = 'Uncategorized';
+  static const filterByCategory = 'Filter by category';
   static const wisdom = 'Wisdom';
   static const wallpapers = 'Wallpapers';
   static const ringtones = 'Ringtones';

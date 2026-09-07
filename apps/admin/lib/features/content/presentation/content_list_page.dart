@@ -8,6 +8,7 @@ import '../../../app/admin_strings.dart';
 import '../../../widgets/admin_page_frame.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/responsive_layout.dart';
+import '../../categories/application/categories_providers.dart';
 import '../application/content_providers.dart';
 import '../application/content_type_config.dart';
 
@@ -23,6 +24,9 @@ class ContentListPage extends ConsumerStatefulWidget {
 class _ContentListPageState extends ConsumerState<ContentListPage> {
   String? _status;
   String _query = '';
+  // null = all categories; '' = uncategorized (no categoryId); else category id.
+  String? _categoryId;
+  bool _categoryFilterActive = false;
 
   ContentTypeConfig get config => widget.config;
 
@@ -80,6 +84,10 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(adminContentListProvider(config.collection));
+    // Categories for this content type (from the shared categories collection).
+    final categories = (ref.watch(adminCategoriesProvider).valueOrNull ?? [])
+        .where((c) => c.module == config.type)
+        .toList();
     return AdminPageFrame(
       title: config.label,
       actions: [
@@ -101,14 +109,25 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
         data: (items) {
           final rows = items.where((item) {
             if (_status != null && item.status != _status) return false;
+            if (_categoryFilterActive) {
+              final itemCat = item.categoryId ?? '';
+              if ((_categoryId ?? '') != itemCat) return false;
+            }
             if (_query.isEmpty) return true;
             final q = _query.toLowerCase();
             return item.title.resolve('en').toLowerCase().contains(q) ||
                 item.id.toLowerCase().contains(q);
           }).toList();
+          // Count per category for the chip labels (admin overview).
+          final countFor = <String, int>{};
+          for (final item in items) {
+            final key = item.categoryId ?? '';
+            countFor[key] = (countFor[key] ?? 0) + 1;
+          }
           // Drag-reorder only makes sense over the full, unfiltered list —
           // otherwise "row 2" doesn't map to a stable sortOrder position.
-          final reorderable = _status == null && _query.isEmpty;
+          final reorderable =
+              _status == null && _query.isEmpty && !_categoryFilterActive;
           return Column(
             children: [
               Padding(
@@ -145,6 +164,57 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                           ),
                       ],
                     ),
+                    if (categories.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        AdminStrings.filterByCategory,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          ChoiceChip(
+                            label: Text(
+                              '${AdminStrings.allCategories} (${items.length})',
+                            ),
+                            selected: !_categoryFilterActive,
+                            onSelected: (_) => setState(() {
+                              _categoryFilterActive = false;
+                              _categoryId = null;
+                            }),
+                          ),
+                          for (final c in categories)
+                            ChoiceChip(
+                              label: Text(
+                                '${c.name.resolve('en')} (${countFor[c.id] ?? 0})',
+                              ),
+                              selected:
+                                  _categoryFilterActive && _categoryId == c.id,
+                              onSelected: (_) => setState(() {
+                                _categoryFilterActive = true;
+                                _categoryId = c.id;
+                              }),
+                            ),
+                          // Items with no category assigned.
+                          if ((countFor[''] ?? 0) > 0)
+                            ChoiceChip(
+                              label: Text(
+                                '${AdminStrings.uncategorized} (${countFor[''] ?? 0})',
+                              ),
+                              selected:
+                                  _categoryFilterActive && _categoryId == '',
+                              onSelected: (_) => setState(() {
+                                _categoryFilterActive = true;
+                                _categoryId = '';
+                              }),
+                            ),
+                        ],
+                      ),
+                    ],
                     if (reorderable && rows.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
