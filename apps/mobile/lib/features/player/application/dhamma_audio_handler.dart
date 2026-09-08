@@ -4,9 +4,12 @@ import 'dart:io' show Platform;
 import 'package:audio_service/audio_service.dart';
 import 'package:core/core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../l10n/generated/app_localizations.dart';
+import '../../notifications/application/fcm_coordinator.dart' show rootMessengerKey;
 import 'media_item_mapper.dart';
 import 'sleep_timer.dart';
 
@@ -34,6 +37,10 @@ class DhammaAudioHandler extends BaseAudioHandler
   final EventsRepository _events = EventsRepository();
   final ProgressRepository _progress = ProgressRepository();
   var _retrying = false;
+
+  /// Guards the one-per-session "enable notifications" nudge so we don't
+  /// spam the user every time they press play.
+  var _notifNudgeShown = false;
 
   /// How close to the start we ignore (nothing worth resuming yet) and how
   /// close to the end counts as "finished" (clear instead of save).
@@ -98,18 +105,49 @@ class DhammaAudioHandler extends BaseAudioHandler
   Future<void> _ensureMediaNotificationPermission() async {
     if (!Platform.isAndroid) return;
     try {
-      final status = await Permission.notification.status;
-      if (status.isGranted ||
-          status.isPermanentlyDenied ||
-          status.isRestricted ||
-          status.isLimited) {
-        return;
+      var status = await Permission.notification.status;
+      if (status.isGranted) return;
+      // The OS shows its permission dialog only once; after the user has
+      // decided, request() returns the same result without a prompt. Ask
+      // while we still can, otherwise guide the user to app settings so the
+      // notification-panel controls can appear.
+      if (!status.isPermanentlyDenied &&
+          !status.isRestricted &&
+          !status.isLimited) {
+        status = await Permission.notification.request();
       }
-      await Permission.notification.request();
+      if (!status.isGranted) {
+        _promptEnableNotifications();
+      }
     } catch (_) {
       // Platform channel unavailable (unit tests, background isolate) —
       // playback must never fail because of a permission check.
     }
+  }
+
+  /// Once per session, nudge the user to turn notifications back on so the
+  /// media controls (mini player) show up in the notification panel while a
+  /// track plays in the background. Never blocks playback.
+  void _promptEnableNotifications() {
+    if (_notifNudgeShown) return;
+    _notifNudgeShown = true;
+    final messenger = rootMessengerKey.currentState;
+    final context = rootMessengerKey.currentContext;
+    if (messenger == null) return;
+    final l10n = context == null ? null : AppLocalizations.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 6),
+        content: Text(
+          l10n?.mediaNotifPermissionMessage ??
+              'Turn on notifications to control playback from the notification panel.',
+        ),
+        action: SnackBarAction(
+          label: l10n?.mediaNotifPermissionAction ?? 'Open settings',
+          onPressed: () => unawaited(openAppSettings()),
+        ),
+      ),
+    );
   }
 
   /// The stored resume point for a meditation, or `null` if none/ineligible.

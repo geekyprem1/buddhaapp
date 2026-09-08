@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../l10n/generated/app_localizations.dart';
 
 /// Persistent 5-tab bottom navigation shell (Home, Calendar, Practice,
-/// Discover, Profile). Each tab keeps its own navigation stack and state via
+/// Videos, Profile). Each tab keeps its own navigation stack and state via
 /// the [StatefulNavigationShell]'s indexed stack.
 class MainShell extends StatelessWidget {
   const MainShell({required this.navigationShell, super.key});
@@ -49,9 +49,9 @@ class MainShell extends StatelessWidget {
             label: l10n?.navPractice ?? 'Practice',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.explore_outlined),
-            selectedIcon: Icon(Icons.explore, color: cs.primary),
-            label: l10n?.navExplore ?? 'Discover',
+            icon: const Icon(Icons.play_circle_outline),
+            selectedIcon: Icon(Icons.play_circle, color: cs.primary),
+            label: l10n?.homeVideo ?? 'Videos',
           ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline),

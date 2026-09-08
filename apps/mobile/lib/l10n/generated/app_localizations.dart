@@ -400,6 +400,24 @@ abstract class AppLocalizations {
   /// **'Watch & learn'**
   String get homeVideoSubtitle;
 
+  /// No description provided for @homeRingtoneSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhamma Sounds & Tunes'**
+  String get homeRingtoneSubtitle;
+
+  /// No description provided for @homeSongSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhamma Music'**
+  String get homeSongSubtitle;
+
+  /// No description provided for @homeVandanaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddha Puja & Homage'**
+  String get homeVandanaSubtitle;
+
   /// No description provided for @videosEmpty.
   ///
   /// In en, this message translates to:
@@ -1132,6 +1150,18 @@ abstract class AppLocalizations {
   /// **'Permission is still off. Open Help to turn it on.'**
   String get ringtonePermissionDenied;
 
+  /// No description provided for @mediaNotifPermissionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on notifications to control playback from the notification panel.'**
+  String get mediaNotifPermissionMessage;
+
+  /// No description provided for @mediaNotifPermissionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get mediaNotifPermissionAction;
+
   /// No description provided for @ringtoneHelpTitle.
   ///
   /// In en, this message translates to:
@@ -1237,37 +1267,37 @@ abstract class AppLocalizations {
   /// No description provided for @prarthanaSongLabel.
   ///
   /// In en, this message translates to:
-  /// **'Prarthana Song'**
+  /// **'Vandana'**
   String get prarthanaSongLabel;
 
   /// No description provided for @prarthanaNoSelection.
   ///
   /// In en, this message translates to:
-  /// **'No Prarthana selected'**
+  /// **'No vandana selected'**
   String get prarthanaNoSelection;
 
   /// No description provided for @prarthanaChooseSong.
   ///
   /// In en, this message translates to:
-  /// **'Choose prarthana'**
+  /// **'Choose vandana'**
   String get prarthanaChooseSong;
 
   /// No description provided for @prarthanaNoSongs.
   ///
   /// In en, this message translates to:
-  /// **'No prarthanas yet.'**
+  /// **'No vandanas yet.'**
   String get prarthanaNoSongs;
 
   /// No description provided for @prarthanaSetCta.
   ///
   /// In en, this message translates to:
-  /// **'Set Prarthana'**
+  /// **'Set Vandana'**
   String get prarthanaSetCta;
 
   /// No description provided for @prarthanaNeedSong.
   ///
   /// In en, this message translates to:
-  /// **'Choose a prarthana first.'**
+  /// **'Choose a vandana first.'**
   String get prarthanaNeedSong;
 
   /// No description provided for @prarthanaNeedDays.

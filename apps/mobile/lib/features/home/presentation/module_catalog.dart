@@ -123,6 +123,11 @@ String? moduleSubtitle(AppLocalizations? l10n, String id) => switch (id) {
       HomeModuleIds.wallpaper => l10n?.homeWallpaperSubtitle ?? 'HD wallpapers',
       HomeModuleIds.meditation =>
         l10n?.homeMeditationSubtitle ?? 'Timer & guide',
+      HomeModuleIds.ringtone =>
+        l10n?.homeRingtoneSubtitle ?? 'Dhamma Sounds & Tunes',
+      HomeModuleIds.song => l10n?.homeSongSubtitle ?? 'Dhamma Music',
+      HomeModuleIds.vandana =>
+        l10n?.homeVandanaSubtitle ?? 'Buddha Puja & Homage',
       HomeModuleIds.video => l10n?.homeVideoSubtitle ?? 'Watch & learn',
       HomeModuleIds.buddhistCalendar =>
         l10n?.homeBuddhistCalendarSubtitle ?? 'Uposatha • Festivals',

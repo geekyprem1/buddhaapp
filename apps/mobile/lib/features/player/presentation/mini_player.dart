@@ -182,7 +182,7 @@ const _mainTabRoutes = <String>{
   AppRoutes.home,
   AppRoutes.buddhistCalendar,
   AppRoutes.prarthana,
-  AppRoutes.explore,
+  AppRoutes.videos,
   AppRoutes.profile,
 };
 

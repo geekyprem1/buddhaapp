@@ -6,14 +6,20 @@ import '../l10n/generated/app_localizations.dart';
 
 /// Shared splash / login brand lockup — centered logo, compact title, tagline.
 class BrandHeader extends StatelessWidget {
-  const BrandHeader({this.compact = false, super.key});
+  const BrandHeader({this.compact = false, this.onDark = false, super.key});
 
   final bool compact;
+
+  /// When true (e.g. over the login background video), title/tagline render in
+  /// light colours for contrast.
+  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final logoSize = compact ? 72.0 : 96.0;
+    final titleColor = onDark ? Colors.white : null;
+    final taglineColor = onDark ? Colors.white70 : AppColors.textSecondary;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
@@ -37,6 +43,7 @@ class BrandHeader extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 1,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: titleColor,
                     fontWeight: FontWeight.w700,
                     fontSize: compact ? 26 : 28,
                     height: 1.15,
@@ -51,7 +58,7 @@ class BrandHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: taglineColor,
                   fontSize: 13,
                   letterSpacing: 0.4,
                 ),

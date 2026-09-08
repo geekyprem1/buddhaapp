@@ -164,6 +164,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get homeVideoSubtitle => 'देखें और सीखें';
 
   @override
+  String get homeRingtoneSubtitle => 'धम्म साउंड्स और ट्यून्स';
+
+  @override
+  String get homeSongSubtitle => 'धम्म संगीत';
+
+  @override
+  String get homeVandanaSubtitle => 'बुद्ध पूजा और वंदना';
+
+  @override
   String get videosEmpty => 'अभी कोई वीडियो नहीं है।';
 
   @override
@@ -546,6 +555,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'अनुमति अभी भी बंद है। चालू करने के लिए मदद खोलें।';
 
   @override
+  String get mediaNotifPermissionMessage =>
+      'नोटिफ़िकेशन पैनल से प्लेबैक कंट्रोल करने के लिए नोटिफ़िकेशन चालू करें।';
+
+  @override
+  String get mediaNotifPermissionAction => 'सेटिंग खोलें';
+
+  @override
   String get ringtoneHelpTitle => 'रिंगटोन कैसे सेट करें';
 
   @override
@@ -604,22 +620,22 @@ class AppLocalizationsHi extends AppLocalizations {
   String get prarthanaEveryday => 'रोज़';
 
   @override
-  String get prarthanaSongLabel => 'प्रार्थना गीत';
+  String get prarthanaSongLabel => 'वंदना';
 
   @override
-  String get prarthanaNoSelection => 'कोई प्रार्थना नहीं चुनी';
+  String get prarthanaNoSelection => 'कोई वंदना नहीं चुनी';
 
   @override
-  String get prarthanaChooseSong => 'प्रार्थना चुनें';
+  String get prarthanaChooseSong => 'वंदना चुनें';
 
   @override
-  String get prarthanaNoSongs => 'अभी कोई प्रार्थना नहीं है।';
+  String get prarthanaNoSongs => 'अभी कोई वंदना नहीं है।';
 
   @override
-  String get prarthanaSetCta => 'प्रार्थना सेट करें';
+  String get prarthanaSetCta => 'वंदना सेट करें';
 
   @override
-  String get prarthanaNeedSong => 'पहले एक प्रार्थना चुनें।';
+  String get prarthanaNeedSong => 'पहले एक वंदना चुनें।';
 
   @override
   String get prarthanaNeedDays => 'कम से कम एक दिन चुनें।';

@@ -124,11 +124,11 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
           const SizedBox(height: AppSpacing.lg),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text(l10n?.prarthanaSongLabel ?? 'Prarthana Song'),
+            title: Text(l10n?.prarthanaSongLabel ?? 'Vandana'),
             subtitle: Text(
               _prarthanaTitle ??
                   l10n?.prarthanaNoSelection ??
-                  'No Prarthana selected',
+                  'No vandana selected',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -137,7 +137,7 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
           ),
           const SizedBox(height: AppSpacing.xl),
           PrimaryPillButton(
-            label: l10n?.prarthanaSetCta ?? 'Set Prarthana',
+            label: l10n?.prarthanaSetCta ?? 'Set Vandana',
             icon: Icons.notifications_active,
             isLoading: _busy,
             onPressed: _busy ? null : _save,
@@ -184,7 +184,7 @@ class _PrarthanaSetupScreenState extends ConsumerState<PrarthanaSetupScreen> {
     var url = _audioUrl;
     if (url == null) {
       final repo = ref.read(
-        contentRepositoryProvider(FirestoreCollections.prarthanas),
+        contentRepositoryProvider(FirestoreCollections.vandanas),
       );
       final page = await repo.fetchPublishedPage(pageSize: 50);
       url = page

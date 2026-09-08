@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -24,9 +25,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _phoneController = TextEditingController();
   String? _errorKey;
 
+  VideoPlayerController? _bgVideo;
+  bool _bgReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final c = VideoPlayerController.asset('assets/video/login_bg.mp4');
+    _bgVideo = c;
+    c.initialize().then((_) {
+      if (!mounted) return;
+      c
+        ..setVolume(0)
+        ..setLooping(true)
+        ..play();
+      setState(() => _bgReady = true);
+    }).catchError((_) {
+      // Fall back to the plain background if the video can't load.
+    });
+  }
+
   @override
   void dispose() {
     _phoneController.dispose();
+    _bgVideo?.dispose();
     super.dispose();
   }
 
@@ -65,15 +87,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     });
 
+    final video = _bgVideo;
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            children: [
-              const SizedBox(height: AppSpacing.xl),
-              const BrandHeader(compact: true),
-              const SizedBox(height: AppSpacing.xl),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background video (falls back to the theme background if it can't
+          // load / while it's initialising).
+          if (_bgReady && video != null)
+            FittedBox(
+              fit: BoxFit.cover,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                width: video.value.size.width,
+                height: video.value.size.height,
+                child: VideoPlayer(video),
+              ),
+            ),
+          // Dark scrim so the form stays legible over the video.
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.black54, Colors.black87],
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                children: [
+                  const SizedBox(height: AppSpacing.xl),
+                  const BrandHeader(compact: true, onDark: true),
+                  const SizedBox(height: AppSpacing.xl),
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
@@ -119,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: AppSpacing.sm),
               OutlinedButton.icon(
                 onPressed: isLoading ? null : _continueWithGoogle,
-                icon: const Icon(Icons.g_mobiledata),
+                icon: const Icon(Icons.g_mobiledata, color: Colors.white),
                 label: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -127,6 +175,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white70),
                   minimumSize: const Size.fromHeight(
                     AppSpacing.minTouchTarget,
                   ),
@@ -144,7 +194,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     l10n?.loginLegalPrefix ??
                         'By continuing you agree to the ',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Colors.white70,
                         ),
                   ),
                   InkWell(
@@ -154,15 +204,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       l10n?.profileTermsConditions ?? 'Terms',
                       style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   Text(
                     l10n?.loginLegalAnd ?? ' and ',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Colors.white70,
                         ),
                   ),
                   InkWell(
@@ -172,22 +222,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       l10n?.profilePrivacyPolicy ?? 'Privacy Policy',
                       style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   Text(
                     '.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Colors.white70,
                         ),
                   ),
                 ],
               ),
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

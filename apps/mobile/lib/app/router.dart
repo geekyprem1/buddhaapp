@@ -8,7 +8,6 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/otp_screen.dart';
 import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
 import '../features/chanting/presentation/chanting_list_screen.dart';
-import '../features/explore/presentation/explore_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/places/presentation/place_detail_screen.dart';
 import '../features/places/presentation/places_list_screen.dart';
@@ -244,8 +243,8 @@ GoRouter appRouter(Ref ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.explore,
-                builder: (context, state) => const ExploreScreen(),
+                path: AppRoutes.videos,
+                builder: (context, state) => const VideoListScreen(),
               ),
             ],
           ),
@@ -308,10 +307,6 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.vandanas,
         builder: (context, state) => const VandanaListScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.videos,
-        builder: (context, state) => const VideoListScreen(),
       ),
       GoRoute(
         path: AppRoutes.tipitaka,

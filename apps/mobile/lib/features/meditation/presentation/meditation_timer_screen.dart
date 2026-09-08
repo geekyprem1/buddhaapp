@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/content_list_controller.dart';
@@ -32,10 +33,24 @@ class _MeditationTimerScreenState extends ConsumerState<MeditationTimerScreen> {
   DateTime? _endsAt;
   bool _running = false;
 
+  /// Dedicated player for the end-of-session bell (independent of the shared
+  /// audio handler, which we stop when the timer finishes).
+  final AudioPlayer _bell = AudioPlayer();
+
   @override
   void dispose() {
     _ticker?.cancel();
+    _bell.dispose();
     super.dispose();
+  }
+
+  Future<void> _playBell() async {
+    try {
+      await _bell.setAsset('assets/audio/bell.mp3');
+      await _bell.play();
+    } catch (_) {
+      // Bell is a nicety — never let it break the finish flow.
+    }
   }
 
   Duration get _remaining {
@@ -105,6 +120,8 @@ class _MeditationTimerScreenState extends ConsumerState<MeditationTimerScreen> {
     _ticker = null;
     _endsAt = null;
     await ref.read(audioHandlerProvider).stop();
+    // Play the gentle bell AFTER the meditation audio stops.
+    unawaited(_playBell());
     AppHaptics.success();
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);

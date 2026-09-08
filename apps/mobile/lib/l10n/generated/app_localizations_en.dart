@@ -163,6 +163,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeVideoSubtitle => 'Watch & learn';
 
   @override
+  String get homeRingtoneSubtitle => 'Dhamma Sounds & Tunes';
+
+  @override
+  String get homeSongSubtitle => 'Dhamma Music';
+
+  @override
+  String get homeVandanaSubtitle => 'Buddha Puja & Homage';
+
+  @override
   String get videosEmpty => 'No videos yet.';
 
   @override
@@ -545,6 +554,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Permission is still off. Open Help to turn it on.';
 
   @override
+  String get mediaNotifPermissionMessage =>
+      'Turn on notifications to control playback from the notification panel.';
+
+  @override
+  String get mediaNotifPermissionAction => 'Open settings';
+
+  @override
   String get ringtoneHelpTitle => 'How to set a ringtone';
 
   @override
@@ -603,22 +619,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prarthanaEveryday => 'Everyday';
 
   @override
-  String get prarthanaSongLabel => 'Prarthana Song';
+  String get prarthanaSongLabel => 'Vandana';
 
   @override
-  String get prarthanaNoSelection => 'No Prarthana selected';
+  String get prarthanaNoSelection => 'No vandana selected';
 
   @override
-  String get prarthanaChooseSong => 'Choose prarthana';
+  String get prarthanaChooseSong => 'Choose vandana';
 
   @override
-  String get prarthanaNoSongs => 'No prarthanas yet.';
+  String get prarthanaNoSongs => 'No vandanas yet.';
 
   @override
-  String get prarthanaSetCta => 'Set Prarthana';
+  String get prarthanaSetCta => 'Set Vandana';
 
   @override
-  String get prarthanaNeedSong => 'Choose a prarthana first.';
+  String get prarthanaNeedSong => 'Choose a vandana first.';
 
   @override
   String get prarthanaNeedDays => 'Pick at least one day.';
