@@ -976,6 +976,18 @@ abstract class AppLocalizations {
   /// **'Set wallpaper'**
   String get setWallpaperTitle;
 
+  /// No description provided for @setWallpaperLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Set live wallpaper'**
+  String get setWallpaperLive;
+
+  /// No description provided for @setWallpaperLivePreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing live wallpaper…'**
+  String get setWallpaperLivePreparing;
+
   /// No description provided for @setWallpaperHome.
   ///
   /// In en, this message translates to:

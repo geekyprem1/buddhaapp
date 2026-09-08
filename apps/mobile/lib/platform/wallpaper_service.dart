@@ -37,6 +37,13 @@ class WallpaperService {
     });
   }
 
+  /// Downloads the mp4 then opens the system live-wallpaper picker backed by
+  /// our native VideoWallpaperService. The user confirms in the system UI.
+  Future<void> setLiveWallpaper(String videoUrl) async {
+    final path = await cacheRemoteFile(videoUrl);
+    await _channel.invokeMethod<void>('setLiveWallpaper', {'path': path});
+  }
+
   Future<String> saveToGallery(String url) async {
     if (await Permission.storage.isDenied) {
       await Permission.storage.request();

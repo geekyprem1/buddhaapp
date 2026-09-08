@@ -465,6 +465,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get setWallpaperTitle => 'वॉलपेपर सेट करा';
 
   @override
+  String get setWallpaperLive => 'लाइव्ह वॉलपेपर सेट करा';
+
+  @override
+  String get setWallpaperLivePreparing => 'लाइव्ह वॉलपेपर तयार होत आहे…';
+
+  @override
   String get setWallpaperHome => 'होम स्क्रीन';
 
   @override

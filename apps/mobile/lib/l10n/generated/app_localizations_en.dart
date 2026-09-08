@@ -463,6 +463,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setWallpaperTitle => 'Set wallpaper';
 
   @override
+  String get setWallpaperLive => 'Set live wallpaper';
+
+  @override
+  String get setWallpaperLivePreparing => 'Preparing live wallpaper…';
+
+  @override
   String get setWallpaperHome => 'Home screen';
 
   @override

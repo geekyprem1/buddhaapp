@@ -20,10 +20,18 @@ WallpaperMeta _$WallpaperMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WallpaperMeta {
+  /// `static` | `live`. Live wallpapers carry [videoUrl] (+ [posterUrl]).
   String get kind => throw _privateConstructorUsedError;
   int? get width => throw _privateConstructorUsedError;
   int? get height => throw _privateConstructorUsedError;
   String get orientation => throw _privateConstructorUsedError;
+
+  /// Live wallpaper only: the mp4 to loop as the device wallpaper.
+  String? get videoUrl => throw _privateConstructorUsedError;
+
+  /// Live wallpaper only: a still image shown while the video loads (and
+  /// used as the grid/reel poster).
+  String? get posterUrl => throw _privateConstructorUsedError;
 
   /// Serializes this WallpaperMeta to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -41,7 +49,13 @@ abstract class $WallpaperMetaCopyWith<$Res> {
           WallpaperMeta value, $Res Function(WallpaperMeta) then) =
       _$WallpaperMetaCopyWithImpl<$Res, WallpaperMeta>;
   @useResult
-  $Res call({String kind, int? width, int? height, String orientation});
+  $Res call(
+      {String kind,
+      int? width,
+      int? height,
+      String orientation,
+      String? videoUrl,
+      String? posterUrl});
 }
 
 /// @nodoc
@@ -63,6 +77,8 @@ class _$WallpaperMetaCopyWithImpl<$Res, $Val extends WallpaperMeta>
     Object? width = freezed,
     Object? height = freezed,
     Object? orientation = null,
+    Object? videoUrl = freezed,
+    Object? posterUrl = freezed,
   }) {
     return _then(_value.copyWith(
       kind: null == kind
@@ -81,6 +97,14 @@ class _$WallpaperMetaCopyWithImpl<$Res, $Val extends WallpaperMeta>
           ? _value.orientation
           : orientation // ignore: cast_nullable_to_non_nullable
               as String,
+      videoUrl: freezed == videoUrl
+          ? _value.videoUrl
+          : videoUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      posterUrl: freezed == posterUrl
+          ? _value.posterUrl
+          : posterUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -93,7 +117,13 @@ abstract class _$$WallpaperMetaImplCopyWith<$Res>
       __$$WallpaperMetaImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String kind, int? width, int? height, String orientation});
+  $Res call(
+      {String kind,
+      int? width,
+      int? height,
+      String orientation,
+      String? videoUrl,
+      String? posterUrl});
 }
 
 /// @nodoc
@@ -113,6 +143,8 @@ class __$$WallpaperMetaImplCopyWithImpl<$Res>
     Object? width = freezed,
     Object? height = freezed,
     Object? orientation = null,
+    Object? videoUrl = freezed,
+    Object? posterUrl = freezed,
   }) {
     return _then(_$WallpaperMetaImpl(
       kind: null == kind
@@ -131,6 +163,14 @@ class __$$WallpaperMetaImplCopyWithImpl<$Res>
           ? _value.orientation
           : orientation // ignore: cast_nullable_to_non_nullable
               as String,
+      videoUrl: freezed == videoUrl
+          ? _value.videoUrl
+          : videoUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      posterUrl: freezed == posterUrl
+          ? _value.posterUrl
+          : posterUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -142,11 +182,14 @@ class _$WallpaperMetaImpl implements _WallpaperMeta {
       {this.kind = 'static',
       this.width,
       this.height,
-      this.orientation = 'portrait'});
+      this.orientation = 'portrait',
+      this.videoUrl,
+      this.posterUrl});
 
   factory _$WallpaperMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$WallpaperMetaImplFromJson(json);
 
+  /// `static` | `live`. Live wallpapers carry [videoUrl] (+ [posterUrl]).
   @override
   @JsonKey()
   final String kind;
@@ -158,9 +201,18 @@ class _$WallpaperMetaImpl implements _WallpaperMeta {
   @JsonKey()
   final String orientation;
 
+  /// Live wallpaper only: the mp4 to loop as the device wallpaper.
+  @override
+  final String? videoUrl;
+
+  /// Live wallpaper only: a still image shown while the video loads (and
+  /// used as the grid/reel poster).
+  @override
+  final String? posterUrl;
+
   @override
   String toString() {
-    return 'WallpaperMeta(kind: $kind, width: $width, height: $height, orientation: $orientation)';
+    return 'WallpaperMeta(kind: $kind, width: $width, height: $height, orientation: $orientation, videoUrl: $videoUrl, posterUrl: $posterUrl)';
   }
 
   @override
@@ -172,13 +224,17 @@ class _$WallpaperMetaImpl implements _WallpaperMeta {
             (identical(other.width, width) || other.width == width) &&
             (identical(other.height, height) || other.height == height) &&
             (identical(other.orientation, orientation) ||
-                other.orientation == orientation));
+                other.orientation == orientation) &&
+            (identical(other.videoUrl, videoUrl) ||
+                other.videoUrl == videoUrl) &&
+            (identical(other.posterUrl, posterUrl) ||
+                other.posterUrl == posterUrl));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, kind, width, height, orientation);
+  int get hashCode => Object.hash(
+      runtimeType, kind, width, height, orientation, videoUrl, posterUrl);
 
   /// Create a copy of WallpaperMeta
   /// with the given fields replaced by the non-null parameter values.
@@ -201,11 +257,14 @@ abstract class _WallpaperMeta implements WallpaperMeta {
       {final String kind,
       final int? width,
       final int? height,
-      final String orientation}) = _$WallpaperMetaImpl;
+      final String orientation,
+      final String? videoUrl,
+      final String? posterUrl}) = _$WallpaperMetaImpl;
 
   factory _WallpaperMeta.fromJson(Map<String, dynamic> json) =
       _$WallpaperMetaImpl.fromJson;
 
+  /// `static` | `live`. Live wallpapers carry [videoUrl] (+ [posterUrl]).
   @override
   String get kind;
   @override
@@ -214,6 +273,15 @@ abstract class _WallpaperMeta implements WallpaperMeta {
   int? get height;
   @override
   String get orientation;
+
+  /// Live wallpaper only: the mp4 to loop as the device wallpaper.
+  @override
+  String? get videoUrl;
+
+  /// Live wallpaper only: a still image shown while the video loads (and
+  /// used as the grid/reel poster).
+  @override
+  String? get posterUrl;
 
   /// Create a copy of WallpaperMeta
   /// with the given fields replaced by the non-null parameter values.

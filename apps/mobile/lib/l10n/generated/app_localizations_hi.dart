@@ -464,6 +464,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get setWallpaperTitle => 'वॉलपेपर सेट करें';
 
   @override
+  String get setWallpaperLive => 'लाइव वॉलपेपर सेट करें';
+
+  @override
+  String get setWallpaperLivePreparing => 'लाइव वॉलपेपर तैयार हो रहा है…';
+
+  @override
   String get setWallpaperHome => 'होम स्क्रीन';
 
   @override

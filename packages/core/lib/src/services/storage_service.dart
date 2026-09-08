@@ -35,6 +35,12 @@ abstract class StoragePaths {
   static String contentAudio(String collection, String itemId) =>
       '$collection/$itemId/audio.mp3';
 
+  /// Live-wallpaper video. Deliberately NOT named `original.*` so the
+  /// `onMediaUpload` image pipeline (sharp) never tries to decode it.
+  static String contentVideo(String collection, String itemId,
+          [String ext = 'mp4']) =>
+      '$collection/$itemId/video.$ext';
+
   static String userAvatar(String uid) => 'users/$uid/avatar.webp';
 
   static String notificationImage(String campaignId, [String ext = 'jpg']) =>

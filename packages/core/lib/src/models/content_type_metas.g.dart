@@ -12,6 +12,8 @@ _$WallpaperMetaImpl _$$WallpaperMetaImplFromJson(Map json) =>
       width: (json['width'] as num?)?.toInt(),
       height: (json['height'] as num?)?.toInt(),
       orientation: json['orientation'] as String? ?? 'portrait',
+      videoUrl: json['videoUrl'] as String?,
+      posterUrl: json['posterUrl'] as String?,
     );
 
 Map<String, dynamic> _$$WallpaperMetaImplToJson(_$WallpaperMetaImpl instance) =>
@@ -20,6 +22,8 @@ Map<String, dynamic> _$$WallpaperMetaImplToJson(_$WallpaperMetaImpl instance) =>
       'width': instance.width,
       'height': instance.height,
       'orientation': instance.orientation,
+      'videoUrl': instance.videoUrl,
+      'posterUrl': instance.posterUrl,
     };
 
 _$AudioMetaImpl _$$AudioMetaImplFromJson(Map json) => _$AudioMetaImpl(

@@ -108,6 +108,11 @@ abstract class AdminStrings {
   static const partField = 'Part number';
   static const levelField = 'Level';
   static const orientationField = 'Orientation';
+  static const liveWallpaper = 'Live wallpaper (video)';
+  static const liveWallpaperVideo = 'Wallpaper video (mp4)';
+  static const liveWallpaperPoster = 'Poster image (shown while loading)';
+  static const liveWallpaperUploadIdRequired =
+      'Set a title or id before uploading the video.';
   static const recommendedTimeField = 'Recommended time (HH:MM)';
   static const descriptionField = 'Description';
   static const idCardPrefix = 'ID card prefix';

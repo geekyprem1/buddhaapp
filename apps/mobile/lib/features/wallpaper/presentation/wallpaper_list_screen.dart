@@ -4,10 +4,12 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/category_filter_providers.dart';
 import '../../content/application/content_list_controller.dart';
+import '../application/wallpaper_providers.dart';
 import 'set_wallpaper_sheet.dart';
 
 /// Wallpapers — full-screen vertical "reel". One wallpaper fills the screen;
@@ -48,6 +50,31 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
         paged.hasMore &&
         !paged.isLoadingMore) {
       ref.read(_providerFor(categoryId).notifier).loadMore();
+    }
+  }
+
+  Future<void> _setLive(String itemId, String videoUrl) async {
+    AppHaptics.impact();
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n?.setWallpaperLivePreparing ?? 'Preparing…'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    try {
+      await ref.read(wallpaperServiceProvider).setLiveWallpaper(videoUrl);
+    } catch (e, st) {
+      await ErrorReporter.instance.record(e, st, reason: 'wallpaper.setLive');
+      AppHaptics.error();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n?.wallpaperSetFailed ?? 'Could not set wallpaper.',
+          ),
+        ),
+      );
     }
   }
 
@@ -101,15 +128,27 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
                   onPageChanged: (i) => _onPageChanged(i, paged, categoryId),
                   itemBuilder: (context, i) {
                     final item = paged.items[i];
-                    final url = item.mediaUrl ?? item.thumbUrl;
+                    final isLive = item.wallpaper?.kind == 'live';
+                    final videoUrl = item.wallpaper?.videoUrl;
+                    final posterUrl = item.mediaUrl ?? item.thumbUrl;
+
+                    if (isLive && videoUrl != null) {
+                      return _LiveWallpaperPage(
+                        videoUrl: videoUrl,
+                        posterUrl: posterUrl,
+                        onSet: () => _setLive(item.id, videoUrl),
+                        setLabel: l10n?.setWallpaperLive ?? 'Set live wallpaper',
+                      );
+                    }
+
                     return _WallpaperPage(
-                      imageUrl: url,
-                      onSet: url == null
+                      imageUrl: posterUrl,
+                      onSet: posterUrl == null
                           ? null
                           : () => showSetWallpaperSheet(
                                 context: context,
                                 ref: ref,
-                                imageUrl: url,
+                                imageUrl: posterUrl,
                                 itemId: item.id,
                               ),
                       setLabel: l10n?.setWallpaperTitle ?? 'Set wallpaper',
@@ -240,6 +279,152 @@ class _DarkChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A full-bleed LIVE wallpaper page: loops the video (muted), showing the
+/// poster image until the first frame is ready, with a "Set live wallpaper"
+/// button and a LIVE badge.
+class _LiveWallpaperPage extends StatefulWidget {
+  const _LiveWallpaperPage({
+    required this.videoUrl,
+    required this.posterUrl,
+    required this.onSet,
+    required this.setLabel,
+  });
+
+  final String videoUrl;
+  final String? posterUrl;
+  final VoidCallback onSet;
+  final String setLabel;
+
+  @override
+  State<_LiveWallpaperPage> createState() => _LiveWallpaperPageState();
+}
+
+class _LiveWallpaperPageState extends State<_LiveWallpaperPage> {
+  VideoPlayerController? _controller;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final c = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    _controller = c;
+    c.initialize().then((_) {
+      if (!mounted) return;
+      c
+        ..setVolume(0)
+        ..setLooping(true)
+        ..play();
+      setState(() => _ready = true);
+    }).catchError((_) {
+      // Leave the poster showing if the video can't load.
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Poster underneath until the video is ready.
+        if (widget.posterUrl != null)
+          CachedNetworkImage(
+            imageUrl: widget.posterUrl!,
+            fit: BoxFit.cover,
+            errorWidget: (_, __, ___) =>
+                const ColoredBox(color: Colors.black),
+          )
+        else
+          const ColoredBox(color: Colors.black),
+        if (_ready && controller != null)
+          FittedBox(
+            fit: BoxFit.cover,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              width: controller.value.size.width,
+              height: controller.value.size.height,
+              child: VideoPlayer(controller),
+            ),
+          ),
+        // LIVE badge (top-right).
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.bolt, color: Colors.white, size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      'LIVE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 200,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black54],
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: widget.onSet,
+                  icon: const Icon(Icons.bolt),
+                  label: Text(widget.setLabel),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

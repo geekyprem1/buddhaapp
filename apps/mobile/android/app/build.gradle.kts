@@ -103,3 +103,8 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // ExoPlayer (media3) — powers the video live wallpaper service.
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+}

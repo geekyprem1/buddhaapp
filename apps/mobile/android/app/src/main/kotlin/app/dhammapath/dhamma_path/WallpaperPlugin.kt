@@ -3,6 +3,7 @@ package app.dhammapath.dhamma_path
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -73,6 +74,19 @@ class WallpaperPlugin(private val activity: Activity) : MethodChannel.MethodCall
                     result.success(true)
                 } catch (e: Exception) {
                     result.error("share_failed", e.message, null)
+                }
+            }
+            "setLiveWallpaper" -> {
+                val path = call.argument<String>("path")
+                if (path.isNullOrEmpty()) {
+                    result.error("bad_args", "path is required", null)
+                    return
+                }
+                try {
+                    setLiveWallpaper(path)
+                    result.success(true)
+                } catch (e: Exception) {
+                    result.error("live_failed", e.message, null)
                 }
             }
             else -> result.notImplemented()
@@ -187,5 +201,40 @@ class WallpaperPlugin(private val activity: Activity) : MethodChannel.MethodCall
         "webp" -> "image/webp"
         "jpg", "jpeg" -> "image/jpeg"
         else -> "image/jpeg"
+    }
+
+    /**
+     * Copies the cached mp4 into the app's private filesDir (so
+     * [VideoWallpaperService] can read it even after the app is backgrounded)
+     * and opens the system live-wallpaper picker pre-selecting our service.
+     * The user confirms "Set wallpaper" in that system UI.
+     */
+    private fun setLiveWallpaper(path: String) {
+        val source = File(path)
+        val dest = File(activity.filesDir, VideoWallpaperService.WALLPAPER_FILE)
+        FileInputStream(source).use { input ->
+            FileOutputStream(dest).use { input.copyTo(it) }
+        }
+        // Persist the path so the service reads the latest video.
+        activity
+            .getSharedPreferences(VideoWallpaperService.PREFS, Activity.MODE_PRIVATE)
+            .edit()
+            .putString(VideoWallpaperService.KEY_PATH, dest.absolutePath)
+            .apply()
+
+        val component = ComponentName(activity, VideoWallpaperService::class.java)
+        try {
+            val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+                putExtra(
+                    WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                    component,
+                )
+            }
+            activity.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            // Fallback: open the generic live-wallpaper chooser.
+            val fallback = Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER)
+            activity.startActivity(fallback)
+        }
     }
 }

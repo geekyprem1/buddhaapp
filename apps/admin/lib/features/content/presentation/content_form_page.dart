@@ -67,6 +67,10 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   String? _docId;
   int? _wallpaperWidth;
   int? _wallpaperHeight;
+  // Live wallpaper (video) state.
+  bool _isLive = false;
+  String? _videoUrl;
+  String? _posterUrl;
   bool _mediaDirty = false;
   int _mediaListenGen = 0;
   int? _existingDurationSec;
@@ -172,6 +176,9 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       _orientation.text = item.wallpaper!.orientation;
       _wallpaperWidth = item.wallpaper!.width;
       _wallpaperHeight = item.wallpaper!.height;
+      _isLive = item.wallpaper!.kind == 'live';
+      _videoUrl = item.wallpaper!.videoUrl;
+      _posterUrl = item.wallpaper!.posterUrl;
     }
     final status = item.statusMeta;
     if (status != null) {
@@ -229,10 +236,16 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       artist: _artist.text.trim().isEmpty ? null : _artist.text.trim(),
       teacherIds: _teacherIds.toList(),
       categoryId: _categoryId,
-      mediaUrl: _mediaUrl,
-      thumbUrl: config.media == ContentMediaKind.image
-          ? (_thumbUrl ?? _mediaUrl)
-          : _thumbUrl,
+      // For a live wallpaper the poster stands in as the media/thumb so the
+      // grid + reel have a still to show while the video loads.
+      mediaUrl: (config.hasWallpaperMeta && _isLive)
+          ? (_posterUrl ?? _mediaUrl)
+          : _mediaUrl,
+      thumbUrl: (config.hasWallpaperMeta && _isLive)
+          ? (_posterUrl ?? _thumbUrl ?? _mediaUrl)
+          : (config.media == ContentMediaKind.image
+              ? (_thumbUrl ?? _mediaUrl)
+              : _thumbUrl),
       storagePath: _storagePath,
       language: config.media == ContentMediaKind.audio ? 'en' : null,
       status: _status,
@@ -248,12 +261,14 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       licence: _existingLicence,
       wallpaper: config.hasWallpaperMeta
           ? WallpaperMeta(
-              kind: 'static',
+              kind: _isLive ? 'live' : 'static',
               orientation: _orientation.text.trim().isEmpty
                   ? 'portrait'
                   : _orientation.text.trim(),
               width: _wallpaperWidth,
               height: _wallpaperHeight,
+              videoUrl: _isLive ? _videoUrl : null,
+              posterUrl: _isLive ? _posterUrl : null,
             )
           : null,
       audio: audio,
@@ -732,6 +747,59 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                 ),
                 onChanged: (_) => _markDirty(),
               ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text(AdminStrings.liveWallpaper),
+                value: _isLive,
+                onChanged: canEdit
+                    ? (v) => setState(() {
+                          _isLive = v;
+                          _dirty = true;
+                        })
+                    : null,
+              ),
+              if (_isLive) ...[
+                if (id == 'pending' || _ensureId().isEmpty) ...[
+                  Text(
+                    AdminStrings.liveWallpaperUploadIdRequired,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                UploadField(
+                  label: AdminStrings.liveWallpaperVideo,
+                  valueUrl: _videoUrl,
+                  allowedExtensions: FieldValidators.allowedVideoExtensions,
+                  maxBytes: FieldValidators.maxImageBytes, // 8 MB cap
+                  enabled: canEdit,
+                  onBeforeUpload: _ensureDraftExists,
+                  storagePathBuilder: (ext) => StoragePaths.contentVideo(
+                    config.collection,
+                    _ensureId(),
+                    ext,
+                  ),
+                  onUploaded: (url) => setState(() {
+                    _videoUrl = url;
+                    _dirty = true;
+                  }),
+                ),
+                const SizedBox(height: 16),
+                UploadField(
+                  label: AdminStrings.liveWallpaperPoster,
+                  valueUrl: _posterUrl,
+                  enabled: canEdit,
+                  onBeforeUpload: _ensureDraftExists,
+                  storagePathBuilder: (ext) =>
+                      StoragePaths.contentThumb(config.collection, _ensureId()),
+                  onUploaded: (url) => setState(() {
+                    _posterUrl = url;
+                    _dirty = true;
+                  }),
+                ),
+              ],
             ],
             if (config.hasPrarthanaExtras) ...[
               const SizedBox(height: 16),

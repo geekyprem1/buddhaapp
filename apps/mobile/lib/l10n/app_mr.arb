@@ -158,6 +158,8 @@
   "notifPermissionAllow": "परवानगी द्या",
 
   "setWallpaperTitle": "वॉलपेपर सेट करा",
+  "setWallpaperLive": "लाइव्ह वॉलपेपर सेट करा",
+  "setWallpaperLivePreparing": "लाइव्ह वॉलपेपर तयार होत आहे…",
   "setWallpaperHome": "होम स्क्रीन",
   "setWallpaperLock": "लॉक स्क्रीन",
   "setWallpaperBoth": "होम आणि लॉक",

@@ -158,6 +158,8 @@
   "notifPermissionAllow": "Allow",
 
   "setWallpaperTitle": "Set wallpaper",
+  "setWallpaperLive": "Set live wallpaper",
+  "setWallpaperLivePreparing": "Preparing live wallpaper…",
   "setWallpaperHome": "Home screen",
   "setWallpaperLock": "Lock screen",
   "setWallpaperBoth": "Home and lock",

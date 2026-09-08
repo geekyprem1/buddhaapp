@@ -11,14 +11,26 @@ part 'content_type_metas.g.dart';
 @freezed
 class WallpaperMeta with _$WallpaperMeta {
   const factory WallpaperMeta({
+    /// `static` | `live`. Live wallpapers carry [videoUrl] (+ [posterUrl]).
     @Default('static') String kind,
     int? width,
     int? height,
     @Default('portrait') String orientation,
+
+    /// Live wallpaper only: the mp4 to loop as the device wallpaper.
+    String? videoUrl,
+
+    /// Live wallpaper only: a still image shown while the video loads (and
+    /// used as the grid/reel poster).
+    String? posterUrl,
   }) = _WallpaperMeta;
 
   factory WallpaperMeta.fromJson(Map<String, dynamic> json) =>
       _$WallpaperMetaFromJson(json);
+}
+
+extension WallpaperMetaX on WallpaperMeta {
+  bool get isLive => kind == 'live';
 }
 
 /// Type-specific metadata shared by ringtones, songs and meditations.
