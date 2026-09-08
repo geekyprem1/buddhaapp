@@ -17,6 +17,7 @@ export { guardOtpAbuse } from "./auth/guardOtpAbuse";
 
 // Content pipeline (M1)
 export { onMediaUpload } from "./media/onMediaUpload";
+export { onWallpaperVideoUpload } from "./media/onWallpaperVideoUpload";
 export {
   onWallpaperWrite,
   onRingtoneWrite,

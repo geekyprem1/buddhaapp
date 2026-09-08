@@ -317,6 +317,32 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     }
   }
 
+  /// After a live-wallpaper video uploads, the `onWallpaperVideoUpload`
+  /// Function generates a poster + thumbnail from the first frame. Poll for it
+  /// so the form picks up the generated still (and the save doesn't clobber it).
+  Future<void> _listenForProcessedVideo() async {
+    final gen = ++_mediaListenGen;
+    final id = _docId;
+    if (id == null) return;
+    final repo = ref.read(contentRepositoryProvider(config.collection));
+    for (var i = 0; i < 20; i++) {
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted || gen != _mediaListenGen) return;
+      final latest = await repo.getById(id);
+      final poster = latest?.wallpaper?.posterUrl;
+      if (poster == null || poster.isEmpty) continue;
+      setState(() {
+        _posterUrl = poster;
+        _mediaUrl = latest?.mediaUrl ?? _mediaUrl;
+        _thumbUrl = latest?.thumbUrl ?? _thumbUrl;
+        _videoUrl = latest?.wallpaper?.videoUrl ?? _videoUrl;
+        _wallpaperWidth = latest?.wallpaper?.width ?? _wallpaperWidth;
+        _wallpaperHeight = latest?.wallpaper?.height ?? _wallpaperHeight;
+      });
+      return;
+    }
+  }
+
   Future<void> _back() async {
     if (_dirty && !await UnsavedChangesGuard.confirmLeave(context)) return;
     if (mounted) context.go(config.route);
@@ -781,10 +807,15 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
                     _ensureId(),
                     ext,
                   ),
-                  onUploaded: (url) => setState(() {
-                    _videoUrl = url;
-                    _dirty = true;
-                  }),
+                  onUploaded: (url) {
+                    setState(() {
+                      _videoUrl = url;
+                      _dirty = true;
+                    });
+                    // The Function auto-generates the poster/thumbnail from
+                    // the first frame — poll for it.
+                    _listenForProcessedVideo();
+                  },
                 ),
                 const SizedBox(height: 16),
                 UploadField(

@@ -21,9 +21,9 @@ List<Widget> moduleSectionSlivers(
   required bool last,
 }) {
   final padding = EdgeInsets.fromLTRB(
-    AppSpacing.lg,
+    AppSpacing.md,
     first ? AppSpacing.lg : 0,
-    AppSpacing.lg,
+    AppSpacing.md,
     last ? AppSpacing.lg : AppSpacing.sm,
   );
   if (section.wide) {
@@ -175,15 +175,17 @@ class ModuleTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.card),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xs,
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.sm,
+            AppSpacing.xs,
+            AppSpacing.xs,
+            AppSpacing.xs,
           ),
           child: Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -195,32 +197,46 @@ class ModuleTile extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(AppRadius.button),
                 ),
-                child: Icon(icon, size: 22, color: AppColors.primary),
+                child: Icon(icon, size: 20, color: AppColors.primary),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: 6),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      label,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
-                          ),
+                    // Single-line, auto-shrink to fit any width / font scale so
+                    // short labels ("Wallpapers", "Meditation") never break
+                    // mid-word on narrow phones.
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.visible,
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    height: 1.15,
+                                  ),
+                        ),
+                      ),
                     ),
                     if (subtitle != null) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         subtitle!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColors.textSecondary,
+                              fontSize: 11,
                               height: 1.1,
                             ),
                       ),
@@ -230,7 +246,7 @@ class ModuleTile extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                size: 18,
+                size: 16,
                 color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
             ],

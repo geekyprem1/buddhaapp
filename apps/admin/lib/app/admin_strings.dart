@@ -110,7 +110,8 @@ abstract class AdminStrings {
   static const orientationField = 'Orientation';
   static const liveWallpaper = 'Live wallpaper (video)';
   static const liveWallpaperVideo = 'Wallpaper video (mp4)';
-  static const liveWallpaperPoster = 'Poster image (shown while loading)';
+  static const liveWallpaperPoster =
+      'Poster image (optional — auto-generated from the video)';
   static const liveWallpaperUploadIdRequired =
       'Set a title or id before uploading the video.';
   static const recommendedTimeField = 'Recommended time (HH:MM)';
