@@ -19,6 +19,13 @@ abstract class StoragePaths {
   static String wisdomImage(String wisdomId, [String ext = 'webp']) =>
       'wisdoms/$wisdomId/image.$ext';
 
+  static String placeThumb(String placeId, [String ext = 'webp']) =>
+      'places/$placeId/thumb.$ext';
+
+  /// A gallery image for a place. [index] keeps each upload at a distinct key.
+  static String placeImage(String placeId, int index, [String ext = 'webp']) =>
+      'places/$placeId/image_$index.$ext';
+
   static String contentOriginal(String collection, String itemId, String ext) =>
       '$collection/$itemId/original.$ext';
   static String contentFull(String collection, String itemId) =>

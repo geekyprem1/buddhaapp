@@ -32,7 +32,7 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     final days = _service.monthGrid(_displayedMonth);
     final monthEvents = _service.observancesBetween(days.first, days.last);
     final selectedEvents = _service.onDate(_selectedDate, monthEvents);
-    final upcoming = _service.upcoming(today);
+    final thisMonthEvents = _service.thisMonth(_displayedMonth);
 
     return Scaffold(
       appBar: AppBar(
@@ -78,30 +78,42 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
               ),
             )
           else
-            for (final event in selectedEvents)
-              _observanceCard(context, l10n, event),
+            for (final event in selectedEvents) _observanceCard(context, event),
           const SizedBox(height: AppSpacing.xl),
           Text(
-            l10n?.calendarUpcoming ?? 'Upcoming observances',
+            l10n?.calendarThisMonth ?? 'This month',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: AppSpacing.sm),
-          Card(
-            child: Column(
-              children: [
-                for (var i = 0; i < upcoming.length; i++) ...[
-                  _upcomingTile(context, l10n, upcoming[i]),
-                  if (i < upcoming.length - 1) const Divider(height: 1),
+          if (thisMonthEvents.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Text(
+                  l10n?.calendarNoObservance ??
+                      'No marked observance this month.',
+                ),
+              ),
+            )
+          else
+            Card(
+              child: Column(
+                children: [
+                  for (var i = 0; i < thisMonthEvents.length; i++) ...[
+                    _thisMonthTile(context, thisMonthEvents[i]),
+                    if (i < thisMonthEvents.length - 1) const Divider(height: 1),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
           const SizedBox(height: AppSpacing.lg),
           _noticeCard(context, l10n),
         ],
       ),
     );
   }
+
+  // ─── Month grid ───
 
   Widget _monthCard(
     BuildContext context,
@@ -111,11 +123,7 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     DateTime today,
   ) {
     final material = MaterialLocalizations.of(context);
-    // Build a Monday-first header that is guaranteed to match the Monday-first
-    // grid from BuddhistCalendarService.monthGrid, regardless of the locale's
-    // firstDayOfWeek. `narrowWeekdays` is always Sunday-indexed (0 = Sunday),
-    // so we pick indices Mon..Sun explicitly instead of relying on skip/reorder.
-    const mondayFirstIndices = [1, 2, 3, 4, 5, 6, 0]; // Mon,Tue,...,Sat,Sun
+    const mondayFirstIndices = [1, 2, 3, 4, 5, 6, 0];
     final narrow = material.narrowWeekdays;
     final weekdays = [for (final i in mondayFirstIndices) narrow[i]];
     return Card(
@@ -180,8 +188,8 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     final isSelected = BuddhistCalendarService.isSameDate(day, _selectedDate);
     final isToday = BuddhistCalendarService.isSameDate(day, today);
     final isOutside = day.month != _displayedMonth.month;
-    final hasFestival = dayEvents.any((event) => event.isFestival);
-    final hasUposatha = dayEvents.any((event) => !event.isFestival);
+    final hasSpecial = dayEvents.any((e) => e.hasSpecialEvents);
+    final hasUposath = dayEvents.isNotEmpty;
     final selectedColor = Theme.of(context).colorScheme.primary;
 
     return Semantics(
@@ -226,15 +234,10 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (hasUposatha)
-                    _marker(
-                      isSelected ? Colors.white : AppColors.primary,
-                    ),
-                  if (hasUposatha && hasFestival) const SizedBox(width: 2),
-                  if (hasFestival)
-                    _marker(
-                      isSelected ? Colors.white : Colors.amber.shade700,
-                    ),
+                  if (hasUposath && !hasSpecial)
+                    _marker(isSelected ? Colors.white : AppColors.primary),
+                  if (hasSpecial)
+                    _marker(isSelected ? Colors.white : Colors.amber.shade700),
                 ],
               ),
             ],
@@ -249,6 +252,8 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
         height: 5,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       );
+
+  // ─── Legend ───
 
   Widget _legend(BuildContext context, AppLocalizations? l10n) {
     return Wrap(
@@ -280,22 +285,26 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     );
   }
 
-  Widget _observanceCard(
-    BuildContext context,
-    AppLocalizations? l10n,
-    BuddhistObservance event,
-  ) {
-    final description = event.description;
+  // ─── Selected date event card ───
+
+  Widget _observanceCard(BuildContext context, BuddhistObservance event) {
+    final special = event.specialEvents;
     return Card(
+      color: event.hasSpecialEvents
+          ? Colors.amber.shade700.withValues(alpha: 0.08)
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
-              event.isFestival ? Icons.celebration_outlined : Icons.nightlight,
-              color:
-                  event.isFestival ? Colors.amber.shade700 : AppColors.primary,
+              event.hasSpecialEvents
+                  ? Icons.celebration_outlined
+                  : Icons.nightlight,
+              color: event.hasSpecialEvents
+                  ? Colors.amber.shade700
+                  : AppColors.primary,
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -303,16 +312,30 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _eventTitle(l10n, event),
-                    style: Theme.of(context).textTheme.titleMedium,
+                    event.title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
-                  if (description != null && description.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(description),
+                  if (special != null && special.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    for (var i = 0; i < special.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                        child: Text('${i + 1}. ${special[i]}'),
+                      ),
                   ],
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    event.uposathDescription,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                  ),
                   if (event.isEstimated) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    _estimatedBadge(l10n),
+                    _estimatedBadge(),
                   ],
                 ],
               ),
@@ -323,50 +346,53 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
     );
   }
 
-  Widget _upcomingTile(
-    BuildContext context,
-    AppLocalizations? l10n,
-    BuddhistObservance event,
-  ) {
+  // ─── This month list ───
+
+  Widget _thisMonthTile(BuildContext context, BuddhistObservance event) {
     return ListTile(
       leading: Container(
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: (event.isFestival ? Colors.amber : AppColors.primary)
+          color: (event.hasSpecialEvents ? Colors.amber : AppColors.primary)
               .withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(
-          event.isFestival ? Icons.celebration_outlined : Icons.nightlight,
-          color: event.isFestival ? Colors.amber.shade700 : AppColors.primary,
+          event.hasSpecialEvents
+              ? Icons.celebration_outlined
+              : Icons.nightlight,
+          color: event.hasSpecialEvents
+              ? Colors.amber.shade700
+              : AppColors.primary,
         ),
       ),
-      title: Text(_eventTitle(l10n, event)),
+      title: Text(event.title),
       subtitle: Text(
         MaterialLocalizations.of(context).formatFullDate(event.date),
       ),
-      trailing: event.isEstimated ? _estimatedBadge(l10n) : null,
+      trailing: event.isEstimated ? _estimatedBadge() : null,
       onTap: () {
         AppHaptics.tap();
         setState(() {
           _selectedDate = event.date;
-          _displayedMonth = DateTime(event.date.year, event.date.month);
         });
       },
     );
   }
 
-  Widget _estimatedBadge(AppLocalizations? l10n) {
+  // ─── Notice + badge ───
+
+  Widget _estimatedBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.chip),
       ),
-      child: Text(
-        l10n?.calendarEstimated ?? 'Estimated',
-        style: const TextStyle(
+      child: const Text(
+        'Estimated',
+        style: TextStyle(
           color: AppColors.primary,
           fontSize: 10,
           fontWeight: FontWeight.w700,
@@ -406,25 +432,6 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
         ),
       ),
     );
-  }
-
-  /// Named full-moon events show their own title; plain uposath days show the
-  /// moon-phase label + "Uposatha".
-  String _eventTitle(AppLocalizations? l10n, BuddhistObservance event) {
-    final title = event.title;
-    if (title != null && title.isNotEmpty) return title;
-    final uposatha = l10n?.calendarUposatha ?? 'Uposatha';
-    return switch (event.kind) {
-      BuddhistObservanceKind.uposathaNewMoon =>
-        '${l10n?.calendarNewMoon ?? 'New Moon'} · $uposatha',
-      BuddhistObservanceKind.uposathaFirstQuarter =>
-        '${l10n?.calendarFirstQuarter ?? 'First Quarter'} · $uposatha',
-      BuddhistObservanceKind.uposathaFullMoon =>
-        '${l10n?.calendarFullMoon ?? 'Full Moon'} · $uposatha',
-      BuddhistObservanceKind.uposathaLastQuarter =>
-        '${l10n?.calendarLastQuarter ?? 'Last Quarter'} · $uposatha',
-      BuddhistObservanceKind.fullMoonEvent => uposatha,
-    };
   }
 
   void _changeMonth(int offset) {

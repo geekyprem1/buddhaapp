@@ -12,6 +12,7 @@ abstract class AdminRoutes {
   static const categories = '/categories';
   static const wisdom = '/wisdom';
   static const videos = '/videos';
+  static const places = '/places';
   static const wallpapers = '/content/wallpapers';
   static const ringtones = '/content/ringtones';
   static const songs = '/content/songs';
@@ -65,6 +66,11 @@ const adminDestinations = <AdminDestination>[
   AdminDestination(
     path: AdminRoutes.videos,
     label: 'Videos',
+    allowed: AdminRole.canEditContent,
+  ),
+  AdminDestination(
+    path: AdminRoutes.places,
+    label: 'Buddhist Places',
     allowed: AdminRole.canEditContent,
   ),
   AdminDestination(

@@ -155,6 +155,10 @@
       { "fieldPath": "isActive", "order": "ASCENDING" },
       { "fieldPath": "sortOrder", "order": "ASCENDING" }
     ]},
+    { "collectionGroup": "places", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "isActive", "order": "ASCENDING" },
+      { "fieldPath": "sortOrder", "order": "ASCENDING" }
+    ]},
 
     { "collectionGroup": "auditLogs", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "entityType", "order": "ASCENDING" },

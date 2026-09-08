@@ -53,15 +53,19 @@ class PrarthanaListScreen extends ConsumerWidget {
               }
             }());
           }
-          if (items.isEmpty) {
-            return EmptyState(
-              message: l10n?.prarthanaEmpty ??
-                  'No prarthana set yet. Tap Add to schedule one.',
-            );
-          }
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
+              _MeditationTimerCard(l10n: l10n),
+              const SizedBox(height: AppSpacing.md),
+              if (items.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xl),
+                  child: EmptyState(
+                    message: l10n?.prarthanaEmpty ??
+                        'No prarthana set yet. Tap Add to schedule one.',
+                  ),
+                ),
               for (final alarm in items)
                 _AlarmCard(alarm: alarm),
               if (kDebugMode && items.isNotEmpty) ...[
@@ -103,6 +107,81 @@ class PrarthanaListScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Entry point to the guided meditation timer (pick a track + duration, then
+/// play with a countdown). Sits at the top of the Daily Practice list.
+class _MeditationTimerCard extends StatelessWidget {
+  const _MeditationTimerCard({required this.l10n});
+
+  final AppLocalizations? l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        onTap: () {
+          AppHaptics.tap();
+          context.push(AppRoutes.meditationTimer);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primary.withValues(alpha: 0.14),
+                      AppColors.accent.withValues(alpha: 0.14),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                ),
+                child: const Icon(
+                  Icons.self_improvement,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n?.meditationTimerTitle ?? 'Start Meditation',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n?.meditationTimerSubtitle ??
+                          'Pick a track and meditate for a set time',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
       ),
     );
   }

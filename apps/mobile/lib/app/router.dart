@@ -10,9 +10,13 @@ import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart
 import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/explore/presentation/explore_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/places/presentation/place_detail_screen.dart';
+import '../features/places/presentation/places_list_screen.dart';
+import '../features/tipitaka/presentation/tipitaka_screen.dart';
 import '../features/video/presentation/video_list_screen.dart';
 import '../features/video/presentation/video_player_screen.dart';
 import '../features/meditation/presentation/meditation_list_screen.dart';
+import '../features/meditation/presentation/meditation_timer_screen.dart';
 import '../features/onboarding/presentation/language_screen.dart';
 import '../features/onboarding/presentation/person_info_screen.dart';
 import '../features/onboarding/presentation/teacher_select_screen.dart';
@@ -59,6 +63,9 @@ abstract class AppRoutes {
   static const explore = '/explore';
   static const videos = '/videos';
   static const videoPlayer = '/videos/play';
+  static const tipitaka = '/tipitaka';
+  static const places = '/places';
+  static const placeDetail = '/places/view';
   static const wisdomDetail = '/wisdom';
   static const buddhistCalendar = '/buddhist-calendar';
   static const wallpapers = '/wallpapers';
@@ -68,6 +75,7 @@ abstract class AppRoutes {
   static const vandanas = '/vandana';
   static const chantings = '/chanting';
   static const meditations = '/meditations';
+  static const meditationTimer = '/meditation-timer';
   static const player = '/player';
   static const wallpaperDetail = '/wallpapers/view';
   static const prarthana = '/prarthana';
@@ -306,6 +314,26 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) => const VideoListScreen(),
       ),
       GoRoute(
+        path: AppRoutes.tipitaka,
+        builder: (context, state) => const TipitakaScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.places,
+        builder: (context, state) => const PlacesListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.placeDetail,
+        builder: (context, state) {
+          final place = state.extra as BuddhistPlace?;
+          if (place == null) {
+            return const Scaffold(
+              body: Center(child: Text('Place not found.')),
+            );
+          }
+          return PlaceDetailScreen(place: place);
+        },
+      ),
+      GoRoute(
         path: AppRoutes.videoPlayer,
         builder: (context, state) {
           final video = state.extra as Video?;
@@ -324,6 +352,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.meditations,
         builder: (context, state) => const MeditationListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.meditationTimer,
+        builder: (context, state) => const MeditationTimerScreen(),
       ),
       GoRoute(
         path: AppRoutes.player,

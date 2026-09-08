@@ -7,6 +7,7 @@ import '../constants/firestore_collections.dart';
 import '../models/app_user.dart';
 import '../models/category.dart';
 import '../models/content_item.dart';
+import '../models/buddhist_place.dart';
 import '../models/teacher.dart';
 import '../models/video.dart';
 import '../models/wisdom.dart';
@@ -21,6 +22,7 @@ import '../repositories/notification_repository.dart';
 import '../repositories/progress_repository.dart';
 import '../repositories/static_page_repository.dart';
 import '../repositories/teacher_repository.dart';
+import '../repositories/place_repository.dart';
 import '../repositories/user_repository.dart';
 import '../repositories/video_repository.dart';
 import '../repositories/wisdom_repository.dart';
@@ -57,6 +59,9 @@ WisdomRepository wisdomRepository(Ref ref) => WisdomRepository();
 
 @Riverpod(keepAlive: true)
 VideoRepository videoRepository(Ref ref) => VideoRepository();
+
+@Riverpod(keepAlive: true)
+PlaceRepository placeRepository(Ref ref) => PlaceRepository();
 
 @Riverpod(keepAlive: true)
 CategoryRepository categoryRepository(Ref ref) => CategoryRepository();
@@ -130,6 +135,12 @@ Stream<List<Wisdom>> activeWisdoms(Ref ref) {
 @riverpod
 Stream<List<Video>> activeVideos(Ref ref) {
   return ref.watch(videoRepositoryProvider).watchActiveVideos();
+}
+
+/// Active Buddhist places ordered by `sortOrder`, for the app's Places grid.
+@riverpod
+Stream<List<BuddhistPlace>> activePlaces(Ref ref) {
+  return ref.watch(placeRepositoryProvider).watchActivePlaces();
 }
 
 /// Active categories for one content module, ordered by `sortOrder`.

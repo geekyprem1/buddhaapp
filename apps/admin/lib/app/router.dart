@@ -23,6 +23,8 @@ import '../features/notifications/presentation/notifications_list_page.dart';
 import '../features/pages/presentation/page_editor_page.dart';
 import '../features/pages/presentation/pages_list_page.dart';
 import '../features/users/presentation/users_list_page.dart';
+import '../features/place/presentation/place_form_page.dart';
+import '../features/place/presentation/place_list_page.dart';
 import '../features/video/presentation/video_form_page.dart';
 import '../features/video/presentation/video_list_page.dart';
 import '../features/wisdom/presentation/wisdom_form_page.dart';
@@ -147,6 +149,22 @@ GoRouter adminRouter(Ref ref) {
                 path: ':id',
                 builder: (context, state) => VideoFormPage(
                   videoId: state.pathParameters['id'],
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: AdminRoutes.places,
+            builder: (context, state) => const PlaceListPage(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const PlaceFormPage(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => PlaceFormPage(
+                  placeId: state.pathParameters['id'],
                 ),
               ),
             ],

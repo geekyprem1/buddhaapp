@@ -124,6 +124,13 @@ abstract class AdminStrings {
       'Paste a YouTube link (e.g. https://youtu.be/xxxxxxxxxxx)';
   static const videoUrlInvalid = 'Enter a valid YouTube URL.';
   static const videoPreview = 'Thumbnail preview';
+  static const places = 'Buddhist Places';
+  static const placeDescription = 'Description';
+  static const placeThumbnail = 'Thumbnail';
+  static const placeGallery = 'Gallery images';
+  static const placeAddImage = 'Add image';
+  static const placeUploadIdRequired =
+      'Set a title or id before uploading images.';
   static const teacherUploadIdRequired =
       'Set an English name or id before uploading files.';
   static const portrait = 'Portrait';

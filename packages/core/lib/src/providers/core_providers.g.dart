@@ -142,6 +142,23 @@ final videoRepositoryProvider = Provider<VideoRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef VideoRepositoryRef = ProviderRef<VideoRepository>;
+String _$placeRepositoryHash() => r'13e7450a99783b56026a028babc8328921a5d36f';
+
+/// See also [placeRepository].
+@ProviderFor(placeRepository)
+final placeRepositoryProvider = Provider<PlaceRepository>.internal(
+  placeRepository,
+  name: r'placeRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$placeRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PlaceRepositoryRef = ProviderRef<PlaceRepository>;
 String _$categoryRepositoryHash() =>
     r'456a5ad6317a837626b1ef88e128af8350acdc1f';
 
@@ -584,6 +601,25 @@ final activeVideosProvider = AutoDisposeStreamProvider<List<Video>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveVideosRef = AutoDisposeStreamProviderRef<List<Video>>;
+String _$activePlacesHash() => r'f0194e9f19354691c2fe038e48e557473f4abe24';
+
+/// Active Buddhist places ordered by `sortOrder`, for the app's Places grid.
+///
+/// Copied from [activePlaces].
+@ProviderFor(activePlaces)
+final activePlacesProvider =
+    AutoDisposeStreamProvider<List<BuddhistPlace>>.internal(
+  activePlaces,
+  name: r'activePlacesProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$activePlacesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ActivePlacesRef = AutoDisposeStreamProviderRef<List<BuddhistPlace>>;
 String _$activeCategoriesHash() => r'ee1a0dfeb2bb582079681167f0b8e17a35e8a4d5';
 
 /// Active categories for one content module, ordered by `sortOrder`.

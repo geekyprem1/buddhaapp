@@ -310,6 +310,78 @@ abstract class AppLocalizations {
   /// **'Daily Practice'**
   String get homeDailyPrarthana;
 
+  /// No description provided for @meditationTimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Meditation'**
+  String get meditationTimerTitle;
+
+  /// No description provided for @meditationTimerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a track and meditate for a set time'**
+  String get meditationTimerSubtitle;
+
+  /// No description provided for @meditationTimerTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditation'**
+  String get meditationTimerTrack;
+
+  /// No description provided for @meditationTimerNoTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'No meditation selected'**
+  String get meditationTimerNoTrack;
+
+  /// No description provided for @meditationTimerNeedTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a meditation first.'**
+  String get meditationTimerNeedTrack;
+
+  /// No description provided for @meditationTimerDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get meditationTimerDuration;
+
+  /// No description provided for @meditationTimerStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get meditationTimerStart;
+
+  /// No description provided for @meditationTimerStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get meditationTimerStop;
+
+  /// No description provided for @meditationTimerReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get meditationTimerReady;
+
+  /// No description provided for @meditationTimerRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditating…'**
+  String get meditationTimerRunning;
+
+  /// No description provided for @meditationTimerDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditation complete. 🙏'**
+  String get meditationTimerDone;
+
+  /// No description provided for @meditationTimerMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String meditationTimerMinutes(int count);
+
   /// No description provided for @homeShareApp.
   ///
   /// In en, this message translates to:
@@ -453,6 +525,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upcoming observances'**
   String get calendarUpcoming;
+
+  /// No description provided for @calendarThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get calendarThisMonth;
 
   /// No description provided for @calendarUposatha.
   ///
@@ -699,6 +777,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sacred sites'**
   String get homeBuddhistPlacesSubtitle;
+
+  /// No description provided for @placesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No places yet.'**
+  String get placesEmpty;
 
   /// No description provided for @featureComingSoonBody.
   ///

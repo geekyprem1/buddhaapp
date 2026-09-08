@@ -115,6 +115,45 @@ class AppLocalizationsMr extends AppLocalizations {
   String get homeDailyPrarthana => 'दैनिक सराव';
 
   @override
+  String get meditationTimerTitle => 'ध्यान सुरू करा';
+
+  @override
+  String get meditationTimerSubtitle =>
+      'एक ट्रॅक निवडा आणि ठरलेल्या वेळेपर्यंत ध्यान करा';
+
+  @override
+  String get meditationTimerTrack => 'ध्यान';
+
+  @override
+  String get meditationTimerNoTrack => 'कोणतेही ध्यान निवडलेले नाही';
+
+  @override
+  String get meditationTimerNeedTrack => 'आधी एक ध्यान निवडा.';
+
+  @override
+  String get meditationTimerDuration => 'कालावधी';
+
+  @override
+  String get meditationTimerStart => 'सुरू करा';
+
+  @override
+  String get meditationTimerStop => 'थांबवा';
+
+  @override
+  String get meditationTimerReady => 'तयार';
+
+  @override
+  String get meditationTimerRunning => 'ध्यान सुरू…';
+
+  @override
+  String get meditationTimerDone => 'ध्यान पूर्ण. 🙏';
+
+  @override
+  String meditationTimerMinutes(int count) {
+    return '$count मिनिटे';
+  }
+
+  @override
   String get homeShareApp => 'अॅप शेअर करा';
 
   @override
@@ -186,6 +225,9 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get calendarUpcoming => 'आगामी उत्सव आणि उपोसथ';
+
+  @override
+  String get calendarThisMonth => 'या महिन्यात';
 
   @override
   String get calendarUposatha => 'उपोसथ';
@@ -318,6 +360,9 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get homeBuddhistPlacesSubtitle => 'पवित्र स्थळे';
+
+  @override
+  String get placesEmpty => 'अजून कोणतेही स्थळ नाही.';
 
   @override
   String get featureComingSoonBody =>

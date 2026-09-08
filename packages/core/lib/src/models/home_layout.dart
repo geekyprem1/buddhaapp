@@ -38,9 +38,7 @@ abstract class HomeModuleIds {
 
   static const comingSoon = <String>{
     dailyPaliWord,
-    tipitaka,
     dana,
-    buddhistPlaces,
   };
 
   static bool isKnown(String id) => all.contains(id);

@@ -1,46 +1,63 @@
 // Buddhist calendar data — Uposath dates and important observances.
 //
-// Source of truth: docs/important_buddhist_uposath_dates_2026_2030.md
-// (2026 BuddhaRashmi Uposath list + full-moon events; 2027–2030 uposath
-// dates from astronomical lunar-phase projection). All dates below are
-// transcribed directly from that file — do NOT recompute them from lunar
-// maths, because the whole point is to match the published list exactly.
+// Source of truth: docs/Notes_260904_204424.pdf (BuddhaRashmi 2026 Uposath list)
+// + docs/important_buddhist_uposath_dates_2026_2030.md (2027–2030 astronomical).
+//
+// All 2026 titles and descriptions are transcribed EXACTLY from the PDF.
+// Do NOT rename the events or add Poya/month names — PDF uses only
+// "पूर्णिमा", "कृष्ण अष्टमी", "अमावस्या", "शुक्ल अष्टमी".
 
-/// Moon phase / observance category for an Uposath day.
-enum BuddhistObservanceKind {
-  uposathaNewMoon, // अमावस्या
-  uposathaFirstQuarter, // शुक्ल अष्टमी
-  uposathaFullMoon, // पूर्णिमा
-  uposathaLastQuarter, // कृष्ण अष्टमी
-  fullMoonEvent, // A full-moon Poya day carrying a named event (2026).
+/// Moon phase category for an Uposath day.
+enum UposathPhase {
+  fullMoon, // पूर्णिमा
+  lastQuarter, // कृष्ण अष्टमी
+  newMoon, // अमावस्या
+  firstQuarter, // शुक्ल अष्टमी
 }
 
 class BuddhistObservance {
   const BuddhistObservance({
     required this.date,
-    required this.kind,
-    this.title,
-    this.description,
+    required this.phase,
+    this.specialEvents,
     this.isEstimated = false,
   });
 
   final DateTime date;
-  final BuddhistObservanceKind kind;
+  final UposathPhase phase;
 
-  /// Event name for a named full-moon Poya (e.g. "वैशाख / वेसाक पूर्णिमा").
-  /// Null for a plain Uposath day.
-  final String? title;
-
-  /// Event description for a named full-moon Poya. Null for plain Uposath.
-  final String? description;
+  /// Numbered special events for a full-moon day (e.g. the January poornima
+  /// has 3 events from the PDF). Null for plain uposath days.
+  final List<String>? specialEvents;
 
   /// True for projected (non-2026) dates that may vary by ~1 day.
   final bool isEstimated;
 
-  bool get isFestival => kind == BuddhistObservanceKind.fullMoonEvent;
-  bool get isFullMoon =>
-      kind == BuddhistObservanceKind.uposathaFullMoon ||
-      kind == BuddhistObservanceKind.fullMoonEvent;
+  bool get hasSpecialEvents =>
+      specialEvents != null && specialEvents!.isNotEmpty;
+
+  /// Display title — exactly as the PDF names each phase.
+  String get title => switch (phase) {
+        UposathPhase.fullMoon => 'पूर्णिमा',
+        UposathPhase.lastQuarter => 'कृष्ण अष्टमी',
+        UposathPhase.newMoon => 'अमावस्या',
+        UposathPhase.firstQuarter => 'शुक्ल अष्टमी',
+      };
+
+  /// The common uposath paragraph from the PDF, phrased per-phase.
+  String get uposathDescription {
+    final phase = switch (this.phase) {
+      UposathPhase.fullMoon => 'पूर्णिमा',
+      UposathPhase.lastQuarter => 'अष्टमी',
+      UposathPhase.newMoon => 'अमावस्या',
+      UposathPhase.firstQuarter => 'अष्टमी',
+    };
+    return 'भगवान बुद्ध के समय में उनके मार्ग पर चलने वाले $phase के दिन '
+        'अष्टांग उपोसथ शील धारण करते थे एवं अपने जीवन में अप्रमाण पुण्य जमा करते '
+        'थे। यह उपोसथ शील अत्यंत उत्तम एवं निर्मल है। इसे पालन करने से मन में '
+        'प्रसन्नता जागती है एवं शोक दूर होता है। अरहन्त मुनि लोगों का अनुसरण करते '
+        'हुए यह उपोसथ शील पालन किया जाता है।';
+  }
 }
 
 class BuddhistCalendarService {
@@ -49,22 +66,17 @@ class BuddhistCalendarService {
   List<BuddhistObservance> observancesBetween(DateTime start, DateTime end) {
     final from = _dateOnly(start);
     final through = _dateOnly(end);
-    final events = _allObservances
+    return _allObservances
         .where((e) => !e.date.isBefore(from) && !e.date.isAfter(through))
-        .toList();
-    events.sort((a, b) => a.date.compareTo(b.date));
-    return events;
-  }
-
-  /// Upcoming observances to highlight: named full-moon events first, and (so
-  /// the list is never empty once 2026's named events pass) any full-moon day.
-  List<BuddhistObservance> upcoming(DateTime from, {int count = 8}) {
-    final today = _dateOnly(from);
-    final future = _allObservances
-        .where((e) => e.isFullMoon && !e.date.isBefore(today))
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
-    return future.take(count).toList();
+  }
+
+  /// Observances in the displayed month only (for "This month" section).
+  List<BuddhistObservance> thisMonth(DateTime month) {
+    final first = DateTime(month.year, month.month);
+    final last = DateTime(month.year, month.month + 1, 0);
+    return observancesBetween(first, last);
   }
 
   List<BuddhistObservance> onDate(
@@ -87,33 +99,27 @@ class BuddhistCalendarService {
   static bool isSameDate(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
-  // --- Data (transcribed from the MD file) ---
+  // ─── Data ───
 
-  /// Built once. Combines the plain uposath days for 2026–2030 with the 2026
-  /// named full-moon events (which replace the plain full-moon entry on the
-  /// same date).
   static final List<BuddhistObservance> _allObservances = _build();
 
   static List<BuddhistObservance> _build() {
     final out = <BuddhistObservance>[];
-    // Dates that carry a named 2026 event — skip the plain uposath entry so we
-    // don't duplicate the day.
-    final eventDates = {
-      for (final e in _events2026) DateTime(e.date.year, e.date.month, e.date.day),
+    // 2026 events replace plain entries on the same date.
+    final eventDates = <String>{
+      for (final e in _events2026) '${e.date.year}-${e.date.month}-${e.date.day}',
     };
     _uposath.forEach((year, months) {
       final estimated = year != 2026;
       months.forEach((month, entries) {
         for (final entry in entries) {
-          final date = DateTime(year, month, entry.$1);
-          if (eventDates.contains(date)) continue;
-          out.add(
-            BuddhistObservance(
-              date: date,
-              kind: entry.$2,
-              isEstimated: estimated,
-            ),
-          );
+          final key = '$year-$month-${entry.$1}';
+          if (eventDates.contains(key)) continue;
+          out.add(BuddhistObservance(
+            date: DateTime(year, month, entry.$1),
+            phase: entry.$2,
+            isEstimated: estimated,
+          ));
         }
       });
     });
@@ -122,14 +128,13 @@ class BuddhistCalendarService {
   }
 
   // Phase shorthands.
-  static const _nm = BuddhistObservanceKind.uposathaNewMoon; // अमावस्या
-  static const _fq = BuddhistObservanceKind.uposathaFirstQuarter; // शुक्ल अष्टमी
-  static const _fm = BuddhistObservanceKind.uposathaFullMoon; // पूर्णिमा
-  static const _lq = BuddhistObservanceKind.uposathaLastQuarter; // कृष्ण अष्टमी
+  static const _nm = UposathPhase.newMoon;
+  static const _fq = UposathPhase.firstQuarter;
+  static const _fm = UposathPhase.fullMoon;
+  static const _lq = UposathPhase.lastQuarter;
 
-  /// year -> month -> list of (day, phase). Transcribed from §3–§5 of the MD.
-  static const Map<int, Map<int, List<(int, BuddhistObservanceKind)>>>
-      _uposath = {
+  /// year -> month -> list of (day, phase).
+  static const Map<int, Map<int, List<(int, UposathPhase)>>> _uposath = {
     2026: {
       1: [(3, _fm), (10, _lq), (18, _nm), (26, _fq)],
       2: [(1, _fm), (9, _lq), (17, _nm), (24, _fq)],
@@ -202,109 +207,118 @@ class BuddhistCalendarService {
     },
   };
 
-  /// 2026 named full-moon events (§2 of the MD), replacing the plain full-moon
-  /// entry on the same date.
+  /// 2026 full-moon days with special events from the PDF.
   static final List<BuddhistObservance> _events2026 = [
     BuddhistObservance(
       date: DateTime(2026, 1, 3),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'दुरुत्थु पूर्णिमा',
-      description:
-          'भगवान बुद्ध का श्रीलंका में पहली बार आगमन; सुमनसमन देवता को केश धातु का '
-          'परित्याग; सुमनसमन देवता का स्रोत सुनकर स्रोतापन्न होना।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'बुद्धत्व प्राप्ति के आठ महीने पश्चात् मह्यंगन नामक स्थान पर भगवान बुद्ध का पहली बार श्रीलंका में आगमन, जहाँ आज एक पूजनीय स्तूप है।',
+        'भगवान बुद्ध द्वारा सुमनसमन नामक देवता को केश धातु का परित्याग।',
+        'भगवान बुद्ध का ज्ञान सुनकर श्रीलंका के सुमनसमन देवता का स्रोतापन्न होना।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 2, 1),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'नवम पूर्णिमा',
-      description:
-          '1250 भिक्षुओं का प्रथम संघ सम्मेलन; अरहंत सारिपुत्र की अग्र शिष्य पद की '
-          'प्राप्ति; महापरिनिर्वाण से तीन माह पूर्व जीवित रहने की आयु का त्याग।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'भगवान बुद्ध द्वारा 1250 भिक्षुओं का प्रथम संघ सम्मेलन।',
+        'अरहन्त सारिपुत्र की अग्र शिष्य पद की प्राप्ति।',
+        'भगवान बुद्ध द्वारा महापरिनिर्वाण से तीन माह पूर्व जीवित रहने की आयु का त्याग करना।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 3, 3),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'मदिन पूर्णिमा',
-      description:
-          'बुद्धत्व प्राप्ति के पश्चात् 20,000 अरहंत भिक्षुओं के साथ राजगीर से '
-          'कपिलवस्तु की यात्रा का आरंभ।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'बुद्धत्व प्राप्ति के पश्चात् 20,000 अरहन्त भिक्षुओं के साथ राजगीर से कपिलवस्तु के लिए यात्रा का आरंभ।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 4, 2),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'बक पूर्णिमा',
-      description:
-          'बुद्ध का श्रीलंका में दूसरी बार आगमन; चूलोदर और महोदर नागों के विवाद को '
-          'शांत करना।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'बुद्धत्व प्राप्ति के 5 वर्ष पश्चात् भगवान बुद्ध का श्रीलंका में दूसरी बार आगमन, चूलोदर एवं महोदर नामक दिव्य नागों के मध्य मणि से निर्मित सिंहासन को लेकर हुए कलह में युद्ध को शांत करने हेतु।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 5, 1),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'वैशाख / वेसाक पूर्णिमा',
-      description:
-          'सिद्धार्थ बोधिसत्त्व का जन्म; बुद्धत्व की प्राप्ति; महापरिनिर्वाण; '
-          'कपिलवस्तु आगमन और यमक महाप्रातिहार्य; श्रीलंका में तीसरी यात्रा; श्रीपाद '
-          'पर श्रीचरण पदचिह्न की स्थापना; अरहंत आनंद का परिनिर्वाण; राजकुमार विजय '
-          'का श्रीलंका आगमन।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'सिद्धार्थ बोधिसत्त्व का मनुष्य लोक में आगमन (जन्म)।',
+        'सिद्धार्थ बोधिसत्त्व की बुद्धत्व प्राप्ति (सम्बुद्धत्व)।',
+        'भगवान बुद्ध का महापरिनिर्वाण।',
+        'बुद्धत्व के पश्चात् कपिलवस्तु में आगमन एवं शाक्यों के अहंकार को खंडित करने हेतु यमक महाप्रातिहार्य का प्रदर्शन।',
+        'बुद्धत्व के 8 वर्ष पश्चात् भगवान बुद्ध का तीसरी बार श्रीलंका में आगमन।',
+        'श्रीलंका के श्रीपाद पर्वत के शिखर पर भगवान बुद्ध द्वारा श्रीचरण के पदचिह्न स्थापित करना।',
+        'अरहन्त आनन्द भन्ते जी का परिनिर्वाण।',
+        'राजकुमार विजय का श्रीलंका द्वीप में आगमन एवं सिंहली जाति की शुरुआत।',
+      ],
     ),
+    // May 31 — second poornima, no special event per PDF.
     BuddhistObservance(
       date: DateTime(2026, 5, 31),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'वैशाख / वेसाक पूर्णिमा',
-      description: 'स्रोत में विशेष बौद्ध घटना नहीं; केवल Uposath Day.',
+      phase: UposathPhase.fullMoon,
     ),
     BuddhistObservance(
       date: DateTime(2026, 6, 29),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'पोसोन पूर्णिमा',
-      description:
-          'अरहंत महेंद्र भंतेजी का अनुराधपुर के मिहिंतले आगमन; राजा देवानंपियतिस्स '
-          'सहित लगभग 40,000 लोगों को धम्म-प्रवचन।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'श्रीलंका में भगवान बुद्ध के धर्म को स्थापित करने हेतु अरहन्त महेन्द्र भन्ते जी का श्रीलंका के अनुराधपुर में मिहिन्तले स्थान पर आगमन।',
+        'श्रीलंका के राजा देवानंपियतिस्स सहित 40,000 लोगों को अरहन्त महेन्द्र भन्ते जी द्वारा चुल्लहत्थिपदोपम सूत्र का धर्म प्रवचन।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 7, 29),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'एसला पूर्णिमा',
-      description:
-          'सिद्धार्थ बोधिसत्त्व का तुषित देवलोक से महामाया के गर्भ में प्रवेश; '
-          'गृहत्याग; प्रथम उपदेश—धम्मचक्कप्पवत्तन सुत्त; राहुल का जन्म; प्रथम '
-          'वर्षावास का आरंभ।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'सिद्धार्थ बोधिसत्त्व का तुषित देवलोक से देवी महामाया के गर्भ में प्रवेश।',
+        'सिद्धार्थ बोधिसत्त्व का मुक्ति हेतु गृहत्याग।',
+        'भगवान बुद्ध द्वारा वाराणसी में पंच भिक्षुओं को प्रथम उपदेश — धम्मचक्कप्पवत्तन सूत्र — का प्रवचन।',
+        'राहुल कुमार का जन्म।',
+        'भगवान बुद्ध सहित पंच भिक्षुओं का प्रथम वर्षावास वाराणसी के ऋषिपतन मृगदाय (वर्तमान सारनाथ) में।',
+        'भिक्षुओं के वर्षावास का आरंभ दिवस।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 8, 28),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'निकिनी पूर्णिमा',
-      description: 'प्रथम धम्म संगीति का आरंभ; आनंद भंतेजी का अरहत्व प्राप्त करना।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'प्रथम धम्म संगीति का आरंभ अगस्त महीने की पूर्णिमा से हुआ था।',
+        'भगवान बुद्ध के अग्र सेवक आनन्द भन्ते जी का अर्हत्व पाना।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 9, 26),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'बिनारा पूर्णिमा',
-      description: 'भिक्षुणी संघ का आरंभ।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'भिक्षुणी संघ का आरंभ।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 10, 25),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'वप पूर्णिमा',
-      description:
-          'वर्षावास का पवारण दिवस; बुद्ध का तावतिंस देवलोक से संकिसा आगमन; सारिपुत्र '
-          'भंतेजी को प्रज्ञावान भिक्षुओं में अग्र पद।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'वर्षावास का पवारण दिवस।',
+        'भगवान बुद्ध का तावतिंस देवलोक से धरती पर संकिस्सा नामक स्थान पर पधारना।',
+        'अरहन्त सारिपुत्र भन्ते जी को प्रज्ञावान भिक्षुओं में अग्र पद की प्राप्ति।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 11, 24),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'इल पूर्णिमा',
-      description:
-          'बुद्ध द्वारा 60 अरहंत भिक्षुओं को धम्मदूत के रूप में भेजना; सारिपुत्र '
-          'भंतेजी का परिनिर्वाण; उरुवेला के तीन जटिलों को दमन करने हेतु बुद्ध का आगमन।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'भगवान बुद्ध द्वारा साठ अरहन्त भिक्षुओं को धर्मदूत के रूप में लोकजन के कल्याण हेतु धर्म प्रचार के लिए आदेश देना।',
+        'अरहन्त सारिपुत्र भन्ते जी का परिनिर्वाण।',
+        'उरुवेला (बोधगया) के तीन जटिलों को दमन करने के लिए भगवान बुद्ध का उरुवेला में आगमन।',
+      ],
     ),
     BuddhistObservance(
       date: DateTime(2026, 12, 23),
-      kind: BuddhistObservanceKind.fullMoonEvent,
-      title: 'उन्दुवप पूर्णिमा',
-      description:
-          'सम्राट अशोक की पुत्री अरहंत संघमित्रा भिक्षुणी द्वारा बोधिवृक्ष को '
-          'श्रीलंका लाना।',
+      phase: UposathPhase.fullMoon,
+      specialEvents: [
+        'सम्राट अशोक की पुत्री अरहन्त संघमित्रा भिक्षुणी द्वारा बोधिवृक्ष को श्रीलंका में लाना।',
+      ],
     ),
   ];
 }

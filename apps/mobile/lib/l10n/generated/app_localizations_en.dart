@@ -115,6 +115,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeDailyPrarthana => 'Daily Practice';
 
   @override
+  String get meditationTimerTitle => 'Start Meditation';
+
+  @override
+  String get meditationTimerSubtitle =>
+      'Pick a track and meditate for a set time';
+
+  @override
+  String get meditationTimerTrack => 'Meditation';
+
+  @override
+  String get meditationTimerNoTrack => 'No meditation selected';
+
+  @override
+  String get meditationTimerNeedTrack => 'Choose a meditation first.';
+
+  @override
+  String get meditationTimerDuration => 'Duration';
+
+  @override
+  String get meditationTimerStart => 'Start';
+
+  @override
+  String get meditationTimerStop => 'Stop';
+
+  @override
+  String get meditationTimerReady => 'Ready';
+
+  @override
+  String get meditationTimerRunning => 'Meditating…';
+
+  @override
+  String get meditationTimerDone => 'Meditation complete. 🙏';
+
+  @override
+  String meditationTimerMinutes(int count) {
+    return '$count min';
+  }
+
+  @override
   String get homeShareApp => 'Share App';
 
   @override
@@ -185,6 +224,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarUpcoming => 'Upcoming observances';
+
+  @override
+  String get calendarThisMonth => 'This month';
 
   @override
   String get calendarUposatha => 'Uposatha';
@@ -317,6 +359,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeBuddhistPlacesSubtitle => 'Sacred sites';
+
+  @override
+  String get placesEmpty => 'No places yet.';
 
   @override
   String get featureComingSoonBody => 'We are preparing this feature for you.';
