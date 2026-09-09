@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
+import '../../premium/application/premium_guard.dart';
 import '../application/status_layout.dart';
 import '../application/status_providers.dart';
 
@@ -194,6 +195,8 @@ class StatusCard extends ConsumerWidget {
     WidgetRef ref,
     Future<void> Function() action,
   ) async {
+    // Downloading or sharing a status is premium (preview/customise is free).
+    if (!ensurePremium(ref, context)) return;
     final l10n = AppLocalizations.of(context);
     try {
       await action();

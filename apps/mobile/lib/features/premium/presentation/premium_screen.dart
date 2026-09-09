@@ -22,6 +22,7 @@ class PremiumScreen extends ConsumerStatefulWidget {
 class _PremiumScreenState extends ConsumerState<PremiumScreen> {
   VideoPlayerController? _video;
   String? _videoUrl;
+  bool _videoLoading = false;
   bool _busy = false;
 
   @override
@@ -35,17 +36,24 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
     _videoUrl = url;
     _video?.dispose();
     _video = null;
-    if (url == null || url.isEmpty) return;
+    if (url == null || url.isEmpty) {
+      _videoLoading = false;
+      return;
+    }
+    _videoLoading = true;
     final c = VideoPlayerController.networkUrl(Uri.parse(url));
     _video = c;
     c.initialize().then((_) {
       if (!mounted) return;
       c
         ..setLooping(true)
-        ..setVolume(0)
+        // Promo video plays with sound (unmuted).
+        ..setVolume(1)
         ..play();
-      setState(() {});
-    }).catchError((_) {});
+      setState(() => _videoLoading = false);
+    }).catchError((_) {
+      if (mounted) setState(() => _videoLoading = false);
+    });
   }
 
   Future<void> _subscribe() async {
@@ -112,7 +120,9 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
         children: [
-          // Promo video (admin mp4). Falls back to a gradient banner.
+          // Promo video (admin mp4). Shows a branded loader while it streams
+          // in, then the video; falls back to a gradient banner if there's no
+          // video / it failed to load.
           AspectRatio(
             aspectRatio: 16 / 9,
             child: (video != null && video.value.isInitialized)
@@ -133,9 +143,13 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                         colors: [cs.primary, AppColors.accent],
                       ),
                     ),
-                    child: const Center(
-                      child: Icon(Icons.workspace_premium,
-                          color: Colors.white, size: 56),
+                    child: Center(
+                      child: _videoLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Icon(Icons.workspace_premium,
+                              color: Colors.white, size: 56),
                     ),
                   ),
           ),

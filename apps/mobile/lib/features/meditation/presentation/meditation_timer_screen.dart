@@ -10,6 +10,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/content_list_controller.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../player/application/audio_providers.dart';
+import '../../premium/application/premium_guard.dart';
 
 /// Guided meditation timer inside Daily Practice: pick a meditation track,
 /// set a duration, tap Start — the audio plays and a countdown runs; when it
@@ -68,6 +69,8 @@ class _MeditationTimerScreenState extends ConsumerState<MeditationTimerScreen> {
   }
 
   Future<void> _start() async {
+    // Starting a guided meditation is premium.
+    if (!ensurePremium(ref, context)) return;
     final l10n = AppLocalizations.of(context);
     final track = _track;
     if (track == null) {

@@ -44,6 +44,7 @@ abstract class PremiumModules {
     'chanting',
     'vandana',
     'video',
+    'status',
   };
 
   static bool isLocked(String moduleId) => ids.contains(moduleId);
