@@ -138,7 +138,6 @@ class FcmCoordinator {
     }
     final desired = FcmTopics.forUser(
       language: user.language,
-      teacherIds: user.selectedTeachers,
       pushEnabled: user.notificationPrefs.push,
     );
     await _alignTopics(desired);

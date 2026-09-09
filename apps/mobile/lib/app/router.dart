@@ -9,6 +9,7 @@ import '../features/auth/presentation/otp_screen.dart';
 import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
 import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/dana/presentation/dana_screen.dart';
 import '../features/places/presentation/place_detail_screen.dart';
 import '../features/places/presentation/places_list_screen.dart';
 import '../features/tipitaka/presentation/tipitaka_screen.dart';
@@ -18,12 +19,10 @@ import '../features/meditation/presentation/meditation_list_screen.dart';
 import '../features/meditation/presentation/meditation_timer_screen.dart';
 import '../features/onboarding/presentation/language_screen.dart';
 import '../features/onboarding/presentation/person_info_screen.dart';
-import '../features/onboarding/presentation/teacher_select_screen.dart';
 import '../features/player/presentation/full_player_screen.dart';
 import '../features/profile/presentation/change_language_screen.dart';
 import '../features/profile/presentation/contact_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
-import '../features/profile/presentation/edit_teachers_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/static_page_screen.dart';
 import '../features/prarthana/presentation/prarthana_help_screen.dart';
@@ -57,12 +56,12 @@ abstract class AppRoutes {
   static const otp = '/otp';
   static const onboardingLanguage = '/onboarding/language';
   static const onboardingPersonInfo = '/onboarding/person-info';
-  static const onboardingTeacher = '/onboarding/teacher';
   static const home = '/home';
   static const explore = '/explore';
   static const videos = '/videos';
   static const videoPlayer = '/videos/play';
   static const tipitaka = '/tipitaka';
+  static const dana = '/dana';
   static const places = '/places';
   static const placeDetail = '/places/view';
   static const wisdomDetail = '/wisdom';
@@ -84,7 +83,6 @@ abstract class AppRoutes {
   static const profile = '/profile';
   static const profileEdit = '/profile/edit';
   static const profileLanguage = '/profile/language';
-  static const profileTeachers = '/profile/teachers';
   static const profileContact = '/profile/contact';
   static const profilePage = '/profile/page';
 }
@@ -208,10 +206,6 @@ GoRouter appRouter(Ref ref) {
         path: AppRoutes.onboardingPersonInfo,
         builder: (context, state) => const PersonInfoScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.onboardingTeacher,
-        builder: (context, state) => const TeacherSelectScreen(),
-      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainShell(navigationShell: navigationShell),
@@ -274,10 +268,6 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) => const ChangeLanguageScreen(),
       ),
       GoRoute(
-        path: AppRoutes.profileTeachers,
-        builder: (context, state) => const EditTeachersScreen(),
-      ),
-      GoRoute(
         path: AppRoutes.profileContact,
         builder: (context, state) => const ContactScreen(),
       ),
@@ -311,6 +301,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.tipitaka,
         builder: (context, state) => const TipitakaScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dana,
+        builder: (context, state) => const DanaScreen(),
       ),
       GoRoute(
         path: AppRoutes.places,
@@ -396,8 +390,8 @@ String _routeForStep(String step) {
       return AppRoutes.onboardingLanguage;
     case AppConstants.onboardingStepPersonInfo:
       return AppRoutes.onboardingPersonInfo;
-    case AppConstants.onboardingStepTeacher:
-      return AppRoutes.onboardingTeacher;
+    // Teacher selection was removed from onboarding. Existing users whose
+    // stored step is still 'teacher' are treated as complete → home.
     default:
       return AppRoutes.home;
   }

@@ -8,6 +8,7 @@ import '../models/app_user.dart';
 import '../models/category.dart';
 import '../models/content_item.dart';
 import '../models/buddhist_place.dart';
+import '../models/home_banner.dart';
 import '../models/teacher.dart';
 import '../models/video.dart';
 import '../models/wisdom.dart';
@@ -18,6 +19,7 @@ import '../repositories/config_repository.dart';
 import '../repositories/contact_repository.dart';
 import '../repositories/content_repository.dart';
 import '../repositories/events_repository.dart';
+import '../repositories/home_banner_repository.dart';
 import '../repositories/notification_repository.dart';
 import '../repositories/progress_repository.dart';
 import '../repositories/static_page_repository.dart';
@@ -56,6 +58,9 @@ TeacherRepository teacherRepository(Ref ref) => TeacherRepository();
 
 @Riverpod(keepAlive: true)
 WisdomRepository wisdomRepository(Ref ref) => WisdomRepository();
+
+@Riverpod(keepAlive: true)
+HomeBannerRepository homeBannerRepository(Ref ref) => HomeBannerRepository();
 
 @Riverpod(keepAlive: true)
 VideoRepository videoRepository(Ref ref) => VideoRepository();
@@ -129,6 +134,12 @@ Stream<List<Teacher>> activeTeachers(Ref ref) {
 @riverpod
 Stream<List<Wisdom>> activeWisdoms(Ref ref) {
   return ref.watch(wisdomRepositoryProvider).watchActiveWisdoms();
+}
+
+/// Active home carousel banner slides ordered by `sortOrder`.
+@riverpod
+Stream<List<HomeBanner>> activeHomeBanners(Ref ref) {
+  return ref.watch(homeBannerRepositoryProvider).watchActiveBanners();
 }
 
 /// Active YouTube videos ordered by `sortOrder`, for the app's Videos screen.

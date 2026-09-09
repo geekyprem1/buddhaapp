@@ -166,30 +166,6 @@ abstract class AppLocalizations {
   /// **'Email'**
   String get emailLabel;
 
-  /// No description provided for @teacherScreenTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select Your Teacher'**
-  String get teacherScreenTitle;
-
-  /// No description provided for @teacherScreenSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'अपने गुरु चुनें'**
-  String get teacherScreenSubtitle;
-
-  /// No description provided for @teacherSearchHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search for a Teacher (e.g. Buddha)...'**
-  String get teacherSearchHint;
-
-  /// No description provided for @teacherHelperText.
-  ///
-  /// In en, this message translates to:
-  /// **'You can select multiple Teachers to personalise your experience'**
-  String get teacherHelperText;
-
   /// No description provided for @errorNameRequired.
   ///
   /// In en, this message translates to:
@@ -219,12 +195,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid email address'**
   String get errorEmailInvalid;
-
-  /// No description provided for @errorTeacherRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select at least one teacher'**
-  String get errorTeacherRequired;
 
   /// No description provided for @loginContinueWithOtp.
   ///
@@ -775,14 +745,74 @@ abstract class AppLocalizations {
   /// No description provided for @homeDana.
   ///
   /// In en, this message translates to:
-  /// **'Dana'**
+  /// **'Daan'**
   String get homeDana;
 
   /// No description provided for @homeDanaSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Support Dhamma'**
+  /// **'Support this app'**
   String get homeDanaSubtitle;
+
+  /// No description provided for @danaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Donation & Support'**
+  String get danaTitle;
+
+  /// No description provided for @danaTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your support keeps this app alive.'**
+  String get danaTagline;
+
+  /// No description provided for @danaScanPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan & Pay'**
+  String get danaScanPay;
+
+  /// No description provided for @danaAnyUpiApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Any UPI app'**
+  String get danaAnyUpiApp;
+
+  /// No description provided for @danaUpiId.
+  ///
+  /// In en, this message translates to:
+  /// **'UPI ID'**
+  String get danaUpiId;
+
+  /// No description provided for @danaCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get danaCopy;
+
+  /// No description provided for @danaCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'UPI ID copied'**
+  String get danaCopied;
+
+  /// No description provided for @danaSaveQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Save QR'**
+  String get danaSaveQr;
+
+  /// No description provided for @danaBlessing.
+  ///
+  /// In en, this message translates to:
+  /// **'May all beings be happy'**
+  String get danaBlessing;
+
+  /// No description provided for @danaDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a voluntary charitable donation to support the running of this app. It is not a purchase and does not unlock any features or content.'**
+  String get danaDisclaimer;
 
   /// No description provided for @homeBuddhistPlaces.
   ///
@@ -873,12 +903,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit Profile'**
   String get profileEdit;
-
-  /// No description provided for @profileMyTeachers.
-  ///
-  /// In en, this message translates to:
-  /// **'My Teachers'**
-  String get profileMyTeachers;
 
   /// No description provided for @profileSave.
   ///

@@ -89,7 +89,9 @@ class UserRepository with RepoGuard {
         'name': name,
         'phone': phone,
         if (email != null && email.isNotEmpty) 'email': email,
-        'onboardingStep': AppConstants.onboardingStepTeacher,
+        // Teacher selection was removed from onboarding — person info is now
+        // the final step, so complete onboarding here directly.
+        'onboardingStep': AppConstants.onboardingStepComplete,
       }),
     );
   }

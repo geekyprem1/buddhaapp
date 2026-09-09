@@ -87,11 +87,6 @@ class ProfileScreen extends ConsumerWidget {
             onTap: () => context.push(AppRoutes.profileEdit),
           ),
           _row(
-            icon: Icons.groups_outlined,
-            label: l10n?.profileMyTeachers ?? 'My Teachers',
-            onTap: () => context.push(AppRoutes.profileTeachers),
-          ),
-          _row(
             icon: Icons.badge_outlined,
             label: l10n?.profileMyIdCard ?? 'My ID Card',
             trailing: ConstrainedBox(

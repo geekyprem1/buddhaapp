@@ -155,6 +155,7 @@ String moduleRoute(String id) => switch (id) {
       HomeModuleIds.buddhistPlaces => AppRoutes.places,
       HomeModuleIds.prarthana => AppRoutes.prarthana,
       HomeModuleIds.status => AppRoutes.statuses,
+      HomeModuleIds.dana => AppRoutes.dana,
       _ => AppRoutes.home,
     };
 

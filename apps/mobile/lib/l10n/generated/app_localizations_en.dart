@@ -42,19 +42,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailLabel => 'Email';
 
   @override
-  String get teacherScreenTitle => 'Select Your Teacher';
-
-  @override
-  String get teacherScreenSubtitle => 'अपने गुरु चुनें';
-
-  @override
-  String get teacherSearchHint => 'Search for a Teacher (e.g. Buddha)...';
-
-  @override
-  String get teacherHelperText =>
-      'You can select multiple Teachers to personalise your experience';
-
-  @override
   String get errorNameRequired => 'Please enter your name';
 
   @override
@@ -68,9 +55,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorEmailInvalid => 'Please enter a valid email address';
-
-  @override
-  String get errorTeacherRequired => 'Please select at least one teacher';
 
   @override
   String get loginContinueWithOtp => 'Continue with OTP';
@@ -358,10 +342,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTipitakaSubtitle => 'Read scriptures';
 
   @override
-  String get homeDana => 'Dana';
+  String get homeDana => 'Daan';
 
   @override
-  String get homeDanaSubtitle => 'Support Dhamma';
+  String get homeDanaSubtitle => 'Support this app';
+
+  @override
+  String get danaTitle => 'Donation & Support';
+
+  @override
+  String get danaTagline => 'Your support keeps this app alive.';
+
+  @override
+  String get danaScanPay => 'Scan & Pay';
+
+  @override
+  String get danaAnyUpiApp => 'Any UPI app';
+
+  @override
+  String get danaUpiId => 'UPI ID';
+
+  @override
+  String get danaCopy => 'Copy';
+
+  @override
+  String get danaCopied => 'UPI ID copied';
+
+  @override
+  String get danaSaveQr => 'Save QR';
+
+  @override
+  String get danaBlessing => 'May all beings be happy';
+
+  @override
+  String get danaDisclaimer =>
+      'This is a voluntary charitable donation to support the running of this app. It is not a purchase and does not unlock any features or content.';
 
   @override
   String get homeBuddhistPlaces => 'Buddhist Places';
@@ -407,9 +422,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileEdit => 'Edit Profile';
-
-  @override
-  String get profileMyTeachers => 'My Teachers';
 
   @override
   String get profileSave => 'Save';

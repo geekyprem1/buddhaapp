@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../notifications/application/fcm_coordinator.dart';
 import '../../profile/application/profile_providers.dart';
-import '../../wisdom/presentation/wisdom_hero_card.dart';
 import '../application/home_providers.dart';
+import 'home_carousel.dart';
 import 'module_catalog.dart';
 
 /// Home tab. Shows today's wisdom hero card followed by the module grid.
@@ -93,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.watch(homeLayoutProvider).valueOrNull ?? HomeLayout.defaults;
           return CustomScrollView(
             slivers: [
-              const SliverToBoxAdapter(child: WisdomHeroCard()),
+              const SliverToBoxAdapter(child: HomeCarousel()),
               for (var i = 0; i < layout.sections.length; i++)
                 ...moduleSectionSlivers(
                   context,

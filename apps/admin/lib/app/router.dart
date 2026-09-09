@@ -29,8 +29,8 @@ import '../features/video/presentation/video_form_page.dart';
 import '../features/video/presentation/video_list_page.dart';
 import '../features/wisdom/presentation/wisdom_form_page.dart';
 import '../features/wisdom/presentation/wisdom_list_page.dart';
-import '../features/teachers/presentation/teacher_form_page.dart';
-import '../features/teachers/presentation/teachers_list_page.dart';
+import '../features/home_banners/presentation/home_banners_list_page.dart';
+import '../features/home_banners/presentation/home_banner_form_page.dart';
 import '../widgets/idle_timeout_listener.dart';
 import 'admin_access.dart';
 import 'admin_shell.dart';
@@ -89,22 +89,6 @@ GoRouter adminRouter(Ref ref) {
             builder: (context, state) => const DashboardPage(),
           ),
           GoRoute(
-            path: AdminRoutes.teachers,
-            builder: (context, state) => const TeachersListPage(),
-            routes: [
-              GoRoute(
-                path: 'new',
-                builder: (context, state) => const TeacherFormPage(),
-              ),
-              GoRoute(
-                path: ':id',
-                builder: (context, state) => TeacherFormPage(
-                  teacherId: state.pathParameters['id'],
-                ),
-              ),
-            ],
-          ),
-          GoRoute(
             path: AdminRoutes.categories,
             builder: (context, state) => const CategoriesListPage(),
             routes: [
@@ -133,6 +117,22 @@ GoRouter adminRouter(Ref ref) {
                 path: ':id',
                 builder: (context, state) => WisdomFormPage(
                   wisdomId: state.pathParameters['id'],
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: AdminRoutes.homeBanners,
+            builder: (context, state) => const HomeBannersListPage(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const HomeBannerFormPage(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => HomeBannerFormPage(
+                  bannerId: state.pathParameters['id'],
                 ),
               ),
             ],

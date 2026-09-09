@@ -1,6 +1,6 @@
 /**
  * Audience strings stored on `notifications/{id}.audience`.
- * Must stay aligned with mobile `FcmTopics` (`all`, `lang_{code}`, `teacher_{id}`).
+ * Must stay aligned with mobile `FcmTopics` (`all`, `lang_{code}`).
  */
 
 export type AudienceTarget =
@@ -23,7 +23,7 @@ export function parseAudience(raw: unknown): AudienceTarget {
   const colon = value.indexOf(":");
   if (colon <= 0 || colon === value.length - 1) {
     throw new Error(
-      "audience must be all, teacher:{id}, language:{code}, platform:{android|ios}, or user:{uid}.",
+      "audience must be all, language:{code}, platform:{android|ios}, or user:{uid}.",
     );
   }
   const kind = value.slice(0, colon);
@@ -32,12 +32,6 @@ export function parseAudience(raw: unknown): AudienceTarget {
     throw new Error("audience value is empty.");
   }
   switch (kind) {
-    case "teacher":
-      return {
-        kind: "topic",
-        topic: `teacher_${topicSafe(id)}`,
-        label: `teacher ${id}`,
-      };
     case "language":
       return {
         kind: "topic",
@@ -53,7 +47,7 @@ export function parseAudience(raw: unknown): AudienceTarget {
       return { kind: "user", uid: id, label: `user ${id}` };
     default:
       throw new Error(
-        "audience must be all, teacher:{id}, language:{code}, platform:{android|ios}, or user:{uid}.",
+        "audience must be all, language:{code}, platform:{android|ios}, or user:{uid}.",
       );
   }
 }

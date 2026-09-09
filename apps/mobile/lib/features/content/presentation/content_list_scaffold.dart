@@ -6,12 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/category_filter_providers.dart';
 import '../application/content_list_controller.dart';
-import '../application/teacher_filter_providers.dart';
 
 /// Reusable scaffold for the four content list screens (wallpaper, ringtone,
 /// song, meditation). Owns the shared chrome — app bar, the
-/// `All | <teachers> | ⊕` filter row, the `All | <categories>` row fed by
-/// the admin-managed `categories` collection, pagination, and
+/// `All | <categories>` filter row fed by the admin-managed `categories`
+/// collection, pagination, and
 /// loading/empty/error states — and delegates only the per-item rendering
 /// to [itemBuilder]
 /// (Architecture §5.1; DRY per the generic content module principle §11).
@@ -72,13 +71,12 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 400) {
-      final teacherId = ref.read(contentTeacherFilterProvider(widget.module));
       final categoryId = ref.read(contentCategoryFilterProvider(widget.module));
       ref
           .read(
             contentListControllerProvider(
               widget.collection,
-              teacherId,
+              null,
               categoryId: categoryId,
             ).notifier,
           )
@@ -89,20 +87,18 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final teacherId = ref.watch(contentTeacherFilterProvider(widget.module));
     final categoryId = ref.watch(contentCategoryFilterProvider(widget.module));
-    final chips = ref.watch(selectedTeacherChipsProvider);
     final categoryChips = ref.watch(moduleCategoryChipsProvider(widget.module));
     final asyncContent = ref.watch(
       contentListControllerProvider(
         widget.collection,
-        teacherId,
+        null,
         categoryId: categoryId,
       ),
     );
     final controller = contentListControllerProvider(
       widget.collection,
-      teacherId,
+      null,
       categoryId: categoryId,
     );
 
@@ -117,17 +113,6 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: AppSpacing.sm),
-          TeacherFilterChipRow(
-            teachers: chips,
-            selectedTeacherId: teacherId,
-            onSelect: (id) => ref
-                .read(contentTeacherFilterProvider(widget.module).notifier)
-                .select(id),
-            onAddTeacher: () {
-              // ⊕ teacher picker sheet — wired in a later task (FR-5.7).
-            },
-          ),
           if (categoryChips.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             TeacherFilterChipRow(

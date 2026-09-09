@@ -1,29 +1,30 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'teachers_providers.dart';
+part of 'home_banner_providers.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$adminTeachersHash() => r'573f55bb7862039e5c45d16119d012b15d8edb1f';
+String _$adminHomeBannersHash() => r'c3fa99d79d1896a3b06c211ff17ac22c1fe83f45';
 
-/// See also [adminTeachers].
-@ProviderFor(adminTeachers)
-final adminTeachersProvider = AutoDisposeStreamProvider<List<Teacher>>.internal(
-  adminTeachers,
-  name: r'adminTeachersProvider',
+/// See also [adminHomeBanners].
+@ProviderFor(adminHomeBanners)
+final adminHomeBannersProvider =
+    AutoDisposeStreamProvider<List<HomeBanner>>.internal(
+  adminHomeBanners,
+  name: r'adminHomeBannersProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$adminTeachersHash,
+      : _$adminHomeBannersHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AdminTeachersRef = AutoDisposeStreamProviderRef<List<Teacher>>;
-String _$adminTeacherHash() => r'c93276ecd75453ca79f52e3d3a494e7d11696b42';
+typedef AdminHomeBannersRef = AutoDisposeStreamProviderRef<List<HomeBanner>>;
+String _$adminHomeBannerHash() => r'07efe0b228a4f46f8fd626a4f1565f281d9c5142';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -46,27 +47,27 @@ class _SystemHash {
   }
 }
 
-/// See also [adminTeacher].
-@ProviderFor(adminTeacher)
-const adminTeacherProvider = AdminTeacherFamily();
+/// See also [adminHomeBanner].
+@ProviderFor(adminHomeBanner)
+const adminHomeBannerProvider = AdminHomeBannerFamily();
 
-/// See also [adminTeacher].
-class AdminTeacherFamily extends Family<AsyncValue<Teacher?>> {
-  /// See also [adminTeacher].
-  const AdminTeacherFamily();
+/// See also [adminHomeBanner].
+class AdminHomeBannerFamily extends Family<AsyncValue<HomeBanner?>> {
+  /// See also [adminHomeBanner].
+  const AdminHomeBannerFamily();
 
-  /// See also [adminTeacher].
-  AdminTeacherProvider call(
+  /// See also [adminHomeBanner].
+  AdminHomeBannerProvider call(
     String id,
   ) {
-    return AdminTeacherProvider(
+    return AdminHomeBannerProvider(
       id,
     );
   }
 
   @override
-  AdminTeacherProvider getProviderOverride(
-    covariant AdminTeacherProvider provider,
+  AdminHomeBannerProvider getProviderOverride(
+    covariant AdminHomeBannerProvider provider,
   ) {
     return call(
       provider.id,
@@ -85,32 +86,32 @@ class AdminTeacherFamily extends Family<AsyncValue<Teacher?>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'adminTeacherProvider';
+  String? get name => r'adminHomeBannerProvider';
 }
 
-/// See also [adminTeacher].
-class AdminTeacherProvider extends AutoDisposeFutureProvider<Teacher?> {
-  /// See also [adminTeacher].
-  AdminTeacherProvider(
+/// See also [adminHomeBanner].
+class AdminHomeBannerProvider extends AutoDisposeFutureProvider<HomeBanner?> {
+  /// See also [adminHomeBanner].
+  AdminHomeBannerProvider(
     String id,
   ) : this._internal(
-          (ref) => adminTeacher(
-            ref as AdminTeacherRef,
+          (ref) => adminHomeBanner(
+            ref as AdminHomeBannerRef,
             id,
           ),
-          from: adminTeacherProvider,
-          name: r'adminTeacherProvider',
+          from: adminHomeBannerProvider,
+          name: r'adminHomeBannerProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$adminTeacherHash,
-          dependencies: AdminTeacherFamily._dependencies,
+                  : _$adminHomeBannerHash,
+          dependencies: AdminHomeBannerFamily._dependencies,
           allTransitiveDependencies:
-              AdminTeacherFamily._allTransitiveDependencies,
+              AdminHomeBannerFamily._allTransitiveDependencies,
           id: id,
         );
 
-  AdminTeacherProvider._internal(
+  AdminHomeBannerProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -124,12 +125,12 @@ class AdminTeacherProvider extends AutoDisposeFutureProvider<Teacher?> {
 
   @override
   Override overrideWith(
-    FutureOr<Teacher?> Function(AdminTeacherRef provider) create,
+    FutureOr<HomeBanner?> Function(AdminHomeBannerRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: AdminTeacherProvider._internal(
-        (ref) => create(ref as AdminTeacherRef),
+      override: AdminHomeBannerProvider._internal(
+        (ref) => create(ref as AdminHomeBannerRef),
         from: from,
         name: null,
         dependencies: null,
@@ -141,13 +142,13 @@ class AdminTeacherProvider extends AutoDisposeFutureProvider<Teacher?> {
   }
 
   @override
-  AutoDisposeFutureProviderElement<Teacher?> createElement() {
-    return _AdminTeacherProviderElement(this);
+  AutoDisposeFutureProviderElement<HomeBanner?> createElement() {
+    return _AdminHomeBannerProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is AdminTeacherProvider && other.id == id;
+    return other is AdminHomeBannerProvider && other.id == id;
   }
 
   @override
@@ -161,17 +162,18 @@ class AdminTeacherProvider extends AutoDisposeFutureProvider<Teacher?> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin AdminTeacherRef on AutoDisposeFutureProviderRef<Teacher?> {
+mixin AdminHomeBannerRef on AutoDisposeFutureProviderRef<HomeBanner?> {
   /// The parameter `id` of this provider.
   String get id;
 }
 
-class _AdminTeacherProviderElement
-    extends AutoDisposeFutureProviderElement<Teacher?> with AdminTeacherRef {
-  _AdminTeacherProviderElement(super.provider);
+class _AdminHomeBannerProviderElement
+    extends AutoDisposeFutureProviderElement<HomeBanner?>
+    with AdminHomeBannerRef {
+  _AdminHomeBannerProviderElement(super.provider);
 
   @override
-  String get id => (origin as AdminTeacherProvider).id;
+  String get id => (origin as AdminHomeBannerProvider).id;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

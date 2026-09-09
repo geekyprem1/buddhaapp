@@ -8,9 +8,9 @@ abstract class AdminRoutes {
   static const splash = '/';
   static const login = '/login';
   static const dashboard = '/dashboard';
-  static const teachers = '/teachers';
   static const categories = '/categories';
   static const wisdom = '/wisdom';
+  static const homeBanners = '/home-slider';
   static const videos = '/videos';
   static const places = '/places';
   static const wallpapers = '/content/wallpapers';
@@ -49,11 +49,6 @@ const adminDestinations = <AdminDestination>[
     allowed: AdminRole.isAdmin,
   ),
   AdminDestination(
-    path: AdminRoutes.teachers,
-    label: 'Teachers',
-    allowed: AdminRole.canEditContent,
-  ),
-  AdminDestination(
     path: AdminRoutes.categories,
     label: 'Categories',
     allowed: AdminRole.canEditContent,
@@ -61,6 +56,11 @@ const adminDestinations = <AdminDestination>[
   AdminDestination(
     path: AdminRoutes.wisdom,
     label: 'Wisdom',
+    allowed: AdminRole.canEditContent,
+  ),
+  AdminDestination(
+    path: AdminRoutes.homeBanners,
+    label: 'Home Slider',
     allowed: AdminRole.canEditContent,
   ),
   AdminDestination(

@@ -7,7 +7,6 @@ import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/content_list_controller.dart';
 import '../../content/application/category_filter_providers.dart';
-import '../../content/application/teacher_filter_providers.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../content/presentation/content_list_scaffold.dart';
 import '../../player/application/audio_providers.dart';
@@ -32,9 +31,6 @@ class MeditationListScreen extends ConsumerWidget {
           item: item,
           language: language,
           onTap: () {
-            final teacherId = ref.read(
-              contentTeacherFilterProvider(ContentType.meditation),
-            );
             final categoryId = ref.read(
               contentCategoryFilterProvider(ContentType.meditation),
             );
@@ -42,7 +38,7 @@ class MeditationListScreen extends ConsumerWidget {
                     .read(
                       contentListControllerProvider(
                         FirestoreCollections.meditations,
-                        teacherId,
+                        null,
                         categoryId: categoryId,
                       ),
                     )

@@ -29,7 +29,7 @@ void main() {
     );
 
     expect(find.text('Dashboard'), findsOneWidget);
-    expect(find.text('Teachers'), findsOneWidget);
+    expect(find.text('Categories'), findsOneWidget);
     expect(find.text('Users'), findsNothing);
     expect(find.text('App config'), findsNothing);
   });
@@ -50,6 +50,6 @@ void main() {
     );
 
     expect(find.text('Users'), findsOneWidget);
-    expect(find.text('Teachers'), findsOneWidget);
+    expect(find.text('Categories'), findsOneWidget);
   });
 }

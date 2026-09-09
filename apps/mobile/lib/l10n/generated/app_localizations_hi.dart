@@ -42,19 +42,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get emailLabel => 'ईमेल';
 
   @override
-  String get teacherScreenTitle => 'अपने गुरु चुनें';
-
-  @override
-  String get teacherScreenSubtitle => 'अपने गुरु चुनें';
-
-  @override
-  String get teacherSearchHint => 'गुरु खोजें (उदा. बुद्ध)...';
-
-  @override
-  String get teacherHelperText =>
-      'आप अपने अनुभव को व्यक्तिगत बनाने के लिए कई गुरु चुन सकते हैं';
-
-  @override
   String get errorNameRequired => 'कृपया अपना नाम दर्ज करें';
 
   @override
@@ -69,9 +56,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get errorEmailInvalid => 'कृपया एक मान्य ईमेल पता दर्ज करें';
-
-  @override
-  String get errorTeacherRequired => 'कृपया कम से कम एक गुरु चुनें';
 
   @override
   String get loginContinueWithOtp => 'OTP से आगे बढ़ें';
@@ -362,7 +346,38 @@ class AppLocalizationsHi extends AppLocalizations {
   String get homeDana => 'दान';
 
   @override
-  String get homeDanaSubtitle => 'धम्म का सहयोग करें';
+  String get homeDanaSubtitle => 'ऐप का सहयोग करें';
+
+  @override
+  String get danaTitle => 'दान और सहयोग';
+
+  @override
+  String get danaTagline => 'आपका सहयोग इस ऐप को चलाए रखता है।';
+
+  @override
+  String get danaScanPay => 'स्कैन करें और भुगतान करें';
+
+  @override
+  String get danaAnyUpiApp => 'कोई भी UPI ऐप';
+
+  @override
+  String get danaUpiId => 'UPI आईडी';
+
+  @override
+  String get danaCopy => 'कॉपी';
+
+  @override
+  String get danaCopied => 'UPI आईडी कॉपी हो गई';
+
+  @override
+  String get danaSaveQr => 'QR सहेजें';
+
+  @override
+  String get danaBlessing => 'सभी प्राणी सुखी हों';
+
+  @override
+  String get danaDisclaimer =>
+      'यह इस ऐप को चलाने में सहयोग हेतु एक स्वैच्छिक दान है। यह कोई खरीद नहीं है और इससे कोई फ़ीचर या सामग्री अनलॉक नहीं होती।';
 
   @override
   String get homeBuddhistPlaces => 'बौद्ध स्थल';
@@ -408,9 +423,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get profileEdit => 'प्रोफ़ाइल संपादित करें';
-
-  @override
-  String get profileMyTeachers => 'मेरे गुरु';
 
   @override
   String get profileSave => 'सहेजें';

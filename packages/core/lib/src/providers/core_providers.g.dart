@@ -125,6 +125,24 @@ final wisdomRepositoryProvider = Provider<WisdomRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef WisdomRepositoryRef = ProviderRef<WisdomRepository>;
+String _$homeBannerRepositoryHash() =>
+    r'9d219409ea5ddb5c3e6ef1c416bcaeed580ffbaf';
+
+/// See also [homeBannerRepository].
+@ProviderFor(homeBannerRepository)
+final homeBannerRepositoryProvider = Provider<HomeBannerRepository>.internal(
+  homeBannerRepository,
+  name: r'homeBannerRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeBannerRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef HomeBannerRepositoryRef = ProviderRef<HomeBannerRepository>;
 String _$videoRepositoryHash() => r'2f1efea7d4b1abed4577e9e4afd0dde4ea93a71a';
 
 /// See also [videoRepository].
@@ -583,6 +601,26 @@ final activeWisdomsProvider = AutoDisposeStreamProvider<List<Wisdom>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveWisdomsRef = AutoDisposeStreamProviderRef<List<Wisdom>>;
+String _$activeHomeBannersHash() => r'80be2feb3c268bdae651f0f85c793e6efa35b758';
+
+/// Active home carousel banner slides ordered by `sortOrder`.
+///
+/// Copied from [activeHomeBanners].
+@ProviderFor(activeHomeBanners)
+final activeHomeBannersProvider =
+    AutoDisposeStreamProvider<List<HomeBanner>>.internal(
+  activeHomeBanners,
+  name: r'activeHomeBannersProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$activeHomeBannersHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ActiveHomeBannersRef = AutoDisposeStreamProviderRef<List<HomeBanner>>;
 String _$activeVideosHash() => r'03973666498144a9ef968a5be173efc910df188c';
 
 /// Active YouTube videos ordered by `sortOrder`, for the app's Videos screen.

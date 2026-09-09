@@ -124,6 +124,16 @@ abstract class AdminStrings {
   static const wisdomImage = 'Card image';
   static const wisdomUploadIdRequired =
       'Set an English title or id before uploading the image.';
+  static const homeBanners = 'Home Slider';
+  static const homeBannersHint =
+      'Slides shown in the Home carousel next to Today\'s Wisdom. '
+      'Only the first 4 active slides appear in the app.';
+  static const homeBannerNew = 'New slide';
+  static const homeBannerEdit = 'Edit slide';
+  static const homeBannerImage = 'Slide image';
+  static const homeBannerImageRequired = 'Upload a slide image first.';
+  static const homeBannerOpens = 'Opens';
+  static const homeBannerNoAction = 'Nothing (image only)';
   static const videos = 'Videos';
   static const videoUrlField = 'YouTube URL';
   static const videoUrlHint =

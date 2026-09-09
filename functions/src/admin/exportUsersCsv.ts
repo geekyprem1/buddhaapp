@@ -13,7 +13,6 @@ const FIELDS = [
   "platform",
   "appVersion",
   "isBlocked",
-  "selectedTeachers",
   "createdAt",
   "lastActiveAt",
 ] as const;

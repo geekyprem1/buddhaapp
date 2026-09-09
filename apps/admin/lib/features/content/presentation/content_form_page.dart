@@ -13,7 +13,6 @@ import '../../../widgets/unsaved_changes_guard.dart';
 import '../../../widgets/upload_field.dart';
 import '../../auth/application/admin_session.dart';
 import '../../categories/application/categories_providers.dart';
-import '../../teachers/application/teachers_providers.dart';
 import '../application/content_providers.dart';
 import '../application/content_type_config.dart';
 
@@ -55,7 +54,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
   var _title = const LocalisedText();
   var _lyrics = const LocalisedText();
   var _description = const LocalisedText();
-  final _teacherIds = <String>{};
   String? _categoryId;
   String _status = ContentStatus.draft;
   bool _featured = false;
@@ -149,9 +147,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     _featured = item.isFeatured;
     _premium = item.isPremium;
     _categoryId = item.categoryId;
-    _teacherIds
-      ..clear()
-      ..addAll(item.teacherIds);
     _mediaUrl = item.mediaUrl;
     _thumbUrl =
         config.media == ContentMediaKind.audio && item.thumbUrl == item.mediaUrl
@@ -234,7 +229,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       type: config.type,
       title: _title,
       artist: _artist.text.trim().isEmpty ? null : _artist.text.trim(),
-      teacherIds: _teacherIds.toList(),
       categoryId: _categoryId,
       // For a live wallpaper the poster stands in as the media/thumb so the
       // grid + reel have a still to show while the video loads.
@@ -452,7 +446,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
       );
     }
 
-    final teachers = ref.watch(adminTeachersProvider).valueOrNull ?? [];
     final categories = (ref.watch(adminCategoriesProvider).valueOrNull ?? [])
         .where((c) => c.module == config.type)
         .toList();
@@ -499,31 +492,6 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
               ),
               const SizedBox(height: 16),
             ],
-            const Text(AdminStrings.teachersField),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final t in teachers)
-                  FilterChip(
-                    label: Text(t.name.resolve('en')),
-                    selected: _teacherIds.contains(t.id),
-                    onSelected: canEdit
-                        ? (selected) {
-                            setState(() {
-                              if (selected) {
-                                _teacherIds.add(t.id);
-                              } else {
-                                _teacherIds.remove(t.id);
-                              }
-                              _dirty = true;
-                            });
-                          }
-                        : null,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
             DropdownButtonFormField<String?>(
               key: ValueKey(_categoryId),
               initialValue: _categoryId,

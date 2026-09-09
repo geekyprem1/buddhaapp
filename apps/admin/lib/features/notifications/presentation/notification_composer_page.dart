@@ -13,7 +13,6 @@ import '../../../widgets/responsive_layout.dart';
 import '../../../widgets/unsaved_changes_guard.dart';
 import '../../../widgets/upload_field.dart';
 import '../../auth/application/admin_session.dart';
-import '../../teachers/application/teachers_providers.dart';
 import '../application/notifications_providers.dart';
 
 const _modules = <(String, String)>[
@@ -29,7 +28,7 @@ const _modules = <(String, String)>[
   ('profile', 'Profile'),
 ];
 
-enum _AudienceKind { all, language, teacher, platform, user }
+enum _AudienceKind { all, language, platform, user }
 
 enum _LinkKind { none, module, route, url }
 
@@ -58,7 +57,6 @@ class _NotificationComposerPageState
   String? _imageUrl;
   _AudienceKind _audienceKind = _AudienceKind.all;
   String _language = AppConstants.defaultLanguageCode;
-  String? _teacherId;
   String _platform = 'android';
   _LinkKind _linkKind = _LinkKind.none;
   String _module = 'home';
@@ -127,9 +125,6 @@ class _NotificationComposerPageState
     if (raw.startsWith('language:')) {
       _audienceKind = _AudienceKind.language;
       _language = raw.substring('language:'.length);
-    } else if (raw.startsWith('teacher:')) {
-      _audienceKind = _AudienceKind.teacher;
-      _teacherId = raw.substring('teacher:'.length);
     } else if (raw.startsWith('platform:')) {
       _audienceKind = _AudienceKind.platform;
       _platform = raw.substring('platform:'.length);
@@ -161,7 +156,6 @@ class _NotificationComposerPageState
     return switch (_audienceKind) {
       _AudienceKind.all => NotificationAudience.all,
       _AudienceKind.language => NotificationAudience.language(_language),
-      _AudienceKind.teacher => NotificationAudience.teacher(_teacherId ?? ''),
       _AudienceKind.platform => NotificationAudience.platform(_platform),
       _AudienceKind.user => NotificationAudience.user(_userId.text.trim()),
     };
@@ -416,8 +410,6 @@ class _NotificationComposerPageState
       );
     }
 
-    final teachers = ref.watch(adminTeachersProvider).valueOrNull ?? const [];
-
     return AdminPageFrame(
       title: widget.isNew
           ? AdminStrings.composeNotification
@@ -452,7 +444,7 @@ class _NotificationComposerPageState
             final wide = constraints.maxWidth >= 980;
             final compact = AdminResponsive.isCompact(context);
             final gutter = AdminResponsive.gutter(context);
-            final form = _form(teachers);
+            final form = _form();
             final preview = _PhonePreview(
               title: _title.text.trim().isEmpty
                   ? 'Dhamma Path'
@@ -501,7 +493,7 @@ class _NotificationComposerPageState
     );
   }
 
-  Widget _form(List<Teacher> teachers) {
+  Widget _form() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -585,25 +577,6 @@ class _NotificationComposerPageState
                 ? null
                 : (v) => setState(() {
                       _language = v ?? _language;
-                      _dirty = true;
-                    }),
-          ),
-        if (_audienceKind == _AudienceKind.teacher)
-          DropdownButtonFormField<String>(
-            initialValue: teachers.any((t) => t.id == _teacherId)
-                ? _teacherId
-                : (teachers.isEmpty ? null : teachers.first.id),
-            decoration:
-                const InputDecoration(labelText: AdminStrings.teachersField),
-            items: [
-              for (final t in teachers)
-                DropdownMenuItem(
-                    value: t.id, child: Text(t.name.resolve('en'))),
-            ],
-            onChanged: _locked
-                ? null
-                : (v) => setState(() {
-                      _teacherId = v;
                       _dirty = true;
                     }),
           ),
@@ -745,7 +718,6 @@ class _NotificationComposerPageState
   String _audienceKindLabel(_AudienceKind kind) => switch (kind) {
         _AudienceKind.all => AdminStrings.notifAudienceAll,
         _AudienceKind.language => AdminStrings.notifAudienceLanguage,
-        _AudienceKind.teacher => AdminStrings.notifAudienceTeacher,
         _AudienceKind.platform => AdminStrings.notifAudiencePlatform,
         _AudienceKind.user => AdminStrings.notifAudienceUser,
       };

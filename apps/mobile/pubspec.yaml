@@ -1,7 +1,7 @@
 name: dhamma_path
 description: "Dhamma Path — Buddhist devotional content app."
 publish_to: 'none'
-version: 1.4.0+9
+version: 1.5.0+10
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
@@ -84,3 +84,4 @@ flutter:
     - assets/branding/app_icon.png
     - assets/audio/bell.mp3
     - assets/video/login_bg.mp4
+    - assets/dana/dana_qr.png

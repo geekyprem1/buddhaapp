@@ -97,14 +97,14 @@ void main() {
     test('hides user management from content managers', () {
       final paths = visibleFor(AdminRole.contentManager).map((d) => d.path);
       expect(paths, isNot(contains(AdminRoutes.users)));
-      expect(paths, contains(AdminRoutes.teachers));
+      expect(paths, contains(AdminRoutes.categories));
       expect(paths, isNot(contains(AdminRoutes.config)));
     });
 
-    test('moderators see content lists but not teacher CRUD', () {
+    test('moderators see content lists but not content-editor CRUD', () {
       final paths = visibleFor(AdminRole.moderator).map((d) => d.path);
       expect(paths, contains(AdminRoutes.wallpapers));
-      expect(paths, isNot(contains(AdminRoutes.teachers)));
+      expect(paths, isNot(contains(AdminRoutes.categories)));
       expect(paths, contains(AdminRoutes.dashboard));
     });
   });

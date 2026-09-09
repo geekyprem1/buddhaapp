@@ -332,10 +332,6 @@ class _UserRow extends StatelessWidget {
                   _MetaChip(label: user.platform),
                   _MetaChip(
                     label:
-                        '${AdminStrings.usersTeachers}: ${user.selectedTeachers.length}',
-                  ),
-                  _MetaChip(
-                    label:
                         '${AdminStrings.usersJoined} ${_fmt(user.createdAt)}',
                   ),
                   _MetaChip(

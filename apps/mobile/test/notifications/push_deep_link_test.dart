@@ -28,14 +28,11 @@ void main() {
   test('topics follow the architecture naming', () {
     final topics = FcmTopics.forUser(
       language: 'hi',
-      teacherIds: const ['buddha', 'ambedkar'],
       pushEnabled: true,
     );
-    expect(topics,
-        containsAll(['all', 'lang_hi', 'teacher_buddha', 'teacher_ambedkar']));
+    expect(topics, containsAll(['all', 'lang_hi']));
     expect(
-      FcmTopics.forUser(
-          language: 'en', teacherIds: const [], pushEnabled: false),
+      FcmTopics.forUser(language: 'en', pushEnabled: false),
       isEmpty,
     );
   });

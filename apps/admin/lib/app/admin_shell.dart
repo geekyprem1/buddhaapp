@@ -365,9 +365,9 @@ class _TopBar extends StatelessWidget {
 IconData _iconFor(String path) {
   return switch (path) {
     AdminRoutes.dashboard => Icons.dashboard_outlined,
-    AdminRoutes.teachers => Icons.people_outline,
     AdminRoutes.categories => Icons.category_outlined,
     AdminRoutes.wisdom => Icons.lightbulb_outline,
+    AdminRoutes.homeBanners => Icons.view_carousel_outlined,
     AdminRoutes.wallpapers => Icons.image_outlined,
     AdminRoutes.ringtones => Icons.notifications_outlined,
     AdminRoutes.songs => Icons.library_music_outlined,

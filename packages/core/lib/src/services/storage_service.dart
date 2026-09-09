@@ -19,6 +19,9 @@ abstract class StoragePaths {
   static String wisdomImage(String wisdomId, [String ext = 'webp']) =>
       'wisdoms/$wisdomId/image.$ext';
 
+  static String homeBannerImage(String bannerId, [String ext = 'webp']) =>
+      'homeBanners/$bannerId/image.$ext';
+
   static String placeThumb(String placeId, [String ext = 'webp']) =>
       'places/$placeId/thumb.$ext';
 

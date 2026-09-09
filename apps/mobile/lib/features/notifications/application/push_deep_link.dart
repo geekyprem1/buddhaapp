@@ -49,18 +49,14 @@ abstract class FcmTopics {
 
   static String language(String code) => 'lang_${_safe(code)}';
 
-  static String teacher(String id) => 'teacher_${_safe(id)}';
-
   static Set<String> forUser({
     required String language,
-    required List<String> teacherIds,
     required bool pushEnabled,
   }) {
     if (!pushEnabled) return {};
     return {
       all,
       FcmTopics.language(language),
-      for (final id in teacherIds) FcmTopics.teacher(id),
     };
   }
 

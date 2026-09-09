@@ -12,6 +12,7 @@ abstract class FirestoreCollections {
   static const wisdoms = 'wisdoms';
   static const videos = 'videos';
   static const places = 'places';
+  static const homeBanners = 'homeBanners';
 
   static const wallpapers = 'wallpapers';
   static const ringtones = 'ringtones';
