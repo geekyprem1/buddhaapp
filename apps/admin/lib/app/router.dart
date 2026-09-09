@@ -18,6 +18,7 @@ import '../features/content/presentation/content_list_page.dart';
 import '../features/content/presentation/status_layout_editor_page.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/config/presentation/config_page.dart';
+import '../features/premium/presentation/premium_config_page.dart';
 import '../features/notifications/presentation/notification_composer_page.dart';
 import '../features/notifications/presentation/notifications_list_page.dart';
 import '../features/pages/presentation/page_editor_page.dart';
@@ -192,6 +193,10 @@ GoRouter adminRouter(Ref ref) {
           GoRoute(
             path: AdminRoutes.config,
             builder: (context, state) => const ConfigPage(),
+          ),
+          GoRoute(
+            path: AdminRoutes.premium,
+            builder: (context, state) => const PremiumConfigPage(),
           ),
           GoRoute(
             path: AdminRoutes.audit,

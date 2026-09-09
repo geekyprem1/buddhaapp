@@ -8,6 +8,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../content/presentation/content_list_scaffold.dart';
 import '../../player/application/audio_providers.dart';
+import '../../premium/application/premium_guard.dart';
 import 'set_ringtone_sheet.dart';
 
 /// Ringtones list (PRD FR-8.1–8.3). Tap previews inline (T2.39).
@@ -77,13 +78,16 @@ class _RingtoneListScreenState extends ConsumerState<RingtoneListScreen>
             ),
             onPressed: url == null
                 ? null
-                : () => showSetRingtoneSheet(
+                : () {
+                    if (!ensurePremium(ref, context)) return;
+                    showSetRingtoneSheet(
                       context: context,
                       ref: ref,
                       audioUrl: url,
                       itemId: item.id,
                       title: item.title.resolve(language),
-                    ),
+                    );
+                  },
             child: Text(l10n?.set ?? 'Set'),
           ),
           onTap: () {

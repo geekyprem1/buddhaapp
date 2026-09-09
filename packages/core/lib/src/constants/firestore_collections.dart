@@ -62,6 +62,7 @@ abstract class ConfigDocIds {
   static const homeLayout = 'home_layout';
   static const languages = 'languages';
   static const promo = 'promo';
+  static const premium = 'premium';
 }
 
 /// Well-known document ids (slugs) inside [FirestoreCollections.staticPages].

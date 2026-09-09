@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Monochrome white status-bar / media notification icon.
+
+  Android tints notification small-icons to a flat white silhouette, so this
+  MUST be a single-colour (white on transparent) vector — the coloured
+  adaptive launcher icon cannot be used here or the notification renders blank
+  and may be suppressed entirely.
+
+  Shape: a simple Bodhi leaf, matching the Dhamma Path brand.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFFFF">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2C8,6 4,9 4,14a8,8 0 0,0 7,7.94V22h2v-0.06A8,8 0 0,0 20,14c0,-5 -4,-8 -8,-12zM12,4.6c2.9,3.1 6,5.5 6,9.4a6,6 0 0,1 -5,5.92V13.4l2.7,-2.7 -0.7,-0.7 -2,2V8h-2v3.99l-2,-2 -0.7,0.7 2.7,2.7v6.52A6,6 0 0,1 6,14c0,-3.9 3.1,-6.3 6,-9.4z" />
+</vector>

@@ -9,6 +9,7 @@ import 'package:video_player/video_player.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/category_filter_providers.dart';
 import '../../content/application/content_list_controller.dart';
+import '../../premium/application/premium_guard.dart';
 import '../application/wallpaper_providers.dart';
 import 'set_wallpaper_sheet.dart';
 
@@ -54,6 +55,7 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
   }
 
   Future<void> _setLive(String itemId, String videoUrl) async {
+    if (!ensurePremium(ref, context)) return;
     AppHaptics.impact();
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -145,12 +147,15 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
                       imageUrl: posterUrl,
                       onSet: posterUrl == null
                           ? null
-                          : () => showSetWallpaperSheet(
+                          : () {
+                              if (!ensurePremium(ref, context)) return;
+                              showSetWallpaperSheet(
                                 context: context,
                                 ref: ref,
                                 imageUrl: posterUrl,
                                 itemId: item.id,
-                              ),
+                              );
+                            },
                       setLabel: l10n?.setWallpaperTitle ?? 'Set wallpaper',
                     );
                   },

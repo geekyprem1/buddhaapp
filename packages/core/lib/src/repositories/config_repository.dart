@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../constants/firestore_collections.dart';
 import '../models/app_config.dart';
 import '../models/home_layout.dart';
+import '../models/premium_config.dart';
 import '../utils/repo_guard.dart';
 
 /// Reads/writes `config/*` (Architecture §6.2, PRD AR-7.1).
@@ -20,6 +21,9 @@ class ConfigRepository with RepoGuard {
 
   DocumentReference<Map<String, dynamic>> get _homeLayout =>
       _config.doc(ConfigDocIds.homeLayout);
+
+  DocumentReference<Map<String, dynamic>> get _premium =>
+      _config.doc(ConfigDocIds.premium);
 
   AppConfig _fromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
     if (!snap.exists || snap.data() == null) return const AppConfig();
@@ -72,6 +76,33 @@ class ConfigRepository with RepoGuard {
       final data = layout.toJson();
       data['updatedAt'] = DateTime.now();
       return _homeLayout.set(data, SetOptions(merge: true));
+    });
+  }
+
+  PremiumConfig _premiumFromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
+    if (!snap.exists || snap.data() == null) return const PremiumConfig();
+    return PremiumConfig.fromJson(snap.data()!);
+  }
+
+  Stream<PremiumConfig> watchPremiumConfig() {
+    return guardedStream(
+      'config.watchPremiumConfig',
+      _premium.snapshots().map(_premiumFromSnap),
+    );
+  }
+
+  Future<PremiumConfig> getPremiumConfig() {
+    return guardedRead(
+      'config.getPremiumConfig',
+      () async => _premiumFromSnap(await _premium.get()),
+    );
+  }
+
+  Future<void> savePremiumConfig(PremiumConfig config) {
+    return guardedWrite('config.savePremiumConfig', () {
+      final data = config.toJson();
+      data['updatedAt'] = DateTime.now();
+      return _premium.set(data, SetOptions(merge: true));
     });
   }
 }

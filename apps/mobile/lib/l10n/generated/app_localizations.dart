@@ -814,6 +814,120 @@ abstract class AppLocalizations {
   /// **'This is a voluntary charitable donation to support the running of this app. It is not a purchase and does not unlock any features or content.'**
   String get danaDisclaimer;
 
+  /// No description provided for @premiumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhamma Path Premium'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock everything'**
+  String get premiumHeadline;
+
+  /// No description provided for @premiumSubhead.
+  ///
+  /// In en, this message translates to:
+  /// **'One plan unlocks all wallpapers, ringtones, songs, meditations, chanting, vandana and videos.'**
+  String get premiumSubhead;
+
+  /// No description provided for @premiumBenefitWallpapers.
+  ///
+  /// In en, this message translates to:
+  /// **'Set unlimited HD wallpapers'**
+  String get premiumBenefitWallpapers;
+
+  /// No description provided for @premiumBenefitRingtones.
+  ///
+  /// In en, this message translates to:
+  /// **'Set any ringtone, alarm or notification tone'**
+  String get premiumBenefitRingtones;
+
+  /// No description provided for @premiumBenefitAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'All songs, meditations, chanting & vandana'**
+  String get premiumBenefitAudio;
+
+  /// No description provided for @premiumBenefitVideos.
+  ///
+  /// In en, this message translates to:
+  /// **'All videos'**
+  String get premiumBenefitVideos;
+
+  /// No description provided for @premiumBenefitAdFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Support the app and its mission'**
+  String get premiumBenefitAdFree;
+
+  /// No description provided for @premiumPlanName.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Monthly'**
+  String get premiumPlanName;
+
+  /// No description provided for @premiumPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'/month'**
+  String get premiumPerMonth;
+
+  /// No description provided for @premiumTrialBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days free, then billed monthly'**
+  String get premiumTrialBadge;
+
+  /// No description provided for @premiumStartTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 3-day free trial'**
+  String get premiumStartTrial;
+
+  /// No description provided for @premiumTrialNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Free for 3 days, then ₹199/month. Cancel anytime in Google Play.'**
+  String get premiumTrialNote;
+
+  /// No description provided for @premiumRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get premiumRestore;
+
+  /// No description provided for @premiumRestoreDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore complete. If you have an active plan it is now active.'**
+  String get premiumRestoreDone;
+
+  /// No description provided for @premiumStoreUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Store unavailable. Please try again later.'**
+  String get premiumStoreUnavailable;
+
+  /// No description provided for @premiumThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now Premium. Enjoy!'**
+  String get premiumThankYou;
+
+  /// No description provided for @premiumLegalPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions renew automatically. See '**
+  String get premiumLegalPrefix;
+
+  /// No description provided for @premiumLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium feature'**
+  String get premiumLockedTitle;
+
   /// No description provided for @homeBuddhistPlaces.
   ///
   /// In en, this message translates to:

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../premium/application/premium_guard.dart';
 
 /// Videos screen — a scrollable list of admin-curated YouTube videos, each
 /// shown as a thumbnail card. Tapping opens the in-app player.
@@ -49,6 +50,7 @@ class VideoListScreen extends ConsumerWidget {
                 title: v.title.resolve(language),
                 thumbnailUrl: v.thumbnailUrl,
                 onTap: () {
+                  if (!ensurePremium(ref, context)) return;
                   AppHaptics.impact();
                   context.push(AppRoutes.videoPlayer, extra: v);
                 },

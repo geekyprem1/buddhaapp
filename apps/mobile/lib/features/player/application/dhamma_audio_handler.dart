@@ -413,6 +413,10 @@ Future<DhammaAudioHandler> initAudioHandler() async {
       androidNotificationChannelName: 'Dhamma Path',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
+      // MUST be a monochrome white drawable — the (now adaptive) launcher
+      // icon renders blank in the status bar and can suppress the media
+      // notification entirely.
+      androidNotificationIcon: 'drawable/ic_stat_dhamma',
     ),
   );
   return _handler!;

@@ -134,6 +134,11 @@ abstract class AdminStrings {
   static const homeBannerImageRequired = 'Upload a slide image first.';
   static const homeBannerOpens = 'Opens';
   static const homeBannerNoAction = 'Nothing (image only)';
+  static const premiumIntro =
+      'Settings for the in-app premium paywall (3-day trial, then \u20b9199/month).';
+  static const premiumVideoField = 'Premium page video (mp4)';
+  static const premiumVideoHint =
+      'Shown at the top of the premium page in the app. Max 60 MB.';
   static const videos = 'Videos';
   static const videoUrlField = 'YouTube URL';
   static const videoUrlHint =

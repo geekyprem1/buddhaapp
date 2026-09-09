@@ -380,6 +380,68 @@ class AppLocalizationsMr extends AppLocalizations {
       'हे अ‍ॅप चालवण्यासाठी सहकार्यार्थ हे एक स्वैच्छिक दान आहे. ही खरेदी नाही आणि यामुळे कोणतेही फीचर किंवा सामग्री अनलॉक होत नाही.';
 
   @override
+  String get premiumTitle => 'धम्म पथ प्रीमियम';
+
+  @override
+  String get premiumHeadline => 'सर्व काही अनलॉक करा';
+
+  @override
+  String get premiumSubhead =>
+      'एकाच प्लॅनमध्ये सर्व वॉलपेपर, रिंगटोन, गाणी, ध्यान, जप, वंदना आणि व्हिडिओ अनलॉक.';
+
+  @override
+  String get premiumBenefitWallpapers => 'अमर्यादित HD वॉलपेपर सेट करा';
+
+  @override
+  String get premiumBenefitRingtones =>
+      'कोणताही रिंगटोन, अलार्म किंवा सूचना टोन सेट करा';
+
+  @override
+  String get premiumBenefitAudio => 'सर्व गाणी, ध्यान, जप आणि वंदना';
+
+  @override
+  String get premiumBenefitVideos => 'सर्व व्हिडिओ';
+
+  @override
+  String get premiumBenefitAdFree => 'अ‍ॅप आणि त्याच्या ध्येयाला सहकार्य करा';
+
+  @override
+  String get premiumPlanName => 'प्रीमियम मासिक';
+
+  @override
+  String get premiumPerMonth => '/महिना';
+
+  @override
+  String get premiumTrialBadge => '3 दिवस मोफत, नंतर मासिक शुल्क';
+
+  @override
+  String get premiumStartTrial => '3 दिवसांची मोफत चाचणी सुरू करा';
+
+  @override
+  String get premiumTrialNote =>
+      '3 दिवस मोफत, नंतर ₹199/महिना. Google Play मध्ये कधीही रद्द करा.';
+
+  @override
+  String get premiumRestore => 'खरेदी पुनर्संचयित करा';
+
+  @override
+  String get premiumRestoreDone =>
+      'पुनर्संचयन पूर्ण. तुमचा प्लॅन सक्रिय असल्यास आता लागू आहे.';
+
+  @override
+  String get premiumStoreUnavailable =>
+      'स्टोअर उपलब्ध नाही. कृपया नंतर प्रयत्न करा.';
+
+  @override
+  String get premiumThankYou => 'आता तुम्ही प्रीमियम आहात. आनंद घ्या!';
+
+  @override
+  String get premiumLegalPrefix => 'सबस्क्रिप्शन आपोआप नूतनीकरण होते. पहा ';
+
+  @override
+  String get premiumLockedTitle => 'प्रीमियम फीचर';
+
+  @override
   String get homeBuddhistPlaces => 'बौद्ध स्थळे';
 
   @override

@@ -10,6 +10,7 @@ import '../../content/application/category_filter_providers.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../content/presentation/content_list_scaffold.dart';
 import '../../player/application/audio_providers.dart';
+import '../../premium/application/premium_guard.dart';
 import '../application/meditation_series.dart';
 
 /// Meditation list (PRD FR-10.1, 10.2). Opens the shared player, which
@@ -31,6 +32,7 @@ class MeditationListScreen extends ConsumerWidget {
           item: item,
           language: language,
           onTap: () {
+            if (!ensurePremium(ref, context)) return;
             final categoryId = ref.read(
               contentCategoryFilterProvider(ContentType.meditation),
             );

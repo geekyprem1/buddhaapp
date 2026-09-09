@@ -379,6 +379,69 @@ class AppLocalizationsEn extends AppLocalizations {
       'This is a voluntary charitable donation to support the running of this app. It is not a purchase and does not unlock any features or content.';
 
   @override
+  String get premiumTitle => 'Dhamma Path Premium';
+
+  @override
+  String get premiumHeadline => 'Unlock everything';
+
+  @override
+  String get premiumSubhead =>
+      'One plan unlocks all wallpapers, ringtones, songs, meditations, chanting, vandana and videos.';
+
+  @override
+  String get premiumBenefitWallpapers => 'Set unlimited HD wallpapers';
+
+  @override
+  String get premiumBenefitRingtones =>
+      'Set any ringtone, alarm or notification tone';
+
+  @override
+  String get premiumBenefitAudio =>
+      'All songs, meditations, chanting & vandana';
+
+  @override
+  String get premiumBenefitVideos => 'All videos';
+
+  @override
+  String get premiumBenefitAdFree => 'Support the app and its mission';
+
+  @override
+  String get premiumPlanName => 'Premium Monthly';
+
+  @override
+  String get premiumPerMonth => '/month';
+
+  @override
+  String get premiumTrialBadge => '3 days free, then billed monthly';
+
+  @override
+  String get premiumStartTrial => 'Start 3-day free trial';
+
+  @override
+  String get premiumTrialNote =>
+      'Free for 3 days, then ₹199/month. Cancel anytime in Google Play.';
+
+  @override
+  String get premiumRestore => 'Restore purchases';
+
+  @override
+  String get premiumRestoreDone =>
+      'Restore complete. If you have an active plan it is now active.';
+
+  @override
+  String get premiumStoreUnavailable =>
+      'Store unavailable. Please try again later.';
+
+  @override
+  String get premiumThankYou => 'You are now Premium. Enjoy!';
+
+  @override
+  String get premiumLegalPrefix => 'Subscriptions renew automatically. See ';
+
+  @override
+  String get premiumLockedTitle => 'Premium feature';
+
+  @override
   String get homeBuddhistPlaces => 'Buddhist Places';
 
   @override

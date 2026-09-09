@@ -10,6 +10,7 @@ import '../../content/application/category_filter_providers.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../content/presentation/content_list_scaffold.dart';
 import '../../player/application/audio_providers.dart';
+import '../../premium/application/premium_guard.dart';
 
 /// Songs list (PRD FR-9.1, 9.2) — rows opening the full player (T2.44).
 class SongListScreen extends ConsumerWidget {
@@ -29,6 +30,7 @@ class SongListScreen extends ConsumerWidget {
           item: item,
           language: language,
           onTap: () {
+            if (!ensurePremium(ref, context)) return;
             final categoryId = ref.read(
               contentCategoryFilterProvider(ContentType.song),
             );

@@ -379,6 +379,7 @@ IconData _iconFor(String path) {
     AdminRoutes.users => Icons.manage_accounts_outlined,
     AdminRoutes.notifications => Icons.campaign_outlined,
     AdminRoutes.config => Icons.settings_outlined,
+    AdminRoutes.premium => Icons.workspace_premium_outlined,
     AdminRoutes.pages => Icons.article_outlined,
     AdminRoutes.audit => Icons.history,
     AdminRoutes.contact => Icons.mail_outline,

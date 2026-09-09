@@ -34,6 +34,10 @@ service firebase.storage {
       allow read: if isSignedIn();
       allow write: if isContentEditor();
     }
+    match /premium/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isContentEditor();
+    }
     match /places/{itemId}/{fileName} {
       allow read: if isSignedIn();
       allow write: if isContentEditor();

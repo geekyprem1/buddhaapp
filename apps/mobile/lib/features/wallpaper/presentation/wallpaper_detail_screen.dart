@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
+import '../../premium/application/premium_guard.dart';
 import '../application/wallpaper_gallery.dart';
 import '../application/wallpaper_providers.dart';
 import 'set_wallpaper_sheet.dart';
@@ -161,12 +162,15 @@ class _WallpaperDetailScreenState extends ConsumerState<WallpaperDetailScreen> {
                     child: FilledButton(
                       onPressed: _busy || _imageUrl == null
                           ? null
-                          : () => showSetWallpaperSheet(
+                          : () {
+                              if (!ensurePremium(ref, context)) return;
+                              showSetWallpaperSheet(
                                 context: context,
                                 ref: ref,
                                 imageUrl: _imageUrl!,
                                 itemId: _item.id,
-                              ),
+                              );
+                            },
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(

@@ -24,6 +24,7 @@ abstract class AdminRoutes {
   static const users = '/users';
   static const notifications = '/notifications';
   static const config = '/config';
+  static const premium = '/premium';
   static const pages = '/pages';
   static const audit = '/audit';
   static const contact = '/contact';
@@ -126,6 +127,11 @@ const adminDestinations = <AdminDestination>[
   AdminDestination(
     path: AdminRoutes.config,
     label: 'App config',
+    allowed: AdminRole.canEditConfig,
+  ),
+  AdminDestination(
+    path: AdminRoutes.premium,
+    label: 'Premium',
     allowed: AdminRole.canEditConfig,
   ),
   AdminDestination(

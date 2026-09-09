@@ -10,6 +10,7 @@ import '../../content/application/category_filter_providers.dart';
 import '../../content/presentation/audio_list_tile.dart';
 import '../../content/presentation/content_list_scaffold.dart';
 import '../../player/application/audio_providers.dart';
+import '../../premium/application/premium_guard.dart';
 
 class ChantingListScreen extends ConsumerWidget {
   const ChantingListScreen({super.key});
@@ -28,6 +29,7 @@ class ChantingListScreen extends ConsumerWidget {
           item: item,
           language: language,
           onTap: () {
+            if (!ensurePremium(ref, context)) return;
             final categoryId = ref.read(
               contentCategoryFilterProvider(ContentType.chanting),
             );

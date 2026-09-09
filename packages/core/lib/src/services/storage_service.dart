@@ -22,6 +22,10 @@ abstract class StoragePaths {
   static String homeBannerImage(String bannerId, [String ext = 'webp']) =>
       'homeBanners/$bannerId/image.$ext';
 
+  /// The promo mp4 shown on the premium page. Not named `original.*` so the
+  /// image pipeline never tries to decode it.
+  static String premiumVideo([String ext = 'mp4']) => 'premium/video.$ext';
+
   static String placeThumb(String placeId, [String ext = 'webp']) =>
       'places/$placeId/thumb.$ext';
 

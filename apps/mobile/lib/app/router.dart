@@ -10,6 +10,7 @@ import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart
 import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/dana/presentation/dana_screen.dart';
+import '../features/premium/presentation/premium_screen.dart';
 import '../features/places/presentation/place_detail_screen.dart';
 import '../features/places/presentation/places_list_screen.dart';
 import '../features/tipitaka/presentation/tipitaka_screen.dart';
@@ -62,6 +63,7 @@ abstract class AppRoutes {
   static const videoPlayer = '/videos/play';
   static const tipitaka = '/tipitaka';
   static const dana = '/dana';
+  static const premium = '/premium';
   static const places = '/places';
   static const placeDetail = '/places/view';
   static const wisdomDetail = '/wisdom';
@@ -305,6 +307,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.dana,
         builder: (context, state) => const DanaScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.premium,
+        builder: (context, state) => const PremiumScreen(),
       ),
       GoRoute(
         path: AppRoutes.places,

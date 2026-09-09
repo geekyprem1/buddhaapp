@@ -27,6 +27,7 @@ export 'src/models/localised_text.dart';
 export 'src/models/notification_campaign.dart';
 export 'src/models/static_page.dart';
 export 'src/models/home_banner.dart';
+export 'src/models/premium_config.dart';
 export 'src/models/teacher.dart';
 export 'src/models/video.dart';
 export 'src/models/wisdom.dart';
