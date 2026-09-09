@@ -8,7 +8,6 @@ import 'package:video_player/video_player.dart';
 
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
-import '../../../widgets/brand_header.dart';
 import '../application/auth_controller.dart';
 import '../application/auth_error_messages.dart';
 
@@ -89,11 +88,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final video = _bgVideo;
     return Scaffold(
+      // Keep the video fixed when the keyboard opens; the sheet handles the
+      // inset itself (see _buildSheet) so only it lifts above the keyboard.
+      resizeToAvoidBottomInset: false,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background video (falls back to the theme background if it can't
-          // load / while it's initialising).
+          // Background video, shown as-is (no scrim) so it stays bright.
+          // Falls back to the theme background while initialising / on error.
           if (_bgReady && video != null)
             FittedBox(
               fit: BoxFit.cover,
@@ -104,24 +106,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: VideoPlayer(video),
               ),
             ),
-          // Dark scrim so the form stays legible over the video.
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.black54, Colors.black87],
-              ),
-            ),
+          // The login form lives in a cream sheet pinned to the bottom. The
+          // brand logo/name already live inside the video, so we don't draw
+          // our own BrandHeader here (that caused a double-logo overlap).
+          //
+          // `Align.bottomCenter` (instead of a Column with a Spacer) keeps the
+          // video fixed when the keyboard opens — only the sheet lifts above
+          // the keyboard, the artwork behind it never jumps.
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildSheet(context, l10n, isLoading),
           ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                children: [
-                  const SizedBox(height: AppSpacing.xl),
-                  const BrandHeader(compact: true, onDark: true),
-                  const SizedBox(height: AppSpacing.xl),
+        ],
+      ),
+    );
+  }
+
+  /// The cream "sheet" that rises from the bottom and holds the whole form.
+  Widget _buildSheet(
+    BuildContext context,
+    AppLocalizations? l10n,
+    bool isLoading,
+  ) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 24,
+            offset: Offset(0, -6),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            // Lift the sheet above the keyboard when it's open.
+            AppSpacing.md + MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
@@ -167,7 +199,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: AppSpacing.sm),
               OutlinedButton.icon(
                 onPressed: isLoading ? null : _continueWithGoogle,
-                icon: const Icon(Icons.g_mobiledata, color: Colors.white),
+                icon: const Icon(
+                  Icons.g_mobiledata,
+                  color: AppColors.primary,
+                ),
                 label: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -175,8 +210,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white70),
+                  foregroundColor: AppColors.textPrimary,
+                  side: BorderSide(
+                    color: AppColors.textSecondary.withValues(alpha: 0.4),
+                  ),
                   minimumSize: const Size.fromHeight(
                     AppSpacing.minTouchTarget,
                   ),
@@ -185,7 +222,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.md),
               Wrap(
                 alignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -194,7 +231,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     l10n?.loginLegalPrefix ??
                         'By continuing you agree to the ',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
+                          color: AppColors.textSecondary,
                         ),
                   ),
                   InkWell(
@@ -204,7 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       l10n?.profileTermsConditions ?? 'Terms',
                       style: const TextStyle(
-                        color: AppColors.accent,
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -212,7 +249,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     l10n?.loginLegalAnd ?? ' and ',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
+                          color: AppColors.textSecondary,
                         ),
                   ),
                   InkWell(
@@ -222,7 +259,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       l10n?.profilePrivacyPolicy ?? 'Privacy Policy',
                       style: const TextStyle(
-                        color: AppColors.accent,
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -230,16 +267,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     '.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
+                          color: AppColors.textSecondary,
                         ),
                   ),
                 ],
               ),
-                ],
-              ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
