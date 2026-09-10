@@ -928,6 +928,24 @@ abstract class AppLocalizations {
   /// **'Premium feature'**
   String get premiumLockedTitle;
 
+  /// No description provided for @premiumActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium active'**
+  String get premiumActive;
+
+  /// No description provided for @premiumGoPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Premium'**
+  String get premiumGoPremium;
+
+  /// No description provided for @premiumRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get premiumRefresh;
+
   /// No description provided for @homeBuddhistPlaces.
   ///
   /// In en, this message translates to:

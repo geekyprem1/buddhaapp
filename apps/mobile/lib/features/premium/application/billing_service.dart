@@ -52,10 +52,18 @@ class BillingService {
     }
   }
 
-  /// True when a purchase for our subscription is in a granting state.
+  /// True when a purchase for our subscription is in a currently-granting
+  /// state. A cancelled/expired subscription arrives with a non-granting
+  /// status (or simply stops arriving), so this is used to *recompute*
+  /// entitlement from scratch rather than to only ever turn it on.
   static bool grantsEntitlement(PurchaseDetails p) {
-    return p.productID == _productId &&
-        (p.status == PurchaseStatus.purchased ||
-            p.status == PurchaseStatus.restored);
+    if (p.productID != _productId) return false;
+    return p.status == PurchaseStatus.purchased ||
+        p.status == PurchaseStatus.restored;
   }
+
+  /// A purchase update that concerns OUR product (any status). Used to know
+  /// the store has spoken about the subscription so we can flip entitlement
+  /// off when it's no longer granting.
+  static bool concernsOurProduct(PurchaseDetails p) => p.productID == _productId;
 }

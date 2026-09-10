@@ -442,6 +442,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumLockedTitle => 'Premium feature';
 
   @override
+  String get premiumActive => 'Premium active';
+
+  @override
+  String get premiumGoPremium => 'Go Premium';
+
+  @override
+  String get premiumRefresh => 'Refresh';
+
+  @override
   String get homeBuddhistPlaces => 'Buddhist Places';
 
   @override

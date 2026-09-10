@@ -35,10 +35,14 @@ service cloud.firestore {
     // --- Users ---
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
-      // Owner may write their own doc but never flip isBlocked or set a role.
+      // Owner may write their own doc but never flip isBlocked, set a role, or
+      // grant themselves premium — entitlement fields are written only by the
+      // verifyPurchase / RTDN Cloud Functions (admin SDK bypasses rules).
       allow create: if isOwner(uid);
       allow update: if (isOwner(uid) &&
-                        !('isBlocked' in request.resource.data.diff(resource.data).affectedKeys())) ||
+                        !request.resource.data.diff(resource.data).affectedKeys()
+                          .hasAny(['isBlocked', 'premiumUntil', 'premiumToken',
+                                   'premiumState', 'premiumUpdatedAt'])) ||
                        isAdmin();
       allow delete: if false; // deletion is via processDeletionRequest Function only
 

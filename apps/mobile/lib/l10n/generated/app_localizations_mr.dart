@@ -442,6 +442,15 @@ class AppLocalizationsMr extends AppLocalizations {
   String get premiumLockedTitle => 'प्रीमियम फीचर';
 
   @override
+  String get premiumActive => 'प्रीमियम सक्रिय';
+
+  @override
+  String get premiumGoPremium => 'प्रीमियम घ्या';
+
+  @override
+  String get premiumRefresh => 'रिफ्रेश';
+
+  @override
   String get homeBuddhistPlaces => 'बौद्ध स्थळे';
 
   @override

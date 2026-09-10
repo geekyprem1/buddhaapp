@@ -31,3 +31,7 @@ export {
 export { publishScheduled } from "./content/publishScheduled";
 export { aggregateEvents } from "./counters/aggregateEvents";
 export { cleanupOrphans } from "./maintenance/cleanupOrphans";
+
+// Subscription billing — server-side verification (M?, monetization)
+export { verifyPurchase } from "./billing/verifyPurchase";
+export { playRtdn } from "./billing/playRtdn";

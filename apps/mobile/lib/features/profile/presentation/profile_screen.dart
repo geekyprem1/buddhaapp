@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../app/router.dart';
 import '../../../app/theme_controller.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../premium/application/premium_controller.dart';
 import '../../status/application/status_providers.dart';
 import '../application/profile_providers.dart';
 
@@ -81,6 +82,26 @@ class ProfileScreen extends ConsumerWidget {
                   ),
             ),
           const SizedBox(height: AppSpacing.lg),
+          Builder(
+            builder: (context) {
+              final isPremium = ref.watch(premiumControllerProvider);
+              return _row(
+                icon: isPremium
+                    ? Icons.workspace_premium
+                    : Icons.workspace_premium_outlined,
+                label: isPremium
+                    ? (l10n?.premiumActive ?? 'Premium active')
+                    : (l10n?.premiumGoPremium ?? 'Go Premium'),
+                trailing: TextButton(
+                  onPressed: () => ref
+                      .read(premiumControllerProvider.notifier)
+                      .refreshFromStore(),
+                  child: Text(l10n?.premiumRefresh ?? 'Refresh'),
+                ),
+                onTap: isPremium ? null : () => context.push(AppRoutes.premium),
+              );
+            },
+          ),
           _row(
             icon: Icons.edit_outlined,
             label: l10n?.profileEdit ?? 'Edit Profile',
