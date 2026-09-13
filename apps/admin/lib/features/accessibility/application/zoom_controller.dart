@@ -8,7 +8,7 @@ part 'zoom_controller.g.dart';
 /// The value multiplies every text size in the desk via [MediaQuery.textScaler]
 /// and is persisted so the choice survives a refresh or sign-out.
 const double kMinZoom = 1.0;
-const double kMaxZoom = 2.0;
+const double kMaxZoom = 3.0;
 const double kZoomStep = 0.1;
 const double _defaultZoom = 1.0;
 

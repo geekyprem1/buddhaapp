@@ -40,74 +40,81 @@ class _CategoriesListPageState extends ConsumerState<CategoriesListPage> {
           final rows = _module == null
               ? all
               : all.where((c) => c.module == _module).toList();
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: AdminResponsive.pagePadding(
-                  context,
-                  top: 16,
-                  bottom: 8,
-                ),
-                child: Wrap(
-                  spacing: 8,
-                  children: [
-                    FilterChip(
-                      label: const Text('All'),
-                      selected: _module == null,
-                      onSelected: (_) => setState(() => _module = null),
-                    ),
-                    for (final m in modules)
+          // Single scroll view (filters + list) so the page scrolls fully on
+          // phones and at high text zoom.
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 16,
+                    bottom: 8,
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
                       FilterChip(
-                        label: Text(m),
-                        selected: _module == m,
-                        onSelected: (_) => setState(() => _module = m),
+                        label: const Text('All'),
+                        selected: _module == null,
+                        onSelected: (_) => setState(() => _module = null),
                       ),
-                  ],
+                      for (final m in modules)
+                        FilterChip(
+                          label: Text(m),
+                          selected: _module == m,
+                          onSelected: (_) => setState(() => _module = m),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-              Expanded(
-                child: rows.isEmpty
-                    ? const EmptyState(message: AdminStrings.emptyList)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                          bottom: 32,
+              if (rows.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.emptyList),
+                )
+              else
+                SliverPadding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 8,
+                    bottom: 32,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: rows.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) {
+                      final c = rows[i];
+                      final status = c.isActive
+                          ? AdminStrings.active
+                          : AdminStrings.inactive;
+                      final compact = AdminResponsive.isCompact(context);
+                      return Material(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        child: ListTile(
+                          title: Text(
+                            c.name.resolve('en'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            compact
+                                ? '${c.module} · ${c.id}\n$status'
+                                : '${c.module} · ${c.id}',
+                            maxLines: compact ? 2 : 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: compact ? null : Text(status),
+                          onTap: () => context.go(
+                            '${AdminRoutes.categories}/${c.id}',
+                          ),
                         ),
-                        itemCount: rows.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final c = rows[i];
-                          final status = c.isActive
-                              ? AdminStrings.active
-                              : AdminStrings.inactive;
-                          final compact = AdminResponsive.isCompact(context);
-                          return Material(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            child: ListTile(
-                              title: Text(
-                                c.name.resolve('en'),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(
-                                compact
-                                    ? '${c.module} · ${c.id}\n$status'
-                                    : '${c.module} · ${c.id}',
-                                maxLines: compact ? 2 : 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              trailing: compact ? null : Text(status),
-                              onTap: () => context.go(
-                                '${AdminRoutes.categories}/${c.id}',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-              ),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },

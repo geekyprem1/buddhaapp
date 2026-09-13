@@ -29,43 +29,51 @@ class HomeBannersListPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => ErrorState(message: e.toString()),
         data: (items) {
-          return Column(
-            children: [
-              Padding(
-                padding:
-                    AdminResponsive.pagePadding(context, top: 16, bottom: 8),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    AdminStrings.homeBannersHint,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+          // Single scroll view (hint + list) so the page scrolls fully on
+          // phones and at high text zoom.
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      AdminResponsive.pagePadding(context, top: 16, bottom: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      AdminStrings.homeBannersHint,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
                   ),
                 ),
               ),
-              Expanded(
-                child: items.isEmpty
-                    ? const EmptyState(message: AdminStrings.emptyList)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                          bottom: 32,
+              if (items.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.emptyList),
+                )
+              else
+                SliverPadding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 8,
+                    bottom: 32,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) {
+                      final b = items[i];
+                      return _BannerRow(
+                        banner: b,
+                        onTap: () => context.go(
+                          '${AdminRoutes.homeBanners}/${b.id}',
                         ),
-                        itemCount: items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final b = items[i];
-                          return _BannerRow(
-                            banner: b,
-                            onTap: () => context.go(
-                              '${AdminRoutes.homeBanners}/${b.id}',
-                            ),
-                          );
-                        },
-                      ),
-              ),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },

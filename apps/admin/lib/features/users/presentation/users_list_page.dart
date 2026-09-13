@@ -152,91 +152,97 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
               return bc.compareTo(ac);
             });
 
-          return Column(
-            children: [
-              if (canManage) const _DeletionQueueSection(),
-              Padding(
-                padding: AdminResponsive.pagePadding(
-                  context,
-                  bottom: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: AdminStrings.usersSearchHint,
+          final listPadding = AdminResponsive.pagePadding(context, top: 8);
+          // One scroll view for the whole page so the header, filters and the
+          // list all scroll together — critical on phones and at high text
+          // zoom, where a fixed filter block used to leave no room (and no
+          // scroll) for the list below it.
+          return CustomScrollView(
+            slivers: [
+              if (canManage)
+                const SliverToBoxAdapter(child: _DeletionQueueSection()),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AdminResponsive.pagePadding(context, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: AdminStrings.usersSearchHint,
+                        ),
+                        onChanged: (v) => setState(() => _query = v),
                       ),
-                      onChanged: (v) => setState(() => _query = v),
-                    ),
-                    const SizedBox(height: 12),
-                    ResponsiveFormRow(
-                      children: [
-                        DropdownButtonFormField<String?>(
-                          initialValue: _language,
-                          decoration: const InputDecoration(
-                            labelText: AdminStrings.usersLanguage,
+                      const SizedBox(height: 12),
+                      ResponsiveFormRow(
+                        children: [
+                          DropdownButtonFormField<String?>(
+                            initialValue: _language,
+                            decoration: const InputDecoration(
+                              labelText: AdminStrings.usersLanguage,
+                            ),
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text(AdminStrings.usersAllLanguages),
+                              ),
+                              for (final l in languages)
+                                DropdownMenuItem(value: l, child: Text(l)),
+                            ],
+                            onChanged: (v) => setState(() => _language = v),
                           ),
-                          items: [
-                            const DropdownMenuItem(
-                              value: null,
-                              child: Text(AdminStrings.usersAllLanguages),
+                          DropdownButtonFormField<_StatusFilter>(
+                            initialValue: _status,
+                            decoration: const InputDecoration(
+                              labelText: AdminStrings.usersStatus,
                             ),
-                            for (final l in languages)
-                              DropdownMenuItem(value: l, child: Text(l)),
-                          ],
-                          onChanged: (v) => setState(() => _language = v),
-                        ),
-                        DropdownButtonFormField<_StatusFilter>(
-                          initialValue: _status,
-                          decoration: const InputDecoration(
-                            labelText: AdminStrings.usersStatus,
+                            items: const [
+                              DropdownMenuItem(
+                                value: _StatusFilter.all,
+                                child: Text(AdminStrings.usersAllStatus),
+                              ),
+                              DropdownMenuItem(
+                                value: _StatusFilter.active,
+                                child: Text(AdminStrings.usersActiveOnly),
+                              ),
+                              DropdownMenuItem(
+                                value: _StatusFilter.blocked,
+                                child: Text(AdminStrings.usersBlockedOnly),
+                              ),
+                            ],
+                            onChanged: (v) => setState(
+                              () => _status = v ?? _StatusFilter.all,
+                            ),
                           ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: _StatusFilter.all,
-                              child: Text(AdminStrings.usersAllStatus),
-                            ),
-                            DropdownMenuItem(
-                              value: _StatusFilter.active,
-                              child: Text(AdminStrings.usersActiveOnly),
-                            ),
-                            DropdownMenuItem(
-                              value: _StatusFilter.blocked,
-                              child: Text(AdminStrings.usersBlockedOnly),
-                            ),
-                          ],
-                          onChanged: (v) => setState(
-                            () => _status = v ?? _StatusFilter.all,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Expanded(
-                child: rows.isEmpty
-                    ? const EmptyState(message: AdminStrings.usersEmpty)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                        ),
-                        itemCount: rows.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final user = rows[i];
-                          return _UserRow(
-                            user: user,
-                            canManage: canManage,
-                            busy: _busy.contains(user.uid),
-                            onToggleBlock: () => _toggleBlock(user),
-                          );
-                        },
-                      ),
-              ),
+              if (rows.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.usersEmpty),
+                )
+              else
+                SliverPadding(
+                  padding: listPadding,
+                  sliver: SliverList.separated(
+                    itemCount: rows.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) {
+                      final user = rows[i];
+                      return _UserRow(
+                        user: user,
+                        canManage: canManage,
+                        busy: _busy.contains(user.uid),
+                        onToggleBlock: () => _toggleBlock(user),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },

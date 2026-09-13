@@ -42,39 +42,47 @@ class _PlaceListPageState extends ConsumerState<PlaceListPage> {
             return p.title.toLowerCase().contains(q) ||
                 p.id.toLowerCase().contains(q);
           }).toList();
-          return Column(
-            children: [
-              Padding(
-                padding: AdminResponsive.pagePadding(context, top: 16, bottom: 8),
-                child: TextField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: AdminStrings.search,
+          // Single scroll view (search + list) so the page scrolls fully on
+          // phones and at high text zoom.
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      AdminResponsive.pagePadding(context, top: 16, bottom: 8),
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: AdminStrings.search,
+                    ),
+                    onChanged: (v) => setState(() => _query = v),
                   ),
-                  onChanged: (v) => setState(() => _query = v),
                 ),
               ),
-              Expanded(
-                child: filtered.isEmpty
-                    ? const EmptyState(message: AdminStrings.emptyList)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                          bottom: 32,
-                        ),
-                        itemCount: filtered.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final p = filtered[i];
-                          return _PlaceRow(
-                            place: p,
-                            onTap: () =>
-                                context.go('${AdminRoutes.places}/${p.id}'),
-                          );
-                        },
-                      ),
-              ),
+              if (filtered.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.emptyList),
+                )
+              else
+                SliverPadding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 8,
+                    bottom: 32,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) {
+                      final p = filtered[i];
+                      return _PlaceRow(
+                        place: p,
+                        onTap: () => context.go('${AdminRoutes.places}/${p.id}'),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },

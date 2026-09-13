@@ -46,69 +46,78 @@ class _NotificationsListPageState extends ConsumerState<NotificationsListPage> {
                 c.body.toLowerCase().contains(q) ||
                 c.id.toLowerCase().contains(q);
           }).toList();
-          return Column(
-            children: [
-              Padding(
-                padding: AdminResponsive.pagePadding(
-                  context,
-                  top: 16,
-                  bottom: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: AdminStrings.search,
-                      ),
-                      onChanged: (v) => setState(() => _query = v),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        for (final status in [
-                          null,
-                          NotificationCampaignStatus.draft,
-                          NotificationCampaignStatus.scheduled,
-                          NotificationCampaignStatus.sent,
-                          NotificationCampaignStatus.failed,
-                        ])
-                          FilterChip(
-                            label: Text(
-                              status == null ? 'All' : _statusLabel(status),
-                            ),
-                            selected: _status == status,
-                            onSelected: (_) => setState(() => _status = status),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: rows.isEmpty
-                    ? const EmptyState(message: AdminStrings.emptyList)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                          bottom: 32,
+          // Single scroll view (filters + list) so the page scrolls fully on
+          // phones and at high text zoom.
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 16,
+                    bottom: 8,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: AdminStrings.search,
                         ),
-                        itemCount: rows.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final campaign = rows[i];
-                          return _CampaignRow(
-                            campaign: campaign,
-                            onTap: () => context.go(
-                              '${AdminRoutes.notifications}/${campaign.id}',
-                            ),
-                          );
-                        },
+                        onChanged: (v) => setState(() => _query = v),
                       ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          for (final status in [
+                            null,
+                            NotificationCampaignStatus.draft,
+                            NotificationCampaignStatus.scheduled,
+                            NotificationCampaignStatus.sent,
+                            NotificationCampaignStatus.failed,
+                          ])
+                            FilterChip(
+                              label: Text(
+                                status == null ? 'All' : _statusLabel(status),
+                              ),
+                              selected: _status == status,
+                              onSelected: (_) =>
+                                  setState(() => _status = status),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
+              if (rows.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.emptyList),
+                )
+              else
+                SliverPadding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 8,
+                    bottom: 32,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: rows.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) {
+                      final campaign = rows[i];
+                      return _CampaignRow(
+                        campaign: campaign,
+                        onTap: () => context.go(
+                          '${AdminRoutes.notifications}/${campaign.id}',
+                        ),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },

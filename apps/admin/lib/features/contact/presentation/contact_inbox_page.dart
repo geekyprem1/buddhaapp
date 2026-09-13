@@ -80,69 +80,78 @@ class _ContactInboxPageState extends ConsumerState<ContactInboxPage> {
         error: (e, _) => ErrorState(message: e.toString()),
         data: (messages) {
           final rows = messages.where(_matches).toList();
-          return Column(
-            children: [
-              Padding(
-                padding: AdminResponsive.pagePadding(
-                  context,
-                  top: 16,
-                  bottom: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: AdminStrings.contactSearchHint,
+          // Single scroll view (filters + list) so the page scrolls fully on
+          // phones and at high text zoom.
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 16,
+                    bottom: 8,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: AdminStrings.contactSearchHint,
+                        ),
+                        onChanged: (v) => setState(() => _query = v),
                       ),
-                      onChanged: (v) => setState(() => _query = v),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        FilterChip(
-                          label: const Text(AdminStrings.contactAllStatus),
-                          selected: _status == _StatusFilter.all,
-                          onSelected: (_) =>
-                              setState(() => _status = _StatusFilter.all),
-                        ),
-                        FilterChip(
-                          label: const Text(AdminStrings.contactOpenOnly),
-                          selected: _status == _StatusFilter.open,
-                          onSelected: (_) =>
-                              setState(() => _status = _StatusFilter.open),
-                        ),
-                        FilterChip(
-                          label: const Text(AdminStrings.contactResolvedOnly),
-                          selected: _status == _StatusFilter.resolved,
-                          onSelected: (_) =>
-                              setState(() => _status = _StatusFilter.resolved),
-                        ),
-                      ],
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          FilterChip(
+                            label: const Text(AdminStrings.contactAllStatus),
+                            selected: _status == _StatusFilter.all,
+                            onSelected: (_) =>
+                                setState(() => _status = _StatusFilter.all),
+                          ),
+                          FilterChip(
+                            label: const Text(AdminStrings.contactOpenOnly),
+                            selected: _status == _StatusFilter.open,
+                            onSelected: (_) =>
+                                setState(() => _status = _StatusFilter.open),
+                          ),
+                          FilterChip(
+                            label:
+                                const Text(AdminStrings.contactResolvedOnly),
+                            selected: _status == _StatusFilter.resolved,
+                            onSelected: (_) => setState(
+                                () => _status = _StatusFilter.resolved),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Expanded(
-                child: rows.isEmpty
-                    ? const EmptyState(message: AdminStrings.contactEmpty)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                          bottom: 32,
-                        ),
-                        itemCount: rows.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) => _MessageTile(
-                          message: rows[i],
-                          busy: _busy.contains(rows[i].id),
-                          onToggle: () => _toggle(rows[i]),
-                        ),
-                      ),
-              ),
+              if (rows.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.contactEmpty),
+                )
+              else
+                SliverPadding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 8,
+                    bottom: 32,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: rows.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) => _MessageTile(
+                      message: rows[i],
+                      busy: _busy.contains(rows[i].id),
+                      onToggle: () => _toggle(rows[i]),
+                    ),
+                  ),
+                ),
             ],
           );
         },

@@ -44,43 +44,50 @@ class _WisdomListPageState extends ConsumerState<WisdomListPage> {
                 w.title.mr.contains(_query) ||
                 w.id.toLowerCase().contains(q);
           }).toList();
-          return Column(
-            children: [
-              Padding(
-                padding: AdminResponsive.pagePadding(
-                  context,
-                  top: 16,
-                  bottom: 8,
-                ),
-                child: TextField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: AdminStrings.search,
+          // Single scroll view (search + list) so the page scrolls fully on
+          // phones and at high text zoom.
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 16,
+                    bottom: 8,
                   ),
-                  onChanged: (v) => setState(() => _query = v),
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: AdminStrings.search,
+                    ),
+                    onChanged: (v) => setState(() => _query = v),
+                  ),
                 ),
               ),
-              Expanded(
-                child: filtered.isEmpty
-                    ? const EmptyState(message: AdminStrings.emptyList)
-                    : ListView.separated(
-                        padding: AdminResponsive.pagePadding(
-                          context,
-                          top: 8,
-                          bottom: 32,
-                        ),
-                        itemCount: filtered.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) {
-                          final w = filtered[i];
-                          return _WisdomRow(
-                            wisdom: w,
-                            onTap: () =>
-                                context.go('${AdminRoutes.wisdom}/${w.id}'),
-                          );
-                        },
-                      ),
-              ),
+              if (filtered.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.emptyList),
+                )
+              else
+                SliverPadding(
+                  padding: AdminResponsive.pagePadding(
+                    context,
+                    top: 8,
+                    bottom: 32,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) {
+                      final w = filtered[i];
+                      return _WisdomRow(
+                        wisdom: w,
+                        onTap: () => context.go('${AdminRoutes.wisdom}/${w.id}'),
+                      );
+                    },
+                  ),
+                ),
             ],
           );
         },

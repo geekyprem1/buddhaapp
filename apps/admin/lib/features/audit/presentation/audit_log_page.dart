@@ -75,86 +75,99 @@ class _AuditLogPageState extends ConsumerState<AuditLogPage> {
           icon: const Icon(Icons.refresh),
         ),
       ],
-      child: Column(
-        children: [
-          Padding(
-            padding: AdminResponsive.pagePadding(context, bottom: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: AdminStrings.auditSearchHint,
+      // Single scroll view (filters + list) so the page scrolls fully on
+      // phones and at high text zoom.
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: AdminResponsive.pagePadding(context, bottom: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: AdminStrings.auditSearchHint,
+                    ),
+                    onChanged: (v) => setState(() => _query = v),
                   ),
-                  onChanged: (v) => setState(() => _query = v),
-                ),
-                const SizedBox(height: 12),
-                ResponsiveFormRow(
-                  children: [
-                    DropdownButtonFormField<String?>(
-                      initialValue: _entityType,
-                      decoration: const InputDecoration(
-                        labelText: AdminStrings.auditEntity,
+                  const SizedBox(height: 12),
+                  ResponsiveFormRow(
+                    children: [
+                      DropdownButtonFormField<String?>(
+                        initialValue: _entityType,
+                        decoration: const InputDecoration(
+                          labelText: AdminStrings.auditEntity,
+                        ),
+                        items: [
+                          const DropdownMenuItem(
+                            value: null,
+                            child: Text(AdminStrings.auditAllEntities),
+                          ),
+                          for (final t in _entityTypes)
+                            DropdownMenuItem(value: t, child: Text(t)),
+                        ],
+                        onChanged: (v) => setState(() => _entityType = v),
                       ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text(AdminStrings.auditAllEntities),
+                      DropdownButtonFormField<_Range>(
+                        initialValue: _range,
+                        decoration: const InputDecoration(
+                          labelText: AdminStrings.auditRange,
                         ),
-                        for (final t in _entityTypes)
-                          DropdownMenuItem(value: t, child: Text(t)),
-                      ],
-                      onChanged: (v) => setState(() => _entityType = v),
-                    ),
-                    DropdownButtonFormField<_Range>(
-                      initialValue: _range,
-                      decoration: const InputDecoration(
-                        labelText: AdminStrings.auditRange,
+                        items: const [
+                          DropdownMenuItem(
+                            value: _Range.all,
+                            child: Text(AdminStrings.auditRangeAll),
+                          ),
+                          DropdownMenuItem(
+                            value: _Range.h24,
+                            child: Text(AdminStrings.auditRange24h),
+                          ),
+                          DropdownMenuItem(
+                            value: _Range.d7,
+                            child: Text(AdminStrings.auditRange7d),
+                          ),
+                          DropdownMenuItem(
+                            value: _Range.d30,
+                            child: Text(AdminStrings.auditRange30d),
+                          ),
+                        ],
+                        onChanged: (v) =>
+                            setState(() => _range = v ?? _Range.all),
                       ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: _Range.all,
-                          child: Text(AdminStrings.auditRangeAll),
-                        ),
-                        DropdownMenuItem(
-                          value: _Range.h24,
-                          child: Text(AdminStrings.auditRange24h),
-                        ),
-                        DropdownMenuItem(
-                          value: _Range.d7,
-                          child: Text(AdminStrings.auditRange7d),
-                        ),
-                        DropdownMenuItem(
-                          value: _Range.d30,
-                          child: Text(AdminStrings.auditRange30d),
-                        ),
-                      ],
-                      onChanged: (v) =>
-                          setState(() => _range = v ?? _Range.all),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-          Expanded(
-            child: async.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => ErrorState(message: e.toString()),
-              data: (logs) {
-                final rows = logs.where(_matches).toList();
-                if (rows.isEmpty) {
-                  return const EmptyState(message: AdminStrings.auditEmpty);
-                }
-                return ListView.separated(
-                  padding: AdminResponsive.pagePadding(context, top: 8),
+          async.when(
+            loading: () => const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => SliverFillRemaining(
+              hasScrollBody: false,
+              child: ErrorState(message: e.toString()),
+            ),
+            data: (logs) {
+              final rows = logs.where(_matches).toList();
+              if (rows.isEmpty) {
+                return const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: EmptyState(message: AdminStrings.auditEmpty),
+                );
+              }
+              return SliverPadding(
+                padding: AdminResponsive.pagePadding(context, top: 8),
+                sliver: SliverList.separated(
                   itemCount: rows.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, i) => _AuditRow(log: rows[i]),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ],
       ),

@@ -128,17 +128,20 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
           // otherwise "row 2" doesn't map to a stable sortOrder position.
           final reorderable =
               _status == null && _query.isEmpty && !_categoryFilterActive;
-          return Column(
-            children: [
-              Padding(
-                padding: AdminResponsive.pagePadding(
-                  context,
-                  top: 16,
-                  bottom: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+          // One scroll view for the whole page (filters + list) so the
+          // content list stays scrollable on phones and at high text zoom,
+          // where a fixed filter block used to push the list off-screen with
+          // no way to scroll to it.
+          final filters = SliverToBoxAdapter(
+            child: Padding(
+              padding: AdminResponsive.pagePadding(
+                context,
+                top: 16,
+                bottom: 8,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                     TextField(
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.search),
@@ -227,70 +230,61 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
                   ],
                 ),
               ),
-              Expanded(
-                child: rows.isEmpty
-                    ? const EmptyState(message: AdminStrings.emptyList)
-                    : reorderable
-                        ? ReorderableListView.builder(
-                            padding: AdminResponsive.pagePadding(
-                              context,
-                              top: 8,
-                              bottom: 32,
-                            ),
-                            itemCount: rows.length,
-                            onReorderItem: (oldIndex, newIndex) =>
-                                _reorder(rows, oldIndex, newIndex),
-                            itemBuilder: (context, i) {
-                              final item = rows[i];
-                              return Padding(
-                                key: ValueKey(item.id),
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: _ContentRow(
-                                  item: item,
-                                  media: config.media,
-                                  onOpen: () =>
-                                      context.go('${config.route}/${item.id}'),
-                                  onPublish: () =>
-                                      _setStatus(item, ContentStatus.published),
-                                  onUnpublish: () => _setStatus(
-                                    item,
-                                    ContentStatus.unpublished,
-                                  ),
-                                  onArchive: () => _archive(item),
-                                  onRestore: () => _restore(item),
-                                  onClone: () => _clone(item),
-                                ),
-                              );
-                            },
-                          )
-                        : ListView.separated(
-                            padding: AdminResponsive.pagePadding(
-                              context,
-                              top: 8,
-                              bottom: 32,
-                            ),
-                            itemCount: rows.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 8),
-                            itemBuilder: (context, i) {
-                              final item = rows[i];
-                              return _ContentRow(
-                                item: item,
-                                media: config.media,
-                                onOpen: () =>
-                                    context.go('${config.route}/${item.id}'),
-                                onPublish: () =>
-                                    _setStatus(item, ContentStatus.published),
-                                onUnpublish: () =>
-                                    _setStatus(item, ContentStatus.unpublished),
-                                onArchive: () => _archive(item),
-                                onRestore: () => _restore(item),
-                                onClone: () => _clone(item),
-                              );
-                            },
-                          ),
+            );
+
+          final listPadding =
+              AdminResponsive.pagePadding(context, top: 8, bottom: 32);
+
+          Widget row(ContentItem item) => _ContentRow(
+                item: item,
+                media: config.media,
+                onOpen: () => context.go('${config.route}/${item.id}'),
+                onPublish: () => _setStatus(item, ContentStatus.published),
+                onUnpublish: () => _setStatus(item, ContentStatus.unpublished),
+                onArchive: () => _archive(item),
+                onRestore: () => _restore(item),
+                onClone: () => _clone(item),
+              );
+
+          final Widget listSliver;
+          if (rows.isEmpty) {
+            listSliver = const SliverFillRemaining(
+              hasScrollBody: false,
+              child: EmptyState(message: AdminStrings.emptyList),
+            );
+          } else if (reorderable) {
+            listSliver = SliverPadding(
+              padding: listPadding,
+              sliver: SliverReorderableList(
+                itemCount: rows.length,
+                onReorderItem: (oldIndex, newIndex) =>
+                    _reorder(rows, oldIndex, newIndex),
+                itemBuilder: (context, i) {
+                  final item = rows[i];
+                  return ReorderableDelayedDragStartListener(
+                    key: ValueKey(item.id),
+                    index: i,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: row(item),
+                    ),
+                  );
+                },
               ),
-            ],
+            );
+          } else {
+            listSliver = SliverPadding(
+              padding: listPadding,
+              sliver: SliverList.separated(
+                itemCount: rows.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, i) => row(rows[i]),
+              ),
+            );
+          }
+
+          return CustomScrollView(
+            slivers: [filters, listSliver],
           );
         },
       ),
