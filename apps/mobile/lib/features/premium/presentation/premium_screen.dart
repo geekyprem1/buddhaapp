@@ -176,8 +176,8 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                _benefits(context, l10n),
-                const SizedBox(height: AppSpacing.lg),
+                // Price and the trial CTA come first so the offer is visible
+                // without scrolling; the benefit list supports it below.
                 _planCard(context, l10n, theme, product),
                 const SizedBox(height: AppSpacing.md),
                 PrimaryPillButton(
@@ -195,6 +195,8 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                     color: AppColors.textSecondary,
                   ),
                 ),
+                const SizedBox(height: AppSpacing.lg),
+                _benefits(context, l10n),
                 const SizedBox(height: AppSpacing.sm),
                 TextButton(
                   onPressed: _busy ? null : _restore,

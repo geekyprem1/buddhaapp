@@ -55,14 +55,10 @@ class MiniPlayer extends ConsumerWidget {
       listenable: router.routerDelegate,
       builder: (context, _) {
         if (_isFullPlayerOpen(router)) return const SizedBox.shrink();
-        // On the main tabbed screens the NavigationBar sits at the bottom, so
-        // lift the mini player above it. On pushed full-screen routes there's
-        // no nav bar, so it stays pinned to the bottom.
-        final bottom = _isOnMainTab(router) ? _kNavBarHeight : 0.0;
-        return Padding(
-          padding: EdgeInsets.only(bottom: bottom),
-          child: bar,
-        );
+        // The donate banner + bottom nav bar are now persistent on every
+        // screen and the root app builder already offsets this mini player
+        // above them, so no extra bottom padding is needed here.
+        return bar;
       },
     );
   }
@@ -169,29 +165,6 @@ class MiniPlayer extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-/// Material 3 [NavigationBar] content height (excludes the system bottom
-/// inset, which the mini player already accounts for via its own SafeArea).
-const double _kNavBarHeight = 80;
-
-/// The five bottom-nav tab roots. When the current location is one of these,
-/// the NavigationBar is visible and the mini player must sit above it.
-const _mainTabRoutes = <String>{
-  AppRoutes.home,
-  AppRoutes.buddhistCalendar,
-  AppRoutes.prarthana,
-  AppRoutes.videos,
-  AppRoutes.profile,
-};
-
-bool _isOnMainTab(GoRouter router) {
-  try {
-    return _mainTabRoutes
-        .contains(router.routerDelegate.currentConfiguration.uri.path);
-  } catch (_) {
-    return false;
   }
 }
 
