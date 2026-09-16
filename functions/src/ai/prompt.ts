@@ -55,6 +55,9 @@ function scopePreamble(lang: string): string {
     "",
     `Reply in the user's language (code: ${lang}) unless they write in another.`,
     "Keep answers warm, concise, and grounded in Buddhist sources.",
+    "Reply in plain text only. Do NOT use Markdown formatting — no **, __, *, " +
+      "backticks, #, or tables. Use short paragraphs, and a simple '-' for any " +
+      "list item.",
   ].join("\n");
 }
 

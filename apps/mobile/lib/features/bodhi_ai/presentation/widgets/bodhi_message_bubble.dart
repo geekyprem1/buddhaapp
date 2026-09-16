@@ -3,6 +3,42 @@ import 'package:flutter/material.dart';
 
 import '../../application/bodhi_chat_store.dart';
 
+/// Flattens the light Markdown the model sometimes emits into plain text, since
+/// the bubble renders with a plain [Text] (no Markdown widget). Without this,
+/// bold **markers**, `code` ticks and `#` headings show up as literal
+/// punctuation. The model is also asked to avoid Markdown, but that is not
+/// reliable, so this is the deterministic backstop.
+String stripMarkdown(String input) {
+  var s = input;
+  // [label](url) → label
+  s = s.replaceAllMapped(
+    RegExp(r'\[([^\]]+)\]\([^)]*\)'),
+    (m) => m[1] ?? '',
+  );
+  // Bold / italic emphasis: **x**, __x__, *x*, _x_ → x. Underscores are only
+  // stripped when they wrap a span, so file_names and snake_case survive.
+  s = s.replaceAllMapped(
+    RegExp(r'\*\*([^*]+)\*\*'),
+    (m) => m[1] ?? '',
+  );
+  s = s.replaceAllMapped(RegExp(r'\*([^*\n]+)\*'), (m) => m[1] ?? '');
+  s = s.replaceAllMapped(RegExp(r'__([^_]+)__'), (m) => m[1] ?? '');
+  // Inline code / code fences.
+  s = s.replaceAll('```', '').replaceAll('`', '');
+  // Leading heading (#) and blockquote (>) markers, per line.
+  s = s.replaceAllMapped(
+    RegExp(r'^\s{0,3}#{1,6}\s*', multiLine: true),
+    (_) => '',
+  );
+  s = s.replaceAllMapped(
+    RegExp(r'^\s{0,3}>\s?', multiLine: true),
+    (_) => '',
+  );
+  // Any lone ** left over from a still-streaming, unclosed span.
+  s = s.replaceAll('**', '');
+  return s;
+}
+
 /// A single chat bubble. User messages sit right in maroon; assistant messages
 /// sit left in surface. A long-press on a settled assistant reply offers the
 /// report action (Play generative-AI policy).
@@ -43,7 +79,12 @@ class BodhiMessageBubble extends StatelessWidget {
       ),
       child: message.pending && message.text.isEmpty
           ? const _TypingDots()
-          : Text(message.text, style: TextStyle(color: fg, height: 1.35)),
+          : Text(
+              // User text is shown verbatim; only assistant Markdown is
+              // flattened.
+              isUser ? message.text : stripMarkdown(message.text),
+              style: TextStyle(color: fg, height: 1.35),
+            ),
     );
 
     return Align(
