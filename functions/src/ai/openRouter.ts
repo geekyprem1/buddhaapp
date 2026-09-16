@@ -1,5 +1,6 @@
 import { HttpsError } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
+import * as logger from "firebase-functions/logger";
 import type { ChatMessage } from "./prompt";
 
 /**
@@ -12,9 +13,30 @@ export const OPENROUTER_API_KEY = defineSecret("OPENROUTER_API_KEY");
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const REQUEST_TIMEOUT_MS = 45_000;
 
-/** Attribution headers OpenRouter uses for its dashboard rankings. */
+/**
+ * Attribution headers OpenRouter uses for its dashboard rankings.
+ *
+ * ASCII ONLY. HTTP header values are byte strings (ISO-8859-1), so any
+ * character above U+00FF makes `fetch` throw a `TypeError` before the request
+ * is even sent. This title previously used an em dash, which failed *every*
+ * call — silently, because the throw was translated into a generic
+ * "could not reach the AI" and the reserved message was refunded. Keep
+ * [asciiHeader] between these constants and the request so a stray typographic
+ * character can never take the feature down again.
+ */
 const REFERER = "https://dhammapath.app";
-const TITLE = "Dhamma Path — Bodhi AI";
+const TITLE = "Dhamma Path - Bodhi AI";
+
+/**
+ * Strips anything a header value cannot legally carry: characters outside
+ * Latin-1, plus CR/LF (which would be a header-injection vector).
+ */
+function asciiHeader(value: string): string {
+  return value
+    .replace(/[\r\n]/g, " ")
+    .replace(/[^\x20-\x7E]/g, "-")
+    .trim();
+}
 
 export interface ChatUsage {
   promptTokens: number;
@@ -66,6 +88,7 @@ export async function chatCompletion(
 ): Promise<ChatResult> {
   const key = OPENROUTER_API_KEY.value();
   if (!key) {
+    logger.error("openRouter: OPENROUTER_API_KEY resolved empty");
     throw new HttpsError("failed-precondition", "AI is not configured.");
   }
 
@@ -96,8 +119,8 @@ export async function chatCompletion(
       headers: {
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": REFERER,
-        "X-Title": TITLE,
+        "HTTP-Referer": asciiHeader(REFERER),
+        "X-Title": asciiHeader(TITLE),
       },
       body: JSON.stringify(body),
       signal: controller.signal,
@@ -105,6 +128,17 @@ export async function chatCompletion(
   } catch (err) {
     clearTimeout(timer);
     const aborted = err instanceof Error && err.name === "AbortError";
+    // Logged, not just translated: without this, a network/egress failure is
+    // indistinguishable from a model refusal by the time it reaches the user.
+    logger.error("openRouter: request failed before a response arrived", {
+      aborted,
+      name: err instanceof Error ? err.name : typeof err,
+      message: err instanceof Error ? err.message : String(err),
+      cause:
+        err instanceof Error && err.cause instanceof Error
+          ? err.cause.message
+          : undefined,
+    });
     throw new HttpsError(
       aborted ? "deadline-exceeded" : "unavailable",
       aborted ? "The AI took too long to respond." : "Could not reach the AI.",
@@ -112,23 +146,44 @@ export async function chatCompletion(
   }
 
   try {
-  if (!response.ok) {
-    // 402 = out of credit, 429 = rate limited upstream — surface as retryable
-    // where sensible, but never leak the provider body to the client.
-    // The 429 reason tag (A9) keeps the client from mistaking an upstream
-    // rate limit for the user's own quota and opening the paywall for it.
-    if (response.status === 429) {
+    if (!response.ok) {
+      // 402 = out of credit, 429 = rate limited upstream — surface as retryable
+      // where sensible, but never leak the provider body to the client.
+      // The 429 reason tag (A9) keeps the client from mistaking an upstream
+      // rate limit for the user's own quota and opening the paywall for it.
+      //
+      // The body is logged (truncated) because the status code on its own
+      // almost never says why the provider rejected the call.
+      const errorBody = await response.text().catch(() => "");
+      logger.error("openRouter: provider returned an error status", {
+        status: response.status,
+        model: params.model,
+        body: errorBody.slice(0, 500),
+      });
+      if (response.status === 429) {
+        throw new HttpsError(
+          "resource-exhausted",
+          `AI request failed (${response.status}).`,
+          { reason: "upstream-rate-limit" },
+        );
+      }
       throw new HttpsError(
-        "resource-exhausted",
+        "internal",
         `AI request failed (${response.status}).`,
-        { reason: "upstream-rate-limit" },
       );
     }
-    throw new HttpsError("internal", `AI request failed (${response.status}).`);
-  }
 
     const data = (await response.json()) as OpenRouterResponse;
     const content = data.choices?.[0]?.message?.content?.trim() ?? "";
+    if (content.length === 0) {
+      // Most likely a reasoning model that spent the whole token budget
+      // "thinking" and never got to write an answer.
+      logger.warn("openRouter: provider returned empty content", {
+        model: params.model,
+        maxTokens: params.maxTokens,
+        completionTokens: data.usage?.completion_tokens,
+      });
+    }
     return {
       content,
       usage: {
@@ -139,6 +194,11 @@ export async function chatCompletion(
   } catch (err) {
     if (err instanceof HttpsError) throw err;
     const aborted = err instanceof Error && err.name === "AbortError";
+    logger.error("openRouter: failed while reading the response", {
+      aborted,
+      name: err instanceof Error ? err.name : typeof err,
+      message: err instanceof Error ? err.message : String(err),
+    });
     throw new HttpsError(
       aborted ? "deadline-exceeded" : "internal",
       aborted

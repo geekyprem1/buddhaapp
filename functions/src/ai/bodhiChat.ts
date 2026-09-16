@@ -1,4 +1,5 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 import { instructionFor, readBodhiConfig } from "./config";
 import { OPENROUTER_API_KEY, chatCompletion } from "./openRouter";
 import {
@@ -109,6 +110,14 @@ export const bodhiChat = onCall(
       }
     } catch (err) {
       await refundMessage({ uid, isPremium: premium, config, day: charge.day });
+      // The refund is silent to the user, so without this line a persistent
+      // answering failure looks like "the app just doesn't reply".
+      logger.error("bodhiChat: answering failed, message refunded", {
+        code: err instanceof HttpsError ? err.code : undefined,
+        message: err instanceof Error ? err.message : String(err),
+        model: config.model,
+        lang,
+      });
       if (err instanceof HttpsError) throw err;
       throw new HttpsError("unavailable", "Could not reach the AI.");
     }
