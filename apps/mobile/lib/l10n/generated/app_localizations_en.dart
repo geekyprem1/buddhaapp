@@ -895,7 +895,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiChatQuotaReached =>
-      'You\'ve used today\'s chat time. It resets tomorrow.';
+      'You\'ve used today\'s messages. It resets tomorrow.';
 
   @override
   String get aiChatDisabled => 'Bodhi AI is currently unavailable.';
@@ -904,8 +904,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiChatError => 'Something went wrong. Please try again.';
 
   @override
-  String aiChatTimeLeft(String time) {
-    return '$time left today';
+  String aiChatMessagesLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count messages left today',
+      one: '1 message left today',
+      zero: 'No messages left today',
+    );
+    return '$_temp0';
   }
 
   @override

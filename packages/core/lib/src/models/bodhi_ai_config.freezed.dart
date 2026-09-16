@@ -38,14 +38,13 @@ mixin _$BodhiAiConfig {
   /// Function's built-in default tone".
   LocalisedText get systemInstruction => throw _privateConstructorUsedError;
 
-  /// Daily chat allowance in seconds. 210 = 3 min 30 s.
-  int get freeDailySeconds => throw _privateConstructorUsedError;
-  int get paidDailySeconds => throw _privateConstructorUsedError;
-
-  /// Cost guards, independent of the minute quota. Under normal use the user
-  /// only ever sees the minute counter; these should only bite for outliers.
-  /// If they start firing for ordinary users, that is the signal that
-  /// minutes was the wrong meter.
+  /// The daily allowance, and the only meter.
+  ///
+  /// There was briefly a second, wall-clock meter here (`freeDailySeconds` /
+  /// `paidDailySeconds`) that drained while the chat screen was open. It was
+  /// removed: time is a poor proxy for cost and a hostile unit for the user,
+  /// since it burned while they read a reply or thought about the next
+  /// question. Messages map to what is actually spent upstream.
   int get freeDailyMessages => throw _privateConstructorUsedError;
   int get paidDailyMessages => throw _privateConstructorUsedError;
 
@@ -78,8 +77,6 @@ abstract class $BodhiAiConfigCopyWith<$Res> {
       {bool enabled,
       String model,
       LocalisedText systemInstruction,
-      int freeDailySeconds,
-      int paidDailySeconds,
       int freeDailyMessages,
       int paidDailyMessages,
       int maxTokens,
@@ -107,8 +104,6 @@ class _$BodhiAiConfigCopyWithImpl<$Res, $Val extends BodhiAiConfig>
     Object? enabled = null,
     Object? model = null,
     Object? systemInstruction = null,
-    Object? freeDailySeconds = null,
-    Object? paidDailySeconds = null,
     Object? freeDailyMessages = null,
     Object? paidDailyMessages = null,
     Object? maxTokens = null,
@@ -128,14 +123,6 @@ class _$BodhiAiConfigCopyWithImpl<$Res, $Val extends BodhiAiConfig>
           ? _value.systemInstruction
           : systemInstruction // ignore: cast_nullable_to_non_nullable
               as LocalisedText,
-      freeDailySeconds: null == freeDailySeconds
-          ? _value.freeDailySeconds
-          : freeDailySeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      paidDailySeconds: null == paidDailySeconds
-          ? _value.paidDailySeconds
-          : paidDailySeconds // ignore: cast_nullable_to_non_nullable
-              as int,
       freeDailyMessages: null == freeDailyMessages
           ? _value.freeDailyMessages
           : freeDailyMessages // ignore: cast_nullable_to_non_nullable
@@ -182,8 +169,6 @@ abstract class _$$BodhiAiConfigImplCopyWith<$Res>
       {bool enabled,
       String model,
       LocalisedText systemInstruction,
-      int freeDailySeconds,
-      int paidDailySeconds,
       int freeDailyMessages,
       int paidDailyMessages,
       int maxTokens,
@@ -210,8 +195,6 @@ class __$$BodhiAiConfigImplCopyWithImpl<$Res>
     Object? enabled = null,
     Object? model = null,
     Object? systemInstruction = null,
-    Object? freeDailySeconds = null,
-    Object? paidDailySeconds = null,
     Object? freeDailyMessages = null,
     Object? paidDailyMessages = null,
     Object? maxTokens = null,
@@ -231,14 +214,6 @@ class __$$BodhiAiConfigImplCopyWithImpl<$Res>
           ? _value.systemInstruction
           : systemInstruction // ignore: cast_nullable_to_non_nullable
               as LocalisedText,
-      freeDailySeconds: null == freeDailySeconds
-          ? _value.freeDailySeconds
-          : freeDailySeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      paidDailySeconds: null == paidDailySeconds
-          ? _value.paidDailySeconds
-          : paidDailySeconds // ignore: cast_nullable_to_non_nullable
-              as int,
       freeDailyMessages: null == freeDailyMessages
           ? _value.freeDailyMessages
           : freeDailyMessages // ignore: cast_nullable_to_non_nullable
@@ -270,8 +245,6 @@ class _$BodhiAiConfigImpl implements _BodhiAiConfig {
       {this.enabled = false,
       this.model = 'deepseek/deepseek-v4-flash-0731',
       this.systemInstruction = const LocalisedText(),
-      this.freeDailySeconds = 210,
-      this.paidDailySeconds = 1800,
       this.freeDailyMessages = 15,
       this.paidDailyMessages = 120,
       this.maxTokens = 700,
@@ -305,18 +278,13 @@ class _$BodhiAiConfigImpl implements _BodhiAiConfig {
   @JsonKey()
   final LocalisedText systemInstruction;
 
-  /// Daily chat allowance in seconds. 210 = 3 min 30 s.
-  @override
-  @JsonKey()
-  final int freeDailySeconds;
-  @override
-  @JsonKey()
-  final int paidDailySeconds;
-
-  /// Cost guards, independent of the minute quota. Under normal use the user
-  /// only ever sees the minute counter; these should only bite for outliers.
-  /// If they start firing for ordinary users, that is the signal that
-  /// minutes was the wrong meter.
+  /// The daily allowance, and the only meter.
+  ///
+  /// There was briefly a second, wall-clock meter here (`freeDailySeconds` /
+  /// `paidDailySeconds`) that drained while the chat screen was open. It was
+  /// removed: time is a poor proxy for cost and a hostile unit for the user,
+  /// since it burned while they read a reply or thought about the next
+  /// question. Messages map to what is actually spent upstream.
   @override
   @JsonKey()
   final int freeDailyMessages;
@@ -340,7 +308,7 @@ class _$BodhiAiConfigImpl implements _BodhiAiConfig {
 
   @override
   String toString() {
-    return 'BodhiAiConfig(enabled: $enabled, model: $model, systemInstruction: $systemInstruction, freeDailySeconds: $freeDailySeconds, paidDailySeconds: $paidDailySeconds, freeDailyMessages: $freeDailyMessages, paidDailyMessages: $paidDailyMessages, maxTokens: $maxTokens, temperature: $temperature, updatedAt: $updatedAt)';
+    return 'BodhiAiConfig(enabled: $enabled, model: $model, systemInstruction: $systemInstruction, freeDailyMessages: $freeDailyMessages, paidDailyMessages: $paidDailyMessages, maxTokens: $maxTokens, temperature: $temperature, updatedAt: $updatedAt)';
   }
 
   @override
@@ -352,10 +320,6 @@ class _$BodhiAiConfigImpl implements _BodhiAiConfig {
             (identical(other.model, model) || other.model == model) &&
             (identical(other.systemInstruction, systemInstruction) ||
                 other.systemInstruction == systemInstruction) &&
-            (identical(other.freeDailySeconds, freeDailySeconds) ||
-                other.freeDailySeconds == freeDailySeconds) &&
-            (identical(other.paidDailySeconds, paidDailySeconds) ||
-                other.paidDailySeconds == paidDailySeconds) &&
             (identical(other.freeDailyMessages, freeDailyMessages) ||
                 other.freeDailyMessages == freeDailyMessages) &&
             (identical(other.paidDailyMessages, paidDailyMessages) ||
@@ -375,8 +339,6 @@ class _$BodhiAiConfigImpl implements _BodhiAiConfig {
       enabled,
       model,
       systemInstruction,
-      freeDailySeconds,
-      paidDailySeconds,
       freeDailyMessages,
       paidDailyMessages,
       maxTokens,
@@ -404,8 +366,6 @@ abstract class _BodhiAiConfig implements BodhiAiConfig {
       {final bool enabled,
       final String model,
       final LocalisedText systemInstruction,
-      final int freeDailySeconds,
-      final int paidDailySeconds,
       final int freeDailyMessages,
       final int paidDailyMessages,
       final int maxTokens,
@@ -436,16 +396,13 @@ abstract class _BodhiAiConfig implements BodhiAiConfig {
   @override
   LocalisedText get systemInstruction;
 
-  /// Daily chat allowance in seconds. 210 = 3 min 30 s.
-  @override
-  int get freeDailySeconds;
-  @override
-  int get paidDailySeconds;
-
-  /// Cost guards, independent of the minute quota. Under normal use the user
-  /// only ever sees the minute counter; these should only bite for outliers.
-  /// If they start firing for ordinary users, that is the signal that
-  /// minutes was the wrong meter.
+  /// The daily allowance, and the only meter.
+  ///
+  /// There was briefly a second, wall-clock meter here (`freeDailySeconds` /
+  /// `paidDailySeconds`) that drained while the chat screen was open. It was
+  /// removed: time is a poor proxy for cost and a hostile unit for the user,
+  /// since it burned while they read a reply or thought about the next
+  /// question. Messages map to what is actually spent upstream.
   @override
   int get freeDailyMessages;
   @override

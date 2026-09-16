@@ -22,23 +22,20 @@ class BodhiChatResult {
   const BodhiChatResult({
     required this.reply,
     required this.onTopic,
-    required this.remainingSeconds,
     required this.remainingMessages,
   });
 
   final String reply;
 
-  /// False when the topic gate refused the question. A refusal does not
-  /// consume the minute quota, so [remainingSeconds] will be unchanged.
+  /// False when the question was off topic and the model declined. A refusal
+  /// refunds the message charge, so [remainingMessages] is unchanged by it.
   final bool onTopic;
-  final int remainingSeconds;
   final int remainingMessages;
 
   factory BodhiChatResult.fromMap(Map<String, dynamic> data) {
     return BodhiChatResult(
       reply: data['reply'] as String? ?? '',
       onTopic: data['onTopic'] as bool? ?? true,
-      remainingSeconds: (data['remainingSeconds'] as num?)?.toInt() ?? 0,
       remainingMessages: (data['remainingMessages'] as num?)?.toInt() ?? 0,
     );
   }
@@ -59,23 +56,14 @@ class BodhiChatDone extends BodhiChatEvent {
   final BodhiChatResult result;
 }
 
-/// Chat-session lifecycle. Minutes accrue only between `start` and `end`,
-/// and only while heartbeats keep arriving.
-enum BodhiSessionAction { start, heartbeat, end }
+/// Today's remaining allowance, as reported by `bodhiQuota`.
+class BodhiQuotaResult {
+  const BodhiQuotaResult({required this.remainingMessages});
 
-/// Remaining allowance after a session tick.
-class BodhiSessionResult {
-  const BodhiSessionResult({
-    required this.remainingSeconds,
-    required this.remainingMessages,
-  });
-
-  final int remainingSeconds;
   final int remainingMessages;
 
-  factory BodhiSessionResult.fromMap(Map<String, dynamic> data) {
-    return BodhiSessionResult(
-      remainingSeconds: (data['remainingSeconds'] as num?)?.toInt() ?? 0,
+  factory BodhiQuotaResult.fromMap(Map<String, dynamic> data) {
+    return BodhiQuotaResult(
       remainingMessages: (data['remainingMessages'] as num?)?.toInt() ?? 0,
     );
   }
@@ -83,10 +71,10 @@ class BodhiSessionResult {
 
 /// Client wrapper for the Bodhi AI callables.
 ///
-/// The OpenRouter key, the daily quota, the topic gate and the system prompt
-/// all live server-side — this class only carries a question and renders what
-/// comes back. It deliberately exposes no way to influence the model, the
-/// limits, or the scope rule.
+/// The OpenRouter key, the daily quota and the system prompt all live
+/// server-side — this class only carries a question and renders what comes
+/// back. It deliberately exposes no way to influence the model, the limits, or
+/// the scope rule.
 class BodhiAiFunctionsService {
   BodhiAiFunctionsService({FirebaseFunctions? functions})
     : _functions =
@@ -95,14 +83,21 @@ class BodhiAiFunctionsService {
 
   final FirebaseFunctions _functions;
 
-  /// Longer than the 60 s default: `bodhiChat` makes two sequential model
-  /// calls (topic gate, then the answer).
+  /// Longer than the 60 s default: a reasoning model can take a while on a
+  /// long answer, and a timeout here reads to the user as a lost message.
   static const _chatTimeout = Duration(seconds: 90);
 
-  Map<String, dynamic> _payload(String message, List<BodhiChatTurn> history) {
+  Map<String, dynamic> _payload(
+    String message,
+    List<BodhiChatTurn> history,
+    String lang,
+  ) {
     return {
       'message': message,
       'history': [for (final turn in history) turn.toJson()],
+      // BCP-47-ish app language code; the server validates against its own
+      // allowlist and falls back to English (A2 — previously never sent).
+      'lang': lang,
     };
   }
 
@@ -115,6 +110,7 @@ class BodhiAiFunctionsService {
   Stream<BodhiChatEvent> streamMessage({
     required String message,
     List<BodhiChatTurn> history = const [],
+    String lang = 'en',
   }) async* {
     final callable = _functions.httpsCallable(
       AppConstants.fnBodhiChat,
@@ -124,7 +120,7 @@ class BodhiAiFunctionsService {
     // Parsed defensively rather than with a hard cast: this is a network
     // boundary, and a shape change should not throw inside the stream.
     await for (final response in callable.stream<Object?, Object?>(
-      _payload(message, history),
+      _payload(message, history, lang),
     )) {
       switch (response) {
         case Chunk(partialData: final data):
@@ -145,23 +141,23 @@ class BodhiAiFunctionsService {
   Future<BodhiChatResult> sendMessage({
     required String message,
     List<BodhiChatTurn> history = const [],
+    String lang = 'en',
   }) async {
     final callable = _functions.httpsCallable(
       AppConstants.fnBodhiChat,
       options: HttpsCallableOptions(timeout: _chatTimeout),
     );
     final result = await callable.call<Map<Object?, Object?>>(
-      _payload(message, history),
+      _payload(message, history, lang),
     );
     return BodhiChatResult.fromMap(Map<String, dynamic>.from(result.data));
   }
 
-  /// Open, tick, or close the chat session that drives minute accrual.
-  Future<BodhiSessionResult> session(BodhiSessionAction action) async {
-    final callable = _functions.httpsCallable(AppConstants.fnBodhiSession);
-    final result = await callable.call<Map<Object?, Object?>>({
-      'action': action.name,
-    });
-    return BodhiSessionResult.fromMap(Map<String, dynamic>.from(result.data));
+  /// Today's remaining allowance, without spending anything. Called when the
+  /// chat screen opens so the counter is populated before the first reply.
+  Future<BodhiQuotaResult> quota() async {
+    final callable = _functions.httpsCallable(AppConstants.fnBodhiQuota);
+    final result = await callable.call<Map<Object?, Object?>>();
+    return BodhiQuotaResult.fromMap(Map<String, dynamic>.from(result.data));
   }
 }

@@ -30,6 +30,13 @@ final premiumConfigProvider = StreamProvider<PremiumConfig>((ref) {
 final premiumControllerProvider =
     NotifierProvider<PremiumController, bool>(PremiumController.new);
 
+/// Whether the server-verified entitlement has resolved at least once (A16).
+///
+/// [premiumControllerProvider] defaults to `false` until the user-doc stream
+/// emits, so paywall nudges must check this first — otherwise a paid user in
+/// the cold-start window gets pushed to the paywall by mistake.
+final premiumReadyProvider = StateProvider<bool>((ref) => false);
+
 class PremiumController extends Notifier<bool> {
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userSub;
@@ -74,6 +81,8 @@ class PremiumController extends Notifier<bool> {
         .doc(uid)
         .snapshots()
         .listen((snap) {
+      // Entitlement resolved (A16) — paywall nudges may now trust the bool.
+      ref.read(premiumReadyProvider.notifier).state = true;
       final raw = snap.data()?['premiumUntil'];
       DateTime? until;
       if (raw is Timestamp) until = raw.toDate();

@@ -14,8 +14,6 @@ _$BodhiAiConfigImpl _$$BodhiAiConfigImplFromJson(Map json) =>
           ? const LocalisedText()
           : LocalisedText.fromJson(
               Map<String, dynamic>.from(json['systemInstruction'] as Map)),
-      freeDailySeconds: (json['freeDailySeconds'] as num?)?.toInt() ?? 210,
-      paidDailySeconds: (json['paidDailySeconds'] as num?)?.toInt() ?? 1800,
       freeDailyMessages: (json['freeDailyMessages'] as num?)?.toInt() ?? 15,
       paidDailyMessages: (json['paidDailyMessages'] as num?)?.toInt() ?? 120,
       maxTokens: (json['maxTokens'] as num?)?.toInt() ?? 700,
@@ -28,8 +26,6 @@ Map<String, dynamic> _$$BodhiAiConfigImplToJson(_$BodhiAiConfigImpl instance) =>
       'enabled': instance.enabled,
       'model': instance.model,
       'systemInstruction': instance.systemInstruction.toJson(),
-      'freeDailySeconds': instance.freeDailySeconds,
-      'paidDailySeconds': instance.paidDailySeconds,
       'freeDailyMessages': instance.freeDailyMessages,
       'paidDailyMessages': instance.paidDailyMessages,
       'maxTokens': instance.maxTokens,

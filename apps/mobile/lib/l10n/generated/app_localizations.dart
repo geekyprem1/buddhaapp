@@ -1771,7 +1771,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiChatQuotaReached.
   ///
   /// In en, this message translates to:
-  /// **'You\'ve used today\'s chat time. It resets tomorrow.'**
+  /// **'You\'ve used today\'s messages. It resets tomorrow.'**
   String get aiChatQuotaReached;
 
   /// No description provided for @aiChatDisabled.
@@ -1786,11 +1786,11 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Please try again.'**
   String get aiChatError;
 
-  /// No description provided for @aiChatTimeLeft.
+  /// No description provided for @aiChatMessagesLeft.
   ///
   /// In en, this message translates to:
-  /// **'{time} left today'**
-  String aiChatTimeLeft(String time);
+  /// **'{count, plural, =0{No messages left today} =1{1 message left today} other{{count} messages left today}}'**
+  String aiChatMessagesLeft(int count);
 
   /// No description provided for @aiChatReportTitle.
   ///

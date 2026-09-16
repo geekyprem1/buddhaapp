@@ -6,6 +6,37 @@ Eight ordered waves: de-risking spikes, shared core models, the backend proxy, t
 
 The backend is built before any UI so that the security posture (key custody, quota, topic gate) is settled and testable via the emulator before a single chat bubble exists. Admin and navigation work are independent of each other and can run in parallel once the shared core lands.
 
+## Amendments after live testing on prod
+
+Two decisions in this plan were reversed once the feature ran against the real
+model. Task notes below still describe what was built at the time; these
+amendments override them.
+
+**1. The classifier pre-pass (task 2.4) was removed.** `deepseek-v4-flash` is a
+reasoning model: given the gate's deliberately tiny token budget it spent the
+whole budget on chain-of-thought and returned empty content, so `JSON.parse`
+threw and the gate took its fail-closed path on *every* message — including
+plainly Buddhist ones. Disabling reasoning fixed the classifier in isolation,
+but the pre-pass turned out not to be load-bearing: the hardcoded scope
+preamble in the answering call already refuses off-topic requests via
+`REFUSAL_SENTINEL` (verified against prod — Buddhist questions answered in
+Hindi and English, a wifi-hacking question refused). `topicGate.ts` is deleted;
+the sentinel path now records the off-topic strike. This also halves per-message
+cost and latency.
+
+**2. The minutes/seconds meter was removed; the quota is per-message only.**
+Wall-clock time drained while the user read a reply or thought about the next
+question, so the number felt arbitrary and punished slow readers — a free user
+could burn the whole day's allowance without a single answer. Messages map
+directly to what is actually spent upstream and are trivial to reason about.
+Removed: `accrueSession`, `IDLE_CAP_SECONDS`, the client heartbeat/session
+lifecycle, `freeDailySeconds`/`paidDailySeconds` in config and admin, and
+`remainingSeconds` throughout. The `bodhiSession` callable (task 2.6) is
+replaced by a read-only `bodhiQuota` that reports the remaining count so the
+screen can show it on open; the obsolete function was deleted from prod. The
+`BodhiSendOutcome.messageLimit` case merged back into `quotaExhausted`, since
+there is now only one way to run out.
+
 ## Task Dependency Graph
 
 ```json
@@ -192,9 +223,10 @@ Wave 1 gates everything: task 0.3 (App Check) and 0.4 (OpenRouter key + spend ca
     - Add widget tests for the quota-exhausted state and the off-topic refusal rendering.
     - _Requirements: BA-3.5, BA-4.1_
   - [ ] 7.2 Manual matrix on a physical device
-    - Free user: consume 210 s, confirm the quota sheet and paywall CTA; confirm the counter does not move while the app is backgrounded.
-    - Paid user: confirm 1800 s and that a trialing user is treated as paid (known behaviour — trial and paid are indistinguishable today).
-    - Off-topic question → refusal with no minutes charged; 20 refusals → rate limited.
+    - Free user: send 15 messages, confirm the counter decrements each time, then the quota snackbar and paywall CTA on the 16th.
+    - Confirm the counter does **not** move while simply sitting on the screen, switching tabs, or backgrounding the app — only a sent message costs.
+    - Paid user: confirm the 120/day cap and that a trialing user is treated as paid (known behaviour — trial and paid are indistinguishable today).
+    - Off-topic question → refusal, and the counter is unchanged (the message is refunded); 20 refusals → rate limited.
     - Admin: change model and system instruction, confirm the next reply reflects it without an app release.
     - `enabled: false` → tab hidden and callable rejects.
     - Layout: keyboard open with mini player playing, on a small screen and at 1.3× text scale.

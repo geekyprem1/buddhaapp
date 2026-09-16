@@ -133,7 +133,6 @@ export const bodhiChat = onCall(
       return {
         reply,
         onTopic: false,
-        remainingSeconds: remaining.remainingSeconds,
         remainingMessages: remaining.remainingMessages,
       };
     }
@@ -154,7 +153,6 @@ export const bodhiChat = onCall(
     return {
       reply: result.content,
       onTopic: true,
-      remainingSeconds: charge.remaining.remainingSeconds,
       remainingMessages: charge.remaining.remainingMessages,
     };
   },

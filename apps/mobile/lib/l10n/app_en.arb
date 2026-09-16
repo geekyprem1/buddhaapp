@@ -322,13 +322,13 @@
   "aiChatSuggest1": "What did the Buddha teach about suffering?",
   "aiChatSuggest2": "How do I start a daily meditation practice?",
   "aiChatSuggest3": "What is the meaning of the Eightfold Path?",
-  "aiChatQuotaReached": "You've used today's chat time. It resets tomorrow.",
+  "aiChatQuotaReached": "You've used today's messages. It resets tomorrow.",
   "aiChatDisabled": "Bodhi AI is currently unavailable.",
   "aiChatError": "Something went wrong. Please try again.",
-  "aiChatTimeLeft": "{time} left today",
-  "@aiChatTimeLeft": {
+  "aiChatMessagesLeft": "{count, plural, =0{No messages left today} =1{1 message left today} other{{count} messages left today}}",
+  "@aiChatMessagesLeft": {
     "placeholders": {
-      "time": { "type": "String" }
+      "count": { "type": "int" }
     }
   },
   "aiChatReportTitle": "Report this reply",

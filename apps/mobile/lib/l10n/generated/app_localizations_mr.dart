@@ -894,7 +894,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get aiChatQuotaReached =>
-      'आजचा चॅट वेळ संपला आहे. तो उद्या पुन्हा सुरू होईल.';
+      'आजचे संदेश संपले आहेत. ते उद्या पुन्हा सुरू होतील.';
 
   @override
   String get aiChatDisabled => 'बोधी AI सध्या उपलब्ध नाही.';
@@ -903,8 +903,15 @@ class AppLocalizationsMr extends AppLocalizations {
   String get aiChatError => 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.';
 
   @override
-  String aiChatTimeLeft(String time) {
-    return 'आज $time शिल्लक';
+  String aiChatMessagesLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'आज $count संदेश शिल्लक',
+      one: 'आज 1 संदेश शिल्लक',
+      zero: 'आज कोणतेही संदेश शिल्लक नाहीत',
+    );
+    return '$_temp0';
   }
 
   @override

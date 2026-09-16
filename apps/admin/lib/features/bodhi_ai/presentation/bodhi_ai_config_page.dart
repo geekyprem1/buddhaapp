@@ -27,8 +27,6 @@ class BodhiAiConfigPage extends ConsumerStatefulWidget {
 
 class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
   late final TextEditingController _model;
-  late final TextEditingController _freeSeconds;
-  late final TextEditingController _paidSeconds;
   late final TextEditingController _freeMessages;
   late final TextEditingController _paidMessages;
   late final TextEditingController _maxTokens;
@@ -46,8 +44,6 @@ class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
   void initState() {
     super.initState();
     _model = TextEditingController();
-    _freeSeconds = TextEditingController();
-    _paidSeconds = TextEditingController();
     _freeMessages = TextEditingController();
     _paidMessages = TextEditingController();
     _maxTokens = TextEditingController();
@@ -57,8 +53,6 @@ class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
   @override
   void dispose() {
     _model.dispose();
-    _freeSeconds.dispose();
-    _paidSeconds.dispose();
     _freeMessages.dispose();
     _paidMessages.dispose();
     _maxTokens.dispose();
@@ -74,8 +68,7 @@ class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
     _model.text = c.model;
     _instruction = c.systemInstruction;
     _enabled = c.enabled;
-    _freeSeconds.text = c.freeDailySeconds.toString();
-    _paidSeconds.text = c.paidDailySeconds.toString();
+
     _freeMessages.text = c.freeDailyMessages.toString();
     _paidMessages.text = c.paidDailyMessages.toString();
     _maxTokens.text = c.maxTokens.toString();
@@ -91,13 +84,6 @@ class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
       return AdminStrings.bodhiAiAliasWarning;
     }
     if (_instruction.isEmpty) return AdminStrings.bodhiAiInstructionRequired;
-
-    final freeSec = int.tryParse(_freeSeconds.text.trim());
-    final paidSec = int.tryParse(_paidSeconds.text.trim());
-    if (freeSec == null || paidSec == null || freeSec <= 0 || paidSec <= 0 ||
-        freeSec > paidSec) {
-      return AdminStrings.bodhiAiSecondsInvalid;
-    }
 
     final freeMsg = int.tryParse(_freeMessages.text.trim());
     final paidMsg = int.tryParse(_paidMessages.text.trim());
@@ -135,8 +121,7 @@ class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
       enabled: _enabled,
       model: _model.text.trim(),
       systemInstruction: _instruction,
-      freeDailySeconds: int.parse(_freeSeconds.text.trim()),
-      paidDailySeconds: int.parse(_paidSeconds.text.trim()),
+
       freeDailyMessages: int.parse(_freeMessages.text.trim()),
       paidDailyMessages: int.parse(_paidMessages.text.trim()),
       maxTokens: int.parse(_maxTokens.text.trim()),
@@ -245,13 +230,6 @@ class _BodhiAiConfigPageState extends ConsumerState<BodhiAiConfigPage> {
             ),
             const SizedBox(height: 24),
             _heading(AdminStrings.bodhiAiQuotaSection),
-            ResponsiveFormRow(
-              children: [
-                _intField(_freeSeconds, AdminStrings.bodhiAiFreeSeconds),
-                _intField(_paidSeconds, AdminStrings.bodhiAiPaidSeconds),
-              ],
-            ),
-            const SizedBox(height: 16),
             ResponsiveFormRow(
               children: [
                 _intField(_freeMessages, AdminStrings.bodhiAiFreeMessages),

@@ -38,14 +38,13 @@ class BodhiAiConfig with _$BodhiAiConfig {
     /// Function's built-in default tone".
     @Default(LocalisedText()) LocalisedText systemInstruction,
 
-    /// Daily chat allowance in seconds. 210 = 3 min 30 s.
-    @Default(210) int freeDailySeconds,
-    @Default(1800) int paidDailySeconds,
-
-    /// Cost guards, independent of the minute quota. Under normal use the user
-    /// only ever sees the minute counter; these should only bite for outliers.
-    /// If they start firing for ordinary users, that is the signal that
-    /// minutes was the wrong meter.
+    /// The daily allowance, and the only meter.
+    ///
+    /// There was briefly a second, wall-clock meter here (`freeDailySeconds` /
+    /// `paidDailySeconds`) that drained while the chat screen was open. It was
+    /// removed: time is a poor proxy for cost and a hostile unit for the user,
+    /// since it burned while they read a reply or thought about the next
+    /// question. Messages map to what is actually spent upstream.
     @Default(15) int freeDailyMessages,
     @Default(120) int paidDailyMessages,
 
@@ -63,12 +62,8 @@ class BodhiAiConfig with _$BodhiAiConfig {
 }
 
 extension BodhiAiConfigX on BodhiAiConfig {
-  /// Daily seconds for the caller's tier. [isPremium] comes from the
+  /// Daily message cap for the caller's tier. [isPremium] comes from the
   /// server-verified `users/{uid}.premiumUntil`, never from a local flag.
-  int secondsFor({required bool isPremium}) =>
-      isPremium ? paidDailySeconds : freeDailySeconds;
-
-  /// Daily message cap for the caller's tier.
   int messagesFor({required bool isPremium}) =>
       isPremium ? paidDailyMessages : freeDailyMessages;
 }

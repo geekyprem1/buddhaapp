@@ -17,9 +17,10 @@ import 'widgets/bodhi_report_sheet.dart';
 
 /// "Ask Buddha" — the Bodhi AI chat tab.
 ///
-/// Owns the minute-session lifecycle: starts on mount, heartbeats every 20 s
-/// while foregrounded, and ends on dispose or when the app is backgrounded, so
-/// time only accrues while the user is actually here.
+/// Owns the minute-session lifecycle: a session is open only while this tab is
+/// actually visible (its branch selected and no route pushed on top) AND the
+/// app is foregrounded, with a heartbeat every 20 s in between — so time only
+/// accrues while the user is really here.
 class AskBuddhaScreen extends ConsumerStatefulWidget {
   const AskBuddhaScreen({super.key});
 
@@ -28,12 +29,8 @@ class AskBuddhaScreen extends ConsumerStatefulWidget {
 }
 
 class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
-  static const _heartbeat = Duration(seconds: 20);
-
   final _input = TextEditingController();
   final _scroll = ScrollController();
-  Timer? _timer;
-  AppLifecycleListener? _lifecycle;
 
   BodhiChatController get _controller =>
       ref.read(bodhiChatControllerProvider.notifier);
@@ -41,30 +38,19 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
   @override
   void initState() {
     super.initState();
-    _lifecycle = AppLifecycleListener(
-      onResume: _openSession,
-      onInactive: _closeSession,
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _openSession());
-  }
-
-  void _openSession() {
-    _timer?.cancel();
-    unawaited(_controller.startSession());
-    _timer = Timer.periodic(_heartbeat, (_) => _controller.heartbeat());
-  }
-
-  void _closeSession() {
-    _timer?.cancel();
-    _timer = null;
-    unawaited(_controller.endSession());
+    _scroll.addListener(_trackBottom);
+    // Populate the counter on open. Nothing else to do on the lifecycle: the
+    // quota is charged per message, so there is no session to open, tick or
+    // close, and no reason to care whether this tab is foregrounded.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _controller.refreshQuota();
+    });
   }
 
   @override
   void dispose() {
-    _closeSession();
-    _lifecycle?.dispose();
     _input.dispose();
+    _scroll.removeListener(_trackBottom);
     _scroll.dispose();
     super.dispose();
   }
@@ -79,14 +65,28 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
     if (!mounted) return;
 
     final l10n = AppLocalizations.of(context);
+    // The controller drops failed turns from the transcript (A8); put the
+    // question back in the composer so the user can retry instead of
+    // retyping. Refusals already have an answer bubble, so they restore
+    // nothing.
+    final failed = outcome == BodhiSendOutcome.quotaExhausted ||
+        outcome == BodhiSendOutcome.disabled ||
+        outcome == BodhiSendOutcome.error;
+    if (failed) _fill(text);
+
     switch (outcome) {
       case BodhiSendOutcome.quotaExhausted:
-        // Free users are nudged to the paywall; premium users just see it's
-        // out for today.
-        final isPremium = ref.read(premiumControllerProvider);
-        _snack(l10n?.aiChatQuotaReached ??
-            "You've used today's chat time. It resets tomorrow.");
-        if (!isPremium) ensurePremium(ref, context);
+        // Free users are nudged to the paywall (premium raises the daily cap);
+        // premium users just see that they are out for today. The nudge waits
+        // for entitlement resolution (A16) so a paid user in the cold-start
+        // window never sees the paywall.
+        {
+          final isPremium = ref.read(premiumControllerProvider);
+          final premiumReady = ref.read(premiumReadyProvider);
+          _snack(l10n?.aiChatQuotaReached ??
+              "You've used today's messages. It resets tomorrow.");
+          if (!isPremium && premiumReady) ensurePremium(ref, context);
+        }
       case BodhiSendOutcome.disabled:
         _snack(l10n?.aiChatDisabled ?? 'Bodhi AI is currently unavailable.');
       case BodhiSendOutcome.error:
@@ -114,10 +114,38 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
     });
   }
 
+  /// Whether the user was near the bottom BEFORE the latest content arrived
+  /// (C3). A large insert grows `maxScrollExtent` past the old position, so a
+  /// live near-bottom check would wrongly fail for a user who never scrolled
+  /// away — this latch is updated on actual scroll activity instead.
+  bool _wasAtBottom = true;
+
+  void _trackBottom() {
+    if (!_scroll.hasClients) return;
+    final pos = _scroll.position;
+    _wasAtBottom = pos.pixels >= pos.maxScrollExtent - 200;
+  }
+
+  /// Follows the streaming reply (C3), but only while the user never left
+  /// the bottom — never yanks them away from reading history.
+  void _followStream() {
+    if (!_wasAtBottom || !_scroll.hasClients) return;
+    _scroll.animateTo(
+      _scroll.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(bodhiChatControllerProvider);
+    // Follow-up to every chat state change (deltas included); the follow
+    // itself is post-frame and near-bottom-guarded.
+    ref.listen(bodhiChatControllerProvider, (_, __) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _followStream());
+    });
     // Only reserve clearance for the mini player, which is an overlay. The
     // nav chrome is a Column sibling and already excluded from this body.
     final mediaPlaying =
@@ -138,7 +166,7 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
       body: Column(
         children: [
           BodhiQuotaBanner(
-            remainingSeconds: state.remainingSeconds,
+            remainingMessages: state.remainingMessages,
             l10n: l10n,
           ),
           Expanded(

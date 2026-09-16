@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
@@ -41,14 +42,31 @@ class BodhiMessage {
 /// unbounded.
 class BodhiChatStore {
   static const boxName = 'bodhi_chat';
-  static const _key = 'messages';
+  static const _legacyKey = 'messages';
   static const _maxMessages = 200;
 
   Box<String>? get _box =>
       Hive.isBoxOpen(boxName) ? Hive.box<String>(boxName) : null;
 
-  List<BodhiMessage> load() {
-    final raw = _box?.get(_key);
+  /// Per-account key (A6): transcripts must never leak across accounts on a
+  /// shared device. Signed-out callers fall back to the legacy shared key.
+  static String keyFor(String? uid) =>
+      uid == null || uid.isEmpty ? _legacyKey : 'messages_$uid';
+
+  List<BodhiMessage> load(String? uid) {
+    final box = _box;
+    if (box == null) return [];
+    if (uid != null && uid.isNotEmpty) {
+      // Quarantine (A6): the pre-namespacing transcript has no ownership
+      // evidence, so it must never be attached to whichever account happens
+      // to load first — that reproduced a cross-account leak. It is discarded
+      // on first authenticated load instead of adopted.
+      if (box.get(_legacyKey) case final legacy
+          when legacy != null && legacy.isNotEmpty) {
+        unawaited(box.delete(_legacyKey));
+      }
+    }
+    final raw = box.get(keyFor(uid));
     if (raw == null || raw.isEmpty) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
@@ -61,7 +79,7 @@ class BodhiChatStore {
     }
   }
 
-  Future<void> save(List<BodhiMessage> messages) async {
+  Future<void> save(String? uid, List<BodhiMessage> messages) async {
     final box = _box;
     if (box == null) return;
     // Persist only settled messages, and only the most recent [_maxMessages].
@@ -71,8 +89,11 @@ class BodhiChatStore {
     final capped = settled.length > _maxMessages
         ? settled.sublist(settled.length - _maxMessages)
         : settled;
-    await box.put(_key, jsonEncode([for (final m in capped) m.toJson()]));
+    await box.put(
+      keyFor(uid),
+      jsonEncode([for (final m in capped) m.toJson()]),
+    );
   }
 
-  Future<void> clear() async => _box?.delete(_key);
+  Future<void> clear(String? uid) async => _box?.delete(keyFor(uid));
 }

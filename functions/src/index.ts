@@ -38,4 +38,4 @@ export { playRtdn } from "./billing/playRtdn";
 
 // Bodhi AI chat proxy (.kiro/specs/bodhi-ai-chat)
 export { bodhiChat } from "./ai/bodhiChat";
-export { bodhiSession } from "./ai/bodhiSession";
+export { bodhiQuota } from "./ai/bodhiQuota";

@@ -400,8 +400,7 @@ abstract class AdminStrings {
       'Guides how the assistant answers. The Buddhism-only rule is enforced in '
       'code and cannot be removed here.';
   static const bodhiAiQuotaSection = 'Daily limits';
-  static const bodhiAiFreeSeconds = 'Free: seconds/day';
-  static const bodhiAiPaidSeconds = 'Paid: seconds/day';
+
   static const bodhiAiFreeMessages = 'Free: messages/day';
   static const bodhiAiPaidMessages = 'Paid: messages/day';
   static const bodhiAiTuningSection = 'Model tuning';
@@ -412,8 +411,7 @@ abstract class AdminStrings {
       'Do not use a "…-latest" alias — pin a dated model id.';
   static const bodhiAiInstructionRequired =
       'Enter a system instruction in at least one language.';
-  static const bodhiAiSecondsInvalid =
-      'Daily seconds must be positive (free ≤ paid).';
+
   static const bodhiAiMessagesInvalid =
       'Daily messages must be positive (free ≤ paid).';
   static const bodhiAiMaxTokensInvalid =
