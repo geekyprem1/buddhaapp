@@ -867,4 +867,60 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get maintenanceFallback =>
       'धम्म पथ में रखरखाव चल रहा है। कृपया बाद में कोशिश करें।';
+
+  @override
+  String get navAskBuddha => 'बुद्ध से पूछें';
+
+  @override
+  String get aiChatWelcome => 'बौद्ध धर्म के बारे में कुछ भी पूछें।';
+
+  @override
+  String get aiChatDisclaimer =>
+      'उत्तर AI द्वारा तैयार किए गए हैं और गलत हो सकते हैं।';
+
+  @override
+  String get aiChatHint => 'बौद्ध धर्म के बारे में पूछें…';
+
+  @override
+  String get aiChatClear => 'चैट साफ़ करें';
+
+  @override
+  String get aiChatSuggest1 => 'बुद्ध ने दुःख के बारे में क्या सिखाया?';
+
+  @override
+  String get aiChatSuggest2 => 'मैं रोज़ ध्यान का अभ्यास कैसे शुरू करूँ?';
+
+  @override
+  String get aiChatSuggest3 => 'अष्टांगिक मार्ग का अर्थ क्या है?';
+
+  @override
+  String get aiChatQuotaReached =>
+      'आज का चैट समय समाप्त हो गया है। यह कल फिर से शुरू होगा।';
+
+  @override
+  String get aiChatDisabled => 'बोधि AI अभी उपलब्ध नहीं है।';
+
+  @override
+  String get aiChatError => 'कुछ गड़बड़ हो गई। कृपया फिर से प्रयास करें।';
+
+  @override
+  String aiChatTimeLeft(String time) {
+    return 'आज $time शेष';
+  }
+
+  @override
+  String get aiChatReportTitle => 'इस उत्तर की रिपोर्ट करें';
+
+  @override
+  String get aiChatReportSubtitle =>
+      'हमें बताएं क्या गलत था ताकि हम सुधार कर सकें।';
+
+  @override
+  String get aiChatReportHint => 'क्या गलत या अनुचित था?';
+
+  @override
+  String get aiChatReportSend => 'रिपोर्ट भेजें';
+
+  @override
+  String get aiChatReportThanks => 'रिपोर्ट के लिए धन्यवाद।';
 }

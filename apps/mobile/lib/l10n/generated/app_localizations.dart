@@ -1719,6 +1719,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dhamma Path is under maintenance. Please try again later.'**
   String get maintenanceFallback;
+
+  /// No description provided for @navAskBuddha.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Buddha'**
+  String get navAskBuddha;
+
+  /// No description provided for @aiChatWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask me anything about Buddhism.'**
+  String get aiChatWelcome;
+
+  /// No description provided for @aiChatDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Replies are AI-generated and may be inaccurate.'**
+  String get aiChatDisclaimer;
+
+  /// No description provided for @aiChatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about Buddhism…'**
+  String get aiChatHint;
+
+  /// No description provided for @aiChatClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear chat'**
+  String get aiChatClear;
+
+  /// No description provided for @aiChatSuggest1.
+  ///
+  /// In en, this message translates to:
+  /// **'What did the Buddha teach about suffering?'**
+  String get aiChatSuggest1;
+
+  /// No description provided for @aiChatSuggest2.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I start a daily meditation practice?'**
+  String get aiChatSuggest2;
+
+  /// No description provided for @aiChatSuggest3.
+  ///
+  /// In en, this message translates to:
+  /// **'What is the meaning of the Eightfold Path?'**
+  String get aiChatSuggest3;
+
+  /// No description provided for @aiChatQuotaReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used today\'s chat time. It resets tomorrow.'**
+  String get aiChatQuotaReached;
+
+  /// No description provided for @aiChatDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Bodhi AI is currently unavailable.'**
+  String get aiChatDisabled;
+
+  /// No description provided for @aiChatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get aiChatError;
+
+  /// No description provided for @aiChatTimeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} left today'**
+  String aiChatTimeLeft(String time);
+
+  /// No description provided for @aiChatReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report this reply'**
+  String get aiChatReportTitle;
+
+  /// No description provided for @aiChatReportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us what was wrong so we can improve.'**
+  String get aiChatReportSubtitle;
+
+  /// No description provided for @aiChatReportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What was inaccurate or inappropriate?'**
+  String get aiChatReportHint;
+
+  /// No description provided for @aiChatReportSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send report'**
+  String get aiChatReportSend;
+
+  /// No description provided for @aiChatReportThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for the report.'**
+  String get aiChatReportThanks;
 }
 
 class _AppLocalizationsDelegate

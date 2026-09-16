@@ -312,5 +312,28 @@
   "forceUpdateBody": "A newer version of Dhamma Path is required to continue.",
   "forceUpdateButton": "Update",
   "maintenanceTitle": "We will be back shortly",
-  "maintenanceFallback": "Dhamma Path is under maintenance. Please try again later."
+  "maintenanceFallback": "Dhamma Path is under maintenance. Please try again later.",
+
+  "navAskBuddha": "Ask Buddha",
+  "aiChatWelcome": "Ask me anything about Buddhism.",
+  "aiChatDisclaimer": "Replies are AI-generated and may be inaccurate.",
+  "aiChatHint": "Ask about Buddhism…",
+  "aiChatClear": "Clear chat",
+  "aiChatSuggest1": "What did the Buddha teach about suffering?",
+  "aiChatSuggest2": "How do I start a daily meditation practice?",
+  "aiChatSuggest3": "What is the meaning of the Eightfold Path?",
+  "aiChatQuotaReached": "You've used today's chat time. It resets tomorrow.",
+  "aiChatDisabled": "Bodhi AI is currently unavailable.",
+  "aiChatError": "Something went wrong. Please try again.",
+  "aiChatTimeLeft": "{time} left today",
+  "@aiChatTimeLeft": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "aiChatReportTitle": "Report this reply",
+  "aiChatReportSubtitle": "Tell us what was wrong so we can improve.",
+  "aiChatReportHint": "What was inaccurate or inappropriate?",
+  "aiChatReportSend": "Send report",
+  "aiChatReportThanks": "Thanks for the report."
 }

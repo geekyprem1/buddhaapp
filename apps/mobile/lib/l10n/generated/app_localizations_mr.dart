@@ -866,4 +866,60 @@ class AppLocalizationsMr extends AppLocalizations {
   @override
   String get maintenanceFallback =>
       'धम्म पथ देखभाल चालू आहे. कृपया नंतर पुन्हा प्रयत्न करा.';
+
+  @override
+  String get navAskBuddha => 'बुद्धांना विचारा';
+
+  @override
+  String get aiChatWelcome => 'बौद्ध धर्माबद्दल काहीही विचारा.';
+
+  @override
+  String get aiChatDisclaimer =>
+      'उत्तरे AI ने तयार केली आहेत आणि चुकीची असू शकतात.';
+
+  @override
+  String get aiChatHint => 'बौद्ध धर्माबद्दल विचारा…';
+
+  @override
+  String get aiChatClear => 'चॅट साफ करा';
+
+  @override
+  String get aiChatSuggest1 => 'बुद्धांनी दुःखाबद्दल काय शिकवले?';
+
+  @override
+  String get aiChatSuggest2 => 'मी दररोज ध्यानाचा सराव कसा सुरू करू?';
+
+  @override
+  String get aiChatSuggest3 => 'अष्टांगिक मार्गाचा अर्थ काय आहे?';
+
+  @override
+  String get aiChatQuotaReached =>
+      'आजचा चॅट वेळ संपला आहे. तो उद्या पुन्हा सुरू होईल.';
+
+  @override
+  String get aiChatDisabled => 'बोधी AI सध्या उपलब्ध नाही.';
+
+  @override
+  String get aiChatError => 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String aiChatTimeLeft(String time) {
+    return 'आज $time शिल्लक';
+  }
+
+  @override
+  String get aiChatReportTitle => 'या उत्तराची तक्रार करा';
+
+  @override
+  String get aiChatReportSubtitle =>
+      'काय चूक होते ते सांगा जेणेकरून आम्ही सुधारणा करू शकू.';
+
+  @override
+  String get aiChatReportHint => 'काय चुकीचे किंवा अयोग्य होते?';
+
+  @override
+  String get aiChatReportSend => 'तक्रार पाठवा';
+
+  @override
+  String get aiChatReportThanks => 'तक्रारीबद्दल धन्यवाद.';
 }

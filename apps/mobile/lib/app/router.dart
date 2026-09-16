@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/otp_screen.dart';
+import '../features/bodhi_ai/presentation/ask_buddha_screen.dart';
 import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
 import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
@@ -68,6 +69,7 @@ abstract class AppRoutes {
   static const placeDetail = '/places/view';
   static const wisdomDetail = '/wisdom';
   static const buddhistCalendar = '/buddhist-calendar';
+  static const askBuddha = '/ask-buddha';
   static const wallpapers = '/wallpapers';
   static const ringtones = '/ringtones';
   static const ringtoneHelp = '/ringtones/help';
@@ -228,6 +230,16 @@ GoRouter appRouter(Ref ref) {
               ),
             ],
           ),
+          // Ask Buddha sits at the centre (index 2) — the flagship feature
+          // earns the middle slot, ahead of the more utilitarian tabs.
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.askBuddha,
+                builder: (context, state) => const AskBuddhaScreen(),
+              ),
+            ],
+          ),
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -244,15 +256,14 @@ GoRouter appRouter(Ref ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoutes.profile,
-                builder: (context, state) => const ProfileScreen(),
-              ),
-            ],
-          ),
         ],
+      ),
+      // Profile is no longer a bottom-nav tab (its slot went to Ask Buddha).
+      // It is reached from the Home app-bar avatar and pushed on top, so it
+      // keeps a back arrow instead of being a root destination.
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.wisdomDetail,

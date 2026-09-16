@@ -5,15 +5,27 @@ import 'package:go_router/go_router.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'router.dart';
 
-/// The five bottom-nav destinations, in order. Each maps to a top-level route
-/// so the bar can drive navigation from anywhere in the app (not just the tab
-/// shell).
-const _navRoutes = <String>[
+/// The bottom-nav destinations, in order. Each maps to a top-level route so
+/// the bar can drive navigation from anywhere in the app (not just the tab
+/// shell). Profile is NOT here — it moved to the Home app-bar avatar (Wave 4);
+/// its old slot is taken by Ask Buddha at the centre.
+///
+/// Two variants because the Ask Buddha tab is hidden when `config/bodhi_ai`
+/// has `enabled: false` (BA-1.3). The route order must stay in lockstep with
+/// the `destinations` list built in [_bar].
+const _navRoutesWithAi = <String>[
+  AppRoutes.home,
+  AppRoutes.buddhistCalendar,
+  AppRoutes.askBuddha,
+  AppRoutes.prarthana,
+  AppRoutes.videos,
+];
+
+const _navRoutesNoAi = <String>[
   AppRoutes.home,
   AppRoutes.buddhistCalendar,
   AppRoutes.prarthana,
   AppRoutes.videos,
-  AppRoutes.profile,
 ];
 
 /// A bottom navigation bar that persists on EVERY screen (mounted in the root
@@ -24,9 +36,20 @@ const _navRoutes = <String>[
 /// When the user is on a pushed detail screen (not one of the five tab roots),
 /// no destination is highlighted; tapping one goes to that tab.
 class PersistentBottomNav extends StatelessWidget {
-  const PersistentBottomNav({required this.router, super.key});
+  const PersistentBottomNav({
+    required this.router,
+    this.bodhiAiEnabled = false,
+    super.key,
+  });
 
   final GoRouter router;
+
+  /// When true, the Ask Buddha tab is shown at the centre (index 2). Driven by
+  /// `config/bodhi_ai.enabled`, threaded down from `app.dart`.
+  final bool bodhiAiEnabled;
+
+  List<String> get _navRoutes =>
+      bodhiAiEnabled ? _navRoutesWithAi : _navRoutesNoAi;
 
   /// Height of the bar's content (excludes the system bottom inset, which
   /// [NavigationBar] applies internally). Other bottom overlays use this to sit
@@ -104,37 +127,34 @@ class PersistentBottomNav extends StatelessWidget {
       // tooltip would throw "No Overlay widget found." and each destination
       // would render as an error box.
       destinations: [
-        NavigationDestination(
-          icon: const Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home, color: cs.primary),
-          label: l10n?.navHome ?? 'Home',
-          tooltip: '',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.calendar_month_outlined),
-          selectedIcon: Icon(Icons.calendar_month, color: cs.primary),
-          label: l10n?.navCalendar ?? 'Calendar',
-          tooltip: '',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.self_improvement),
-          selectedIcon: Icon(Icons.self_improvement, color: cs.primary),
-          label: l10n?.navPractice ?? 'Practice',
-          tooltip: '',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.play_circle_outline),
-          selectedIcon: Icon(Icons.play_circle, color: cs.primary),
-          label: l10n?.homeVideo ?? 'Videos',
-          tooltip: '',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person, color: cs.primary),
-          label: l10n?.navProfile ?? 'Profile',
-          tooltip: '',
-        ),
+        _destinationFor(cs, Icons.home_outlined, Icons.home,
+            l10n?.navHome ?? 'Home'),
+        _destinationFor(cs, Icons.calendar_month_outlined, Icons.calendar_month,
+            l10n?.navCalendar ?? 'Calendar'),
+        if (bodhiAiEnabled)
+          _destinationFor(cs, Icons.self_improvement, Icons.self_improvement,
+              l10n?.navAskBuddha ?? 'Ask Buddha'),
+        _destinationFor(cs, Icons.spa_outlined, Icons.spa,
+            l10n?.navPractice ?? 'Practice'),
+        _destinationFor(cs, Icons.play_circle_outline, Icons.play_circle,
+            l10n?.homeVideo ?? 'Videos'),
       ],
+    );
+  }
+
+  /// `tooltip: ''` is required, not cosmetic — see the class doc: this bar is
+  /// above the Overlay, so a defaulted tooltip would throw.
+  NavigationDestination _destinationFor(
+    ColorScheme cs,
+    IconData icon,
+    IconData selected,
+    String label,
+  ) {
+    return NavigationDestination(
+      icon: Icon(icon),
+      selectedIcon: Icon(selected, color: cs.primary),
+      label: label,
+      tooltip: '',
     );
   }
 }

@@ -30,9 +30,16 @@ const _hiddenExactRoutes = <String>{
 /// which means it lives above the `InheritedGoRouter` — hence the injected
 /// [router] rather than `context.push`.
 class BottomAppChrome extends StatelessWidget {
-  const BottomAppChrome({required this.router, super.key});
+  const BottomAppChrome({
+    required this.router,
+    this.bodhiAiEnabled = false,
+    super.key,
+  });
 
   final GoRouter router;
+
+  /// Forwarded to [PersistentBottomNav] to show/hide the Ask Buddha tab.
+  final bool bodhiAiEnabled;
 
   /// Whether the chrome should be drawn for the router's current location.
   static bool isVisibleFor(GoRouter router) {
@@ -76,7 +83,10 @@ class BottomAppChrome extends StatelessWidget {
         // No SafeArea wrapper here: NavigationBar already applies the system
         // bottom inset internally (and paints behind it), so adding one would
         // double the inset and waste screen space.
-        PersistentBottomNav(router: router),
+        PersistentBottomNav(
+          router: router,
+          bodhiAiEnabled: bodhiAiEnabled,
+        ),
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/bodhi_ai/application/bodhi_chat_controller.dart';
 import '../features/notifications/application/fcm_coordinator.dart';
 import '../features/player/presentation/mini_player.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -28,6 +29,10 @@ class DhammaPathApp extends ConsumerWidget {
         onboardingStep != AppConstants.onboardingStepLanguage &&
         onboardingStep != AppConstants.onboardingStepPersonInfo;
     final themeMode = ref.watch(themeModeControllerProvider);
+    // Drives whether the Ask Buddha tab is shown (BA-1.3). Defaults to hidden
+    // until the config stream resolves with enabled: true.
+    final bodhiAiEnabled =
+        ref.watch(bodhiAiConfigProvider).valueOrNull?.enabled ?? false;
     return MaterialApp.router(
       title: 'Dhamma Path',
       debugShowCheckedModeBanner: false,
@@ -60,7 +65,11 @@ class DhammaPathApp extends ConsumerWidget {
                   children: [
                     const OfflineBanner(),
                     Expanded(child: child ?? const SizedBox.shrink()),
-                    if (showChrome) BottomAppChrome(router: router),
+                    if (showChrome)
+                      BottomAppChrome(
+                        router: router,
+                        bodhiAiEnabled: bodhiAiEnabled,
+                      ),
                   ],
                 ),
                 // The mini player floats above the chrome so its controls

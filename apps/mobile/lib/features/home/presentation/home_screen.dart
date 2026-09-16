@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../notifications/application/fcm_coordinator.dart';
 import '../../profile/application/profile_providers.dart';
+import '../../profile/presentation/widgets/profile_avatar_button.dart';
 import '../application/home_providers.dart';
 import 'home_carousel.dart';
 import 'module_catalog.dart';
@@ -72,6 +73,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        // Profile moved off the bottom nav (its slot went to Ask Buddha), so
+        // its entry point is this top-left avatar.
+        leading: const Padding(
+          padding: EdgeInsets.only(left: AppSpacing.xs),
+          child: ProfileAvatarButton(),
+        ),
         title: Text(
           l10n?.appName ?? AppConstants.appName,
           maxLines: 1,

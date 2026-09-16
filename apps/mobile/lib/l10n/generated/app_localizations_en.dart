@@ -867,4 +867,60 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get maintenanceFallback =>
       'Dhamma Path is under maintenance. Please try again later.';
+
+  @override
+  String get navAskBuddha => 'Ask Buddha';
+
+  @override
+  String get aiChatWelcome => 'Ask me anything about Buddhism.';
+
+  @override
+  String get aiChatDisclaimer =>
+      'Replies are AI-generated and may be inaccurate.';
+
+  @override
+  String get aiChatHint => 'Ask about Buddhism…';
+
+  @override
+  String get aiChatClear => 'Clear chat';
+
+  @override
+  String get aiChatSuggest1 => 'What did the Buddha teach about suffering?';
+
+  @override
+  String get aiChatSuggest2 => 'How do I start a daily meditation practice?';
+
+  @override
+  String get aiChatSuggest3 => 'What is the meaning of the Eightfold Path?';
+
+  @override
+  String get aiChatQuotaReached =>
+      'You\'ve used today\'s chat time. It resets tomorrow.';
+
+  @override
+  String get aiChatDisabled => 'Bodhi AI is currently unavailable.';
+
+  @override
+  String get aiChatError => 'Something went wrong. Please try again.';
+
+  @override
+  String aiChatTimeLeft(String time) {
+    return '$time left today';
+  }
+
+  @override
+  String get aiChatReportTitle => 'Report this reply';
+
+  @override
+  String get aiChatReportSubtitle =>
+      'Tell us what was wrong so we can improve.';
+
+  @override
+  String get aiChatReportHint => 'What was inaccurate or inappropriate?';
+
+  @override
+  String get aiChatReportSend => 'Send report';
+
+  @override
+  String get aiChatReportThanks => 'Thanks for the report.';
 }

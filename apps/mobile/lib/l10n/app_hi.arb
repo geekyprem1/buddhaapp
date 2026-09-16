@@ -312,5 +312,28 @@
   "forceUpdateBody": "आगे बढ़ने के लिए धम्म पथ का नया संस्करण चाहिए।",
   "forceUpdateButton": "अपडेट करें",
   "maintenanceTitle": "हम जल्द वापस होंगे",
-  "maintenanceFallback": "धम्म पथ में रखरखाव चल रहा है। कृपया बाद में कोशिश करें।"
+  "maintenanceFallback": "धम्म पथ में रखरखाव चल रहा है। कृपया बाद में कोशिश करें।",
+
+  "navAskBuddha": "बुद्ध से पूछें",
+  "aiChatWelcome": "बौद्ध धर्म के बारे में कुछ भी पूछें।",
+  "aiChatDisclaimer": "उत्तर AI द्वारा तैयार किए गए हैं और गलत हो सकते हैं।",
+  "aiChatHint": "बौद्ध धर्म के बारे में पूछें…",
+  "aiChatClear": "चैट साफ़ करें",
+  "aiChatSuggest1": "बुद्ध ने दुःख के बारे में क्या सिखाया?",
+  "aiChatSuggest2": "मैं रोज़ ध्यान का अभ्यास कैसे शुरू करूँ?",
+  "aiChatSuggest3": "अष्टांगिक मार्ग का अर्थ क्या है?",
+  "aiChatQuotaReached": "आज का चैट समय समाप्त हो गया है। यह कल फिर से शुरू होगा।",
+  "aiChatDisabled": "बोधि AI अभी उपलब्ध नहीं है।",
+  "aiChatError": "कुछ गड़बड़ हो गई। कृपया फिर से प्रयास करें।",
+  "aiChatTimeLeft": "आज {time} शेष",
+  "@aiChatTimeLeft": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "aiChatReportTitle": "इस उत्तर की रिपोर्ट करें",
+  "aiChatReportSubtitle": "हमें बताएं क्या गलत था ताकि हम सुधार कर सकें।",
+  "aiChatReportHint": "क्या गलत या अनुचित था?",
+  "aiChatReportSend": "रिपोर्ट भेजें",
+  "aiChatReportThanks": "रिपोर्ट के लिए धन्यवाद।"
 }

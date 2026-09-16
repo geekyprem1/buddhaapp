@@ -21,6 +21,10 @@ class AlarmLocalStore {
     if (!Hive.isBoxOpen('app_prefs')) {
       await Hive.openBox('app_prefs');
     }
+    // Bodhi AI chat keeps its transcript locally (the server stores nothing).
+    if (!Hive.isBoxOpen('bodhi_chat')) {
+      await Hive.openBox<String>('bodhi_chat');
+    }
   }
 
   List<Alarm> getAll() {
