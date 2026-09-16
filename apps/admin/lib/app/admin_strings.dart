@@ -382,6 +382,45 @@ abstract class AdminStrings {
   static const configUpdatedAt = 'Last saved';
   static const configSaveFailed = 'Could not save.';
 
+  // --- Bodhi AI chat ---
+  static const bodhiAi = 'Bodhi AI';
+  static const bodhiAiIntro =
+      'Settings for the in-app "Ask Buddha" chat. Changes take effect on the '
+      'next message — no app release needed.';
+  static const bodhiAiEnabled = 'Bodhi AI enabled';
+  static const bodhiAiEnabledHint =
+      'Master switch. Off hides the tab and makes the chat refuse.';
+  static const bodhiAiModelSection = 'Model';
+  static const bodhiAiModel = 'OpenRouter model id';
+  static const bodhiAiModelHint =
+      'Use a pinned, dated slug, e.g. deepseek/deepseek-v4-flash-0731. Never a '
+      '"…-latest" alias — it silently changes model under you.';
+  static const bodhiAiInstruction = 'System instruction (tone & style)';
+  static const bodhiAiInstructionHint =
+      'Guides how the assistant answers. The Buddhism-only rule is enforced in '
+      'code and cannot be removed here.';
+  static const bodhiAiQuotaSection = 'Daily limits';
+  static const bodhiAiFreeSeconds = 'Free: seconds/day';
+  static const bodhiAiPaidSeconds = 'Paid: seconds/day';
+  static const bodhiAiFreeMessages = 'Free: messages/day';
+  static const bodhiAiPaidMessages = 'Paid: messages/day';
+  static const bodhiAiTuningSection = 'Model tuning';
+  static const bodhiAiMaxTokens = 'Max reply tokens';
+  static const bodhiAiTemperature = 'Temperature (0–2)';
+  static const bodhiAiModelRequired = 'Enter a model id.';
+  static const bodhiAiAliasWarning =
+      'Do not use a "…-latest" alias — pin a dated model id.';
+  static const bodhiAiInstructionRequired =
+      'Enter a system instruction in at least one language.';
+  static const bodhiAiSecondsInvalid =
+      'Daily seconds must be positive (free ≤ paid).';
+  static const bodhiAiMessagesInvalid =
+      'Daily messages must be positive (free ≤ paid).';
+  static const bodhiAiMaxTokensInvalid =
+      'Max tokens must be between 100 and 4000.';
+  static const bodhiAiTemperatureInvalid =
+      'Temperature must be between 0 and 2.';
+
   static const pageTitle = 'Title';
   static const pageBody = 'Body';
   static const pageBodyHint =

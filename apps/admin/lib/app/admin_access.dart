@@ -25,6 +25,7 @@ abstract class AdminRoutes {
   static const notifications = '/notifications';
   static const config = '/config';
   static const premium = '/premium';
+  static const bodhiAi = '/bodhi-ai';
   static const pages = '/pages';
   static const audit = '/audit';
   static const contact = '/contact';
@@ -132,6 +133,11 @@ const adminDestinations = <AdminDestination>[
   AdminDestination(
     path: AdminRoutes.premium,
     label: 'Premium',
+    allowed: AdminRole.canEditConfig,
+  ),
+  AdminDestination(
+    path: AdminRoutes.bodhiAi,
+    label: 'Bodhi AI',
     allowed: AdminRole.canEditConfig,
   ),
   AdminDestination(

@@ -32,6 +32,8 @@ void main() {
     expect(find.text('Categories'), findsOneWidget);
     expect(find.text('Users'), findsNothing);
     expect(find.text('App config'), findsNothing);
+    // Bodhi AI settings edit config/bodhi_ai — super admin only.
+    expect(find.text('Bodhi AI'), findsNothing);
   });
 
   testWidgets('side nav shows Users for a super admin', (tester) async {
@@ -51,5 +53,6 @@ void main() {
 
     expect(find.text('Users'), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
+    expect(find.text('Bodhi AI'), findsOneWidget);
   });
 }
