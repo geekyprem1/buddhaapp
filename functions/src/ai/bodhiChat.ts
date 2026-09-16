@@ -1,14 +1,19 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { instructionFor, readBodhiConfig } from "./config";
 import { OPENROUTER_API_KEY, chatCompletion } from "./openRouter";
-import { buildMessages, refusalMessage, sanitiseHistory } from "./prompt";
+import {
+  REFUSAL_SENTINEL,
+  buildMessages,
+  refusalMessage,
+  sanitiseHistory,
+} from "./prompt";
 import {
   isPremium,
   recordOffTopic,
   recordTokens,
+  refundMessage,
   reserveMessage,
 } from "./quota";
-import { isOnTopic } from "./topicGate";
 
 interface BodhiChatRequest {
   message?: unknown;
@@ -68,16 +73,60 @@ export const bodhiChat = onCall(
     // Refunded below if the question turns out to be off-topic.
     const charge = await reserveMessage({ uid, isPremium: premium, config });
 
-    // Topic gate. Fails closed (off-topic) on any classifier error.
-    const onTopic = await isOnTopic({ model: config.model, question });
-    if (!onTopic) {
+    // Scope is enforced by the answering call itself, via the hardcoded
+    // preamble in `buildMessages` — an off-topic question comes back as
+    // REFUSAL_SENTINEL and is handled below.
+    //
+    // There used to be a cheap classifier pre-pass here. It was removed: the
+    // model is a reasoning model, so a small-budget classifier call spends its
+    // tokens on chain-of-thought and returns empty content, which made the
+    // gate's fail-closed path refuse *every* question — including plainly
+    // Buddhist ones. Disabling reasoning fixed the classifier in isolation but
+    // the pre-pass was never load-bearing: the preamble already refuses
+    // off-topic requests on its own (verified against prod). Dropping it also
+    // halves the per-message cost and latency.
+    const messages = buildMessages({
+      lang,
+      adminInstruction: instructionFor(config, lang),
+      history: sanitiseHistory(data.history),
+      question,
+    });
+
+    // Answer. A provider failure — or an empty reply — refunds the reserved
+    // message (A3/N5): the user must not pay quota for an answer they never
+    // got. The original error is rethrown so the client shows "try again"
+    // instead of a paywall.
+    let result;
+    try {
+      result = await chatCompletion({
+        model: config.model,
+        messages,
+        maxTokens: config.maxTokens,
+        temperature: config.temperature,
+      });
+      if (result.content.length === 0) {
+        throw new HttpsError("unavailable", "The AI returned an empty reply.");
+      }
+    } catch (err) {
+      await refundMessage({ uid, isPremium: premium, config, day: charge.day });
+      if (err instanceof HttpsError) throw err;
+      throw new HttpsError("unavailable", "Could not reach the AI.");
+    }
+
+    // Off-topic detection (A5). The scope preamble makes the model reply with
+    // just the sentinel; never show it raw and never charge a message for it.
+    // Refund the reserved message and record a strike — with the classifier
+    // pre-pass gone this is the only off-topic signal, so the strike counter
+    // (and the lockout it feeds in `reserveMessage`) has to be driven here,
+    // otherwise the refusal path could be farmed for free.
+    if (result.content.includes(REFUSAL_SENTINEL)) {
       const remaining = await recordOffTopic({
         uid,
         isPremium: premium,
         config,
+        day: charge.day,
       });
       const reply = refusalMessage(lang);
-      // Stream the refusal too, so the client renders it the same way.
       if (request.acceptsStreaming && response) {
         response.sendChunk(reply);
       }
@@ -89,21 +138,6 @@ export const bodhiChat = onCall(
       };
     }
 
-    // Answer.
-    const messages = buildMessages({
-      lang,
-      adminInstruction: instructionFor(config, lang),
-      history: sanitiseHistory(data.history),
-      question,
-    });
-
-    const result = await chatCompletion({
-      model: config.model,
-      messages,
-      maxTokens: config.maxTokens,
-      temperature: config.temperature,
-    });
-
     // The answering call is non-streamed upstream; emit it as one chunk so the
     // client's streaming path still receives text before the final result.
     if (request.acceptsStreaming && response && result.content.length > 0) {
@@ -114,6 +148,7 @@ export const bodhiChat = onCall(
       uid,
       promptTokens: result.usage.promptTokens,
       completionTokens: result.usage.completionTokens,
+      day: charge.day,
     });
 
     return {
