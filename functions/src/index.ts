@@ -35,3 +35,7 @@ export { cleanupOrphans } from "./maintenance/cleanupOrphans";
 // Subscription billing — server-side verification (M?, monetization)
 export { verifyPurchase } from "./billing/verifyPurchase";
 export { playRtdn } from "./billing/playRtdn";
+
+// Bodhi AI chat proxy (.kiro/specs/bodhi-ai-chat)
+export { bodhiChat } from "./ai/bodhiChat";
+export { bodhiSession } from "./ai/bodhiSession";

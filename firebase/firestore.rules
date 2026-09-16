@@ -227,6 +227,14 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // --- Bodhi AI daily quota (Functions only; bodhi-ai-chat spec) ---
+    // Counters must be untouchable by the client, or a user could reset
+    // their own daily allowance. Written by bodhiChat / bodhiSession via the
+    // Admin SDK, which bypasses rules.
+    match /aiUsage/{usageId} {
+      allow read, write: if false;
+    }
+
     // --- Contact & deletion requests ---
     match /contactMessages/{msgId} {
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;

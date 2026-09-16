@@ -166,6 +166,21 @@ describe('Firestore rules', () => {
     );
   });
 
+  it('denies all client access to aiUsage', async () => {
+    // The daily AI quota counter is Function-only; a user must not be able to
+    // read or reset their own allowance.
+    await assertFails(getDoc(doc(user(), 'aiUsage/user1_2026-09-16')));
+    await assertFails(
+      setDoc(doc(user(), 'aiUsage/user1_2026-09-16'), { usedSeconds: 0 }),
+    );
+    await assertFails(
+      updateDoc(doc(user(), 'aiUsage/user1_2026-09-16'), { usedSeconds: 0 }),
+    );
+    await assertFails(
+      getDoc(doc(role('sa', 'super_admin'), 'aiUsage/user1_2026-09-16')),
+    );
+  });
+
   it('lets a user create their own contact message, not read the inbox', async () => {
     await assertSucceeds(
       addDoc(collection(user('user1'), 'contactMessages'), {
