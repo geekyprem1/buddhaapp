@@ -11,6 +11,9 @@ abstract class AppColors {
   /// Deep maroon — primary brand colour, filled chips, primary buttons.
   static const primary = Color(0xFF8B1A1A);
 
+  /// Lighter maroon used to give compact primary controls subtle depth.
+  static const primaryHighlight = Color(0xFFA62D2D);
+
   /// Gold — accents, highlights, ID card (Phase 2) trims.
   static const accent = Color(0xFFD4A24C);
 
