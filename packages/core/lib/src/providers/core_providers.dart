@@ -29,6 +29,7 @@ import '../repositories/user_repository.dart';
 import '../repositories/video_repository.dart';
 import '../repositories/wisdom_repository.dart';
 import '../services/admin_functions_service.dart';
+import '../services/bodhi_ai_functions_service.dart';
 import '../services/analytics_service.dart';
 import '../services/auth_functions_service.dart';
 import '../services/auth_service.dart';
@@ -98,6 +99,10 @@ AnalyticsService analyticsService(Ref ref) => AnalyticsService();
 
 @Riverpod(keepAlive: true)
 AdminFunctionsService adminFunctionsService(Ref ref) => AdminFunctionsService();
+
+@Riverpod(keepAlive: true)
+BodhiAiFunctionsService bodhiAiFunctionsService(Ref ref) =>
+    BodhiAiFunctionsService();
 
 /// One [ContentRepository] instance per collection name, cached for the
 /// lifetime of the app (Architecture §11 generic content module).

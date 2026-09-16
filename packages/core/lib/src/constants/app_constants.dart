@@ -34,6 +34,8 @@ abstract class AppConstants {
   static const fnExportUsersCsv = 'exportUsersCsv';
   static const fnProcessDeletionRequest = 'processDeletionRequest';
   static const fnGuardOtpAbuse = 'guardOtpAbuse';
+  static const fnBodhiChat = 'bodhiChat';
+  static const fnBodhiSession = 'bodhiSession';
 
   /// Firestore disk cache cap (Architecture §10 / T2.1 — 40 MB).
   static const firestoreCacheSizeBytes = 40 * 1024 * 1024;

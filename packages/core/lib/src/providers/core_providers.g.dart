@@ -354,6 +354,25 @@ final adminFunctionsServiceProvider = Provider<AdminFunctionsService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AdminFunctionsServiceRef = ProviderRef<AdminFunctionsService>;
+String _$bodhiAiFunctionsServiceHash() =>
+    r'10f709ff0296a34c39c2dc74e43fdf1a2861a68f';
+
+/// See also [bodhiAiFunctionsService].
+@ProviderFor(bodhiAiFunctionsService)
+final bodhiAiFunctionsServiceProvider =
+    Provider<BodhiAiFunctionsService>.internal(
+  bodhiAiFunctionsService,
+  name: r'bodhiAiFunctionsServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$bodhiAiFunctionsServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef BodhiAiFunctionsServiceRef = ProviderRef<BodhiAiFunctionsService>;
 String _$contentRepositoryHash() => r'30861485e0e2f75b5da412d11c67db173881854d';
 
 /// Copied from Dart SDK

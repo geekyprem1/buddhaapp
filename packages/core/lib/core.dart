@@ -16,6 +16,7 @@ export 'src/models/alarm.dart';
 export 'src/models/app_config.dart';
 export 'src/models/app_user.dart';
 export 'src/models/audit_log.dart';
+export 'src/models/bodhi_ai_config.dart';
 export 'src/models/buddhist_place.dart';
 export 'src/models/category.dart';
 export 'src/models/contact_message.dart';
@@ -66,6 +67,7 @@ export 'src/repositories/wisdom_repository.dart';
 // Services
 export 'src/services/admin_functions_service.dart';
 export 'src/services/analytics_service.dart';
+export 'src/services/bodhi_ai_functions_service.dart';
 export 'src/services/error_reporter.dart';
 export 'src/services/auth_functions_service.dart';
 export 'src/services/auth_service.dart';

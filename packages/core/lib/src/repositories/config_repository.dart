@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../constants/firestore_collections.dart';
 import '../models/app_config.dart';
+import '../models/bodhi_ai_config.dart';
 import '../models/home_layout.dart';
 import '../models/premium_config.dart';
 import '../utils/repo_guard.dart';
@@ -24,6 +25,9 @@ class ConfigRepository with RepoGuard {
 
   DocumentReference<Map<String, dynamic>> get _premium =>
       _config.doc(ConfigDocIds.premium);
+
+  DocumentReference<Map<String, dynamic>> get _bodhiAi =>
+      _config.doc(ConfigDocIds.bodhiAi);
 
   AppConfig _fromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
     if (!snap.exists || snap.data() == null) return const AppConfig();
@@ -103,6 +107,35 @@ class ConfigRepository with RepoGuard {
       final data = config.toJson();
       data['updatedAt'] = DateTime.now();
       return _premium.set(data, SetOptions(merge: true));
+    });
+  }
+
+  BodhiAiConfig _bodhiAiFromSnap(
+    DocumentSnapshot<Map<String, dynamic>> snap,
+  ) {
+    if (!snap.exists || snap.data() == null) return const BodhiAiConfig();
+    return BodhiAiConfig.fromJson(snap.data()!);
+  }
+
+  Stream<BodhiAiConfig> watchBodhiAiConfig() {
+    return guardedStream(
+      'config.watchBodhiAiConfig',
+      _bodhiAi.snapshots().map(_bodhiAiFromSnap),
+    );
+  }
+
+  Future<BodhiAiConfig> getBodhiAiConfig() {
+    return guardedRead(
+      'config.getBodhiAiConfig',
+      () async => _bodhiAiFromSnap(await _bodhiAi.get()),
+    );
+  }
+
+  Future<void> saveBodhiAiConfig(BodhiAiConfig config) {
+    return guardedWrite('config.saveBodhiAiConfig', () {
+      final data = config.toJson();
+      data['updatedAt'] = DateTime.now();
+      return _bodhiAi.set(data, SetOptions(merge: true));
     });
   }
 }

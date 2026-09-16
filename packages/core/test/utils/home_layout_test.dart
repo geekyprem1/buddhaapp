@@ -34,6 +34,7 @@ void main() {
         HomeModuleIds.ringtone,
         HomeModuleIds.song,
         HomeModuleIds.vandana,
+        HomeModuleIds.video,
         HomeModuleIds.buddhistCalendar,
         HomeModuleIds.dailyPaliWord,
         HomeModuleIds.chanting,

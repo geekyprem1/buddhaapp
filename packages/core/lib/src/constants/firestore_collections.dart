@@ -63,6 +63,11 @@ abstract class ConfigDocIds {
   static const languages = 'languages';
   static const promo = 'promo';
   static const premium = 'premium';
+
+  /// Bodhi AI chat settings — model, system instruction, daily quotas.
+  /// Read by the mobile app and the `bodhiChat` Function; written only by a
+  /// Super Admin (see the `config/{docId}` rule).
+  static const bodhiAi = 'bodhi_ai';
 }
 
 /// Well-known document ids (slugs) inside [FirestoreCollections.staticPages].
