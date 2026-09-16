@@ -60,8 +60,11 @@ const config = {
   enabled: true,
   model: 'deepseek/deepseek-v4-flash-0731',
   systemInstruction,
-  freeDailySeconds: 210, // 3 min 30 s
-  paidDailySeconds: 1800, // 30 min
+  // NOTE: raised from the spec's 210 s while the feature is being tested on
+  // prod — 3 min 30 s is not enough to exercise the flows by hand. Drop back
+  // to 210 before public launch (or edit it from the admin panel).
+  freeDailySeconds: 1800, // 30 min (testing)
+  paidDailySeconds: 3600, // 60 min (testing)
   freeDailyMessages: 15,
   paidDailyMessages: 120,
   maxTokens: 700,

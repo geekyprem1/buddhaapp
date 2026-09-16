@@ -83,6 +83,9 @@ export async function chatCompletion(
     body.reasoning = { enabled: false };
   }
 
+  // The abort timer spans the whole upstream read — headers AND body (N4).
+  // The fetch signal also aborts an in-progress body read, so a stalled JSON
+  // payload can no longer outlive the advertised timeout.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
@@ -100,35 +103,49 @@ export async function chatCompletion(
       signal: controller.signal,
     });
   } catch (err) {
+    clearTimeout(timer);
     const aborted = err instanceof Error && err.name === "AbortError";
     throw new HttpsError(
       aborted ? "deadline-exceeded" : "unavailable",
       aborted ? "The AI took too long to respond." : "Could not reach the AI.",
     );
-  } finally {
-    clearTimeout(timer);
   }
 
+  try {
   if (!response.ok) {
     // 402 = out of credit, 429 = rate limited upstream — surface as retryable
     // where sensible, but never leak the provider body to the client.
-    const code = response.status === 429 ? "resource-exhausted" : "internal";
-    throw new HttpsError(code, `AI request failed (${response.status}).`);
+    // The 429 reason tag (A9) keeps the client from mistaking an upstream
+    // rate limit for the user's own quota and opening the paywall for it.
+    if (response.status === 429) {
+      throw new HttpsError(
+        "resource-exhausted",
+        `AI request failed (${response.status}).`,
+        { reason: "upstream-rate-limit" },
+      );
+    }
+    throw new HttpsError("internal", `AI request failed (${response.status}).`);
   }
 
-  let data: OpenRouterResponse;
-  try {
-    data = (await response.json()) as OpenRouterResponse;
-  } catch {
-    throw new HttpsError("internal", "AI returned an unreadable response.");
+    const data = (await response.json()) as OpenRouterResponse;
+    const content = data.choices?.[0]?.message?.content?.trim() ?? "";
+    return {
+      content,
+      usage: {
+        promptTokens: data.usage?.prompt_tokens ?? 0,
+        completionTokens: data.usage?.completion_tokens ?? 0,
+      },
+    };
+  } catch (err) {
+    if (err instanceof HttpsError) throw err;
+    const aborted = err instanceof Error && err.name === "AbortError";
+    throw new HttpsError(
+      aborted ? "deadline-exceeded" : "internal",
+      aborted
+        ? "The AI took too long to respond."
+        : "AI returned an unreadable response.",
+    );
+  } finally {
+    clearTimeout(timer);
   }
-
-  const content = data.choices?.[0]?.message?.content?.trim() ?? "";
-  return {
-    content,
-    usage: {
-      promptTokens: data.usage?.prompt_tokens ?? 0,
-      completionTokens: data.usage?.completion_tokens ?? 0,
-    },
-  };
 }

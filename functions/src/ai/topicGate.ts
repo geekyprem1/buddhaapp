@@ -8,10 +8,12 @@ import { chatCompletion } from "./openRouter";
  * costs the user no minutes, so the gate is also the point where off-topic
  * abuse is counted (by the caller).
  *
- * Fails CLOSED: if the classifier errors or returns something unparseable,
- * we treat the question as off-topic. A provider hiccup must never widen the
- * scope.
+ * Distinguishes classifier failure from a real off-topic verdict (A4): an
+ * outage used to look identical to off-topic, so innocent users farmed
+ * strikes toward a lockout. Scope still fails closed — callers must treat
+ * "unknown" like a refusal — but without recording a strike.
  */
+export type TopicVerdict = "on-topic" | "off-topic" | "unknown";
 
 const CLASSIFIER_PROMPT = [
   "You are a strict classifier for a Buddhism-only assistant.",
@@ -25,10 +27,10 @@ const CLASSIFIER_PROMPT = [
   'Reply with ONLY a JSON object: {"on_topic": true} or {"on_topic": false}.',
 ].join(" ");
 
-export async function isOnTopic(params: {
+export async function classifyTopic(params: {
   model: string;
   question: string;
-}): Promise<boolean> {
+}): Promise<TopicVerdict> {
   try {
     const result = await chatCompletion({
       model: params.model,
@@ -42,9 +44,11 @@ export async function isOnTopic(params: {
       disableReasoning: true,
     });
     const parsed = JSON.parse(result.content) as { on_topic?: unknown };
-    return parsed.on_topic === true;
+    if (parsed.on_topic === true) return "on-topic";
+    if (parsed.on_topic === false) return "off-topic";
+    return "unknown";
   } catch {
-    // Fail closed.
-    return false;
+    // Classifier outage or unparseable output — NOT an off-topic verdict.
+    return "unknown";
   }
 }
