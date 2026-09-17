@@ -49,6 +49,36 @@ void main() {
     expect(boot.gate, AppGate.maintenance);
   });
 
+  test('unknown installed version fails open (no bogus force-update lock)',
+      () async {
+    final loader = AppBootstrapLoader(
+      installedVersion: '0.0.0',
+      versionKnown: false,
+      minWait: Duration.zero,
+      fetchFirestore: () async => const AppConfig(
+        forceUpdate: true,
+        minSupportedVersion: '1.0.0',
+      ),
+    );
+    final boot = await loader.load();
+    expect(boot.gate, AppGate.ready);
+  });
+
+  test('maintenance still applies when version is unknown', () async {
+    final loader = AppBootstrapLoader(
+      installedVersion: '0.0.0',
+      versionKnown: false,
+      minWait: Duration.zero,
+      fetchFirestore: () async => const AppConfig(
+        forceUpdate: true,
+        minSupportedVersion: '1.0.0',
+        maintenanceMode: true,
+      ),
+    );
+    final boot = await loader.load();
+    expect(boot.gate, AppGate.maintenance);
+  });
+
   test('Remote Config overlay can raise the force-update flag', () async {
     final loader = AppBootstrapLoader(
       installedVersion: '0.1.0',

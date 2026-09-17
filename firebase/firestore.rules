@@ -38,7 +38,15 @@ service cloud.firestore {
       // Owner may write their own doc but never flip isBlocked, set a role, or
       // grant themselves premium — entitlement fields are written only by the
       // verifyPurchase / RTDN Cloud Functions (admin SDK bypasses rules).
-      allow create: if isOwner(uid);
+      // Create must not seed entitlement fields either (B1): `resource`
+      // doesn't exist on create, so the incoming keys are checked directly.
+      // The client model never sends these (Functions use the Admin SDK and
+      // bypass rules). `isBlocked` is intentionally allowed here — the client
+      // seeds it as false on first write and flipping it only harms/equals self.
+      allow create: if isOwner(uid) &&
+                        !request.resource.data.keys()
+                          .hasAny(['premiumUntil', 'premiumToken',
+                                   'premiumState', 'premiumUpdatedAt']);
       allow update: if (isOwner(uid) &&
                         !request.resource.data.diff(resource.data).affectedKeys()
                           .hasAny(['isBlocked', 'premiumUntil', 'premiumToken',
@@ -185,7 +193,17 @@ service cloud.firestore {
     match /idCards/{cardId} {
       allow read: if isSignedIn() &&
         (resource.data.uid == request.auth.uid || isAdmin());
-      allow write: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      // Split create/update/delete (B4): a single `write` rule checking only
+      // the *new* data let anyone overwrite someone else's card by stamping
+      // their own uid on it — and `request.resource` is null on delete, so a
+      // combined rule denied owners their own deletes too.
+      allow create: if isSignedIn() &&
+        request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn() &&
+        resource.data.uid == request.auth.uid &&
+        request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() &&
+        resource.data.uid == request.auth.uid;
     }
 
     // --- Config & static content ---
@@ -217,13 +235,32 @@ service cloud.firestore {
     }
 
     // --- Events (write-only counters feed) ---
+    // Shape-validated (B15): unsigned junk docs used to cost a read+delete
+    // every 5 minutes in `aggregateEvents`. The allowlists mirror
+    // `CONTENT_COLLECTIONS` and `EVENT_TYPE_TO_COUNTER` in
+    // functions/src/lib/content.ts — keep them in sync.
     match /events/{eventId} {
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() &&
+        request.resource.data.collection in ['wallpapers', 'ringtones',
+          'songs', 'vandanas', 'meditations', 'chantings', 'statuses',
+          'prarthanas'] &&
+        request.resource.data.type in ['view', 'views', 'download',
+          'downloads', 'share', 'shares', 'play', 'plays', 'song_play',
+          'song_complete', 'vandana_play', 'vandana_complete'] &&
+        request.resource.data.itemId is string &&
+        request.resource.data.itemId.size() > 0 &&
+        request.resource.data.itemId.size() <= 300 &&
+        !request.resource.data.itemId.matches('.*/.*') &&
+        request.resource.data.createdAt is timestamp;
       allow read, update, delete: if false;
     }
 
     // --- OTP abuse guard (Functions only; FR-2.9, T2.11) ---
     match /otpGuards/{phoneKey} {
+      allow read, write: if false;
+    }
+    // --- Per-IP OTP throttle (Functions only; B2) ---
+    match /otpGuardsByIp/{ipKey} {
       allow read, write: if false;
     }
 
@@ -232,6 +269,14 @@ service cloud.firestore {
     // their own daily allowance. Written by bodhiChat / bodhiSession via the
     // Admin SDK, which bypasses rules.
     match /aiUsage/{usageId} {
+      allow read, write: if false;
+    }
+
+    // --- Purchase token ownership (Functions only; N7) ---
+    // Maps a Play purchase token to exactly one app uid so a token cannot
+    // grant premium to multiple accounts. Written by verifyPurchase via the
+    // Admin SDK, which bypasses rules.
+    match /purchaseTokens/{tokenId} {
       allow read, write: if false;
     }
 

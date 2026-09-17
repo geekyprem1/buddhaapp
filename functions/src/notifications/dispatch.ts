@@ -9,6 +9,7 @@ import {
   getFirestore,
   Timestamp,
   type DocumentReference,
+  type QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { parseAudience, pushDataFromDeepLink } from "./audience";
 
@@ -60,30 +61,83 @@ function collectTokens(raw: unknown): string[] {
   return tokens;
 }
 
-async function tokensForUser(uid: string): Promise<string[]> {
+/** A device token with its owning user, so dead tokens can be pruned (B7). */
+interface OwnedToken {
+  token: string;
+  uid: string;
+}
+
+function ownedTokens(uid: string, raw: unknown): OwnedToken[] {
+  return collectTokens(raw).map((token) => ({ token, uid }));
+}
+
+async function tokensForUser(uid: string): Promise<OwnedToken[]> {
   const snap = await getFirestore().collection("users").doc(uid).get();
   if (!snap.exists) {
     throw new Error(`User ${uid} was not found.`);
   }
-  return collectTokens(snap.data()?.fcmTokens);
+  return ownedTokens(uid, snap.data()?.fcmTokens);
 }
 
-async function tokensForPlatform(platform: string): Promise<string[]> {
-  const snap = await getFirestore()
-    .collection("users")
-    .where("platform", "==", platform)
-    .limit(2000)
-    .get();
-  const tokens: string[] = [];
-  for (const doc of snap.docs) {
-    tokens.push(...collectTokens(doc.data().fcmTokens));
-    if (tokens.length >= 5000) break;
+async function tokensForPlatform(platform: string): Promise<OwnedToken[]> {
+  // Full cursor pagination (B8): the old limit(2000) + 5000-token cutoff
+  // silently dropped everyone past the cap while the campaign was still
+  // marked sent. Requires the (platform, __name__) composite index shipped
+  // in firebase/firestore.indexes.json.
+  const db = getFirestore();
+  const tokens: OwnedToken[] = [];
+  let cursor: QueryDocumentSnapshot | null = null;
+  for (;;) {
+    let query = db
+      .collection("users")
+      .where("platform", "==", platform)
+      .orderBy("__name__")
+      .limit(2000);
+    if (cursor) query = query.startAfter(cursor);
+    const snap = await query.get();
+    if (snap.empty) break;
+    for (const doc of snap.docs) {
+      tokens.push(...ownedTokens(doc.id, doc.data().fcmTokens));
+    }
+    cursor = snap.docs[snap.docs.length - 1];
+    if (snap.size < 2000) break;
   }
   return tokens;
 }
 
+/** FCM codes meaning "this token will never work again" (B7). */
+function isDeadToken(error: unknown): boolean {
+  const code = (error as { code?: unknown } | undefined)?.code;
+  return (
+    code === "messaging/registration-token-not-registered" ||
+    code === "messaging/invalid-registration-token"
+  );
+}
+
+/** Best-effort removal of dead tokens from their owners (B7). Never throws. */
+async function pruneTokens(dead: OwnedToken[]): Promise<void> {
+  const byUser = new Map<string, string[]>();
+  for (const { token, uid } of dead) {
+    const list = byUser.get(uid) ?? [];
+    list.push(token);
+    byUser.set(uid, list);
+  }
+  await Promise.all(
+    [...byUser.entries()].map(async ([uid, uidTokens]) => {
+      try {
+        await getFirestore()
+          .collection("users")
+          .doc(uid)
+          .update({ fcmTokens: FieldValue.arrayRemove(...uidTokens) });
+      } catch {
+        // Owner deleted mid-campaign — nothing left to prune.
+      }
+    }),
+  );
+}
+
 async function sendToTokens(
-  tokens: string[],
+  tokens: OwnedToken[],
   content: CampaignContent,
   campaignId: string,
 ): Promise<DispatchResult> {
@@ -96,13 +150,25 @@ async function sendToTokens(
   let lastError: string | undefined;
   for (let i = 0; i < tokens.length; i += TOKEN_CHUNK) {
     const chunk = tokens.slice(i, i + TOKEN_CHUNK);
-    const message: MulticastMessage = { ...base, tokens: chunk };
+    const message: MulticastMessage = {
+      ...base,
+      tokens: chunk.map((t) => t.token),
+    };
     const result = await messaging.sendEachForMulticast(message);
     delivered += result.successCount;
-    if (result.failureCount > 0) {
-      const first = result.responses.find((r) => !r.success);
-      lastError = first?.error?.message;
-    }
+    // Prune dead tokens so the list heals instead of rotting (B7); only
+    // retryable errors count toward the campaign failure message.
+    const dead: OwnedToken[] = [];
+    result.responses.forEach((r, idx) => {
+      if (!r.success) {
+        if (isDeadToken(r.error)) {
+          dead.push(chunk[idx]);
+        } else if (lastError === undefined) {
+          lastError = r.error?.message;
+        }
+      }
+    });
+    if (dead.length > 0) await pruneTokens(dead);
   }
   if (delivered === 0) {
     throw new Error(lastError ?? "FCM rejected every device token.");

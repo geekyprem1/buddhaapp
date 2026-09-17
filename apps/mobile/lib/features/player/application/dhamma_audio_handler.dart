@@ -36,7 +36,6 @@ class DhammaAudioHandler extends BaseAudioHandler
   final AudioPlayer _player = AudioPlayer();
   final EventsRepository _events = EventsRepository();
   final ProgressRepository _progress = ProgressRepository();
-  var _retrying = false;
 
   /// Guards the one-per-session "enable notifications" nudge so we don't
   /// spam the user every time they press play.
@@ -92,10 +91,10 @@ class DhammaAudioHandler extends BaseAudioHandler
     if (index < 0) index = 0;
 
     // Only the explicitly requested track resumes; later parts of a series
-    // start from the beginning.
+    // start from the beginning. A superseded load (B13) must not trigger
+    // playback — the newer load owns that decision.
     final resumeAt = await _savedResumePosition(playable[index]);
-    await _loadIndex(index, startAt: resumeAt);
-    await play();
+    if (await _loadIndex(index, startAt: resumeAt)) await play();
   }
 
   /// Best-effort runtime permission for the media notification (Android
@@ -160,27 +159,53 @@ class DhammaAudioHandler extends BaseAudioHandler
     return saved.position;
   }
 
-  Future<void> _loadIndex(int index, {Duration? startAt}) async {
+  /// Monotonic load id (B13): fast skipping or auto-advance racing a tap
+  /// starts concurrent loads — only the newest may publish, clear, seek or
+  /// trigger playback. Superseded loads stand down silently.
+  int _loadGeneration = 0;
+
+  /// Loads [index] for playback. Returns true when this load is still the
+  /// newest on completion; false means a newer load took over and the caller
+  /// must not play or publish anything further.
+  Future<bool> _loadIndex(int index, {Duration? startAt}) async {
+    final gen = ++_loadGeneration;
+    bool current() => gen == _loadGeneration;
+
     final items = queue.value;
-    if (index < 0 || index >= items.length) return;
+    if (index < 0 || index >= items.length) return false;
     final item = items[index];
-    mediaItem.add(item);
     final url = mediaUrlOf(item);
-    if (url == null || url.isEmpty) return;
-    try {
-      final loaded = await _player.setUrl(url);
-      _retrying = false;
-      _applyDuration(loaded ?? _player.duration);
-    } catch (_) {
-      if (_retrying) rethrow;
-      _retrying = true;
-      await Future<void>.delayed(const Duration(seconds: 1));
-      final loaded = await _player.setUrl(url);
-      _retrying = false;
-      _applyDuration(loaded ?? _player.duration);
+    if (url == null || url.isEmpty) {
+      // Unplayable entry: never publish it — dismiss any stale display
+      // instead of leaving an untappable mini-player track behind.
+      if (current()) mediaItem.add(null);
+      return false;
     }
-    if (startAt != null && startAt > Duration.zero) {
-      await _player.seek(startAt);
+    mediaItem.add(item);
+    // Exactly one retry: straight-line local logic replaces the old
+    // instance-wide flag, which let concurrent loads corrupt each other.
+    try {
+      try {
+        final loaded = await _player.setUrl(url);
+        if (current()) _applyDuration(loaded ?? _player.duration);
+      } catch (_) {
+        await Future<void>.delayed(const Duration(seconds: 1));
+        if (!current()) return false;
+        final loaded = await _player.setUrl(url);
+        if (current()) _applyDuration(loaded ?? _player.duration);
+      }
+      if (!current()) return false;
+      if (startAt != null && startAt > Duration.zero) {
+        await _player.seek(startAt);
+      }
+      if (!current()) return false;
+      return true;
+    } catch (_) {
+      // Final load failure: don't leave an unplayable track displayed —
+      // unless a newer load already owns the display.
+      // Rethrow so callers keep their existing error UX.
+      if (current()) mediaItem.add(null);
+      rethrow;
     }
   }
 
@@ -243,8 +268,7 @@ class DhammaAudioHandler extends BaseAudioHandler
     if (index >= 0 && index < items.length - 1) {
       await skipToNext();
     } else if (_player.loopMode == LoopMode.all && items.isNotEmpty) {
-      await _loadIndex(0);
-      await play();
+      if (await _loadIndex(0)) await play();
     } else {
       await stop();
     }
@@ -304,8 +328,8 @@ class DhammaAudioHandler extends BaseAudioHandler
     final index = items.indexWhere((e) => e.id == current.id);
     if (index < 0 || index >= items.length - 1) return;
     final wasPlaying = _player.playing;
-    await _loadIndex(index + 1);
-    if (wasPlaying) await play();
+    // A superseded load (B13) must not trigger playback for an older track.
+    if (await _loadIndex(index + 1) && wasPlaying) await play();
   }
 
   @override
@@ -323,15 +347,13 @@ class DhammaAudioHandler extends BaseAudioHandler
       return;
     }
     final wasPlaying = _player.playing;
-    await _loadIndex(index - 1);
-    if (wasPlaying) await play();
+    if (await _loadIndex(index - 1) && wasPlaying) await play();
   }
 
   @override
   Future<void> skipToQueueItem(int index) async {
     final wasPlaying = _player.playing;
-    await _loadIndex(index);
-    if (wasPlaying) await play();
+    if (await _loadIndex(index) && wasPlaying) await play();
   }
 
   Future<void> skipForward() =>

@@ -42,13 +42,26 @@ export const aggregateEvents = onSchedule(
       const collection = data.collection;
       const itemId = data.itemId;
       const counter = EVENT_TYPE_TO_COUNTER[String(data.type)];
-      if (!isContentCollection(collection) || typeof itemId !== "string" || !counter) {
+      if (
+        !isContentCollection(collection) ||
+        typeof itemId !== "string" ||
+        itemId.length === 0 ||
+        itemId.includes("/") ||
+        !counter
+      ) {
         // Malformed event — still deleted below so it can't poison the queue.
         continue;
       }
       const key = `${collection}/${itemId}`;
       if (!docRefs.has(key)) {
-        docRefs.set(key, db.collection(collection).doc(itemId));
+        // Reference construction itself can throw (empty/path-like/oversize
+        // IDs on old poison docs pre-dating rule validation) — and it sits
+        // outside the update try/catch below, so guard it here (B15).
+        try {
+          docRefs.set(key, db.collection(collection).doc(itemId));
+        } catch {
+          continue;
+        }
         increments.set(key, new Map());
       }
       const fields = increments.get(key)!;

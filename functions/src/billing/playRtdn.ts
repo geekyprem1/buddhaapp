@@ -1,5 +1,7 @@
+import { HttpsError } from "firebase-functions/v2/https";
 import { onMessagePublished } from "firebase-functions/v2/pubsub";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { findTokenOwnerUid } from "./purchaseTokens";
 import { fetchSubscriptionStatus } from "./androidPublisher";
 
 /**
@@ -12,9 +14,16 @@ import { fetchSubscriptionStatus } from "./androidPublisher";
  *
  * Topic name must match the one configured in Play Console → Monetization
  * setup → Real-time developer notifications. Set here to `play-subscriptions`.
+ *
+ * `retry: true` with failure propagation (N8): a transient Play lookup
+ * failure used to return normally — acknowledging the message and silently
+ * dropping a renewal/revocation. Now it throws so Pub/Sub redelivers. The
+ * handler is idempotent (re-fetch authoritative status, overwrite the same
+ * fields), so redelivery is safe. Poison messages (missing/bad payload,
+ * unknown token) still return normally and are never retried.
  */
 export const playRtdn = onMessagePublished(
-  { region: "asia-south1", topic: "play-subscriptions" },
+  { region: "asia-south1", topic: "play-subscriptions", retry: true },
   async (event) => {
     const raw = event.data.message.data;
     if (!raw) return;
@@ -34,24 +43,54 @@ export const playRtdn = onMessagePublished(
     if (!token) return;
 
     const db = getFirestore();
-    // Find the user who owns this purchase token.
-    const snap = await db
-      .collection("users")
-      .where("premiumToken", "==", token)
-      .limit(1)
-      .get();
-    if (snap.empty) return;
-    const userRef = snap.docs[0].ref;
+    // Find the user who owns this purchase token: canonical + pre-ownership
+    // records first (N7), then the legacy `users.premiumToken` field for
+    // tokens granted before records existed.
+    const ownerUid = await findTokenOwnerUid(token);
+    const legacySnap = ownerUid
+      ? null
+      : await db
+          .collection("users")
+          .where("premiumToken", "==", token)
+          .limit(1)
+          .get();
+    const userRef = ownerUid
+      ? db.collection("users").doc(ownerUid)
+      : legacySnap && !legacySnap.empty
+        ? legacySnap.docs[0].ref
+        : null;
+    if (!userRef) return;
 
     let status;
     try {
       status = await fetchSubscriptionStatus(token);
-    } catch {
-      return; // transient; Play will retry via Pub/Sub redelivery
+    } catch (err) {
+      // Transient lookup failure: throw so the message is redelivered (N8).
+      // Never swallow here — a normal return would ack and lose the update.
+      throw new HttpsError(
+        "unavailable",
+        `Could not verify with Google Play: ${(err as Error).message}`,
+      );
     }
 
-    await userRef.set(
-      {
+    // Existence + current-token + write in one transaction (B5): a
+    // `set({merge:true})` after a non-transactional exists-check could
+    // recreate an erased user if deletion landed in between. `update`
+    // cannot create a missing doc; the transaction re-reads so a concurrent
+    // erase is visible. Ownership records are deleted with the account, so
+    // a later legitimate restore re-claims via `verifyPurchase`.
+    await db.runTransaction(async (tx) => {
+      const userSnap = await tx.get(userRef);
+      if (!userSnap.exists) return;
+      // Stale-event guard: if the user has since moved to a different
+      // purchase token, this event belongs to a superseded subscription
+      // and must not clobber the current entitlement.
+      const currentToken = userSnap.data()?.premiumToken as
+        | string
+        | null
+        | undefined;
+      if (currentToken != null && currentToken !== token) return;
+      tx.update(userRef, {
         premiumUntil:
           status.premiumUntil > 0
             ? Timestamp.fromMillis(status.premiumUntil)
@@ -59,8 +98,7 @@ export const playRtdn = onMessagePublished(
         premiumToken: status.active ? token : null,
         premiumState: status.state,
         premiumUpdatedAt: Timestamp.now(),
-      },
-      { merge: true },
-    );
+      });
+    });
   },
 );

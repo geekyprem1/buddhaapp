@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/otp_screen.dart';
+import '../features/bodhi_ai/application/bodhi_chat_controller.dart';
 import '../features/bodhi_ai/presentation/ask_buddha_screen.dart';
 import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
 import '../features/chanting/presentation/chanting_list_screen.dart';
@@ -103,6 +104,9 @@ GoRouter appRouter(Ref ref) {
   ref.listen(authStateProvider, (_, __) => refresh.ping());
   ref.listen(currentAppUserProvider, (_, __) => refresh.ping());
   ref.listen(appBootstrapProvider, (_, __) => refresh.ping());
+  // Re-evaluate the Ask Buddha gate (A14) when the feature flag resolves —
+  // e.g. bounce a viewer to home the moment an admin disables the feature.
+  ref.listen(bodhiAiConfigProvider, (_, __) => refresh.ping());
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
@@ -166,6 +170,16 @@ GoRouter appRouter(Ref ref) {
         final expected = _routeForStep(step);
         if (path != expected) return expected;
         return null;
+      }
+
+      // Ask Buddha disabled → bounce direct navigation to home (A14). The
+      // tab hides via `bodhiAiEnabled`, but the branch stays registered, so
+      // without this a deep-link/push would land on dead UI. The server
+      // still rejects calls while disabled; this is routing only.
+      if (path == AppRoutes.askBuddha) {
+        final enabled =
+            ref.read(bodhiAiConfigProvider).valueOrNull?.enabled ?? false;
+        if (!enabled) return AppRoutes.home;
       }
 
       // Onboarding complete: keep users out of onboarding/auth screens.

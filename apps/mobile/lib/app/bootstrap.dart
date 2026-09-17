@@ -49,7 +49,9 @@ Future<void> bootstrapAndRun({
   // Firebase/plugin call can either throw OR hang indefinitely (the App Check
   // debug provider does this on some devices). Either one must never stop us
   // from reaching `runApp`, or the app hangs forever on the native splash.
-  // App Check isn't enforced, so proceeding without it is safe.
+  // Activate is still best-effort so a hang cannot block launch. OTP, Bodhi
+  // chat and quota callables DO enforce App Check — if activate failed those
+  // paths reject; browsing the rest of the app still works.
   await _guardInit(
     'app_check',
     () => _activateAppCheck(debugAppCheck),
@@ -96,8 +98,8 @@ Future<void> _activateAppCheck(bool debugAppCheck) async {
       );
     }
   } catch (error, stack) {
-    // Never block launch if App Check isn't provisioned yet — login and
-    // content still work until Console enforcement is flipped on.
+    // Never block launch if App Check isn't provisioned. Content still
+    // works; OTP and Bodhi AI callables will reject until attestation works.
     debugPrint('App Check activate failed: $error');
     await _safeRecordError(error, stack, reason: 'app_check.activate');
   }

@@ -68,11 +68,19 @@ class FcmCoordinator {
     await _syncUser(_ref.read(currentAppUserProvider).valueOrNull);
   }
 
+  /// Prefs box, opened on demand (B9): startup init is best-effort and may
+  /// have timed out, leaving the box closed — `Hive.box()` would then throw.
+  Future<Box> _prefs() async {
+    if (!Hive.isBoxOpen('app_prefs')) await Hive.openBox('app_prefs');
+    return Hive.box('app_prefs');
+  }
+
   bool get hasPromptedPermission =>
+      Hive.isBoxOpen('app_prefs') &&
       Hive.box('app_prefs').get('notif_prompted') == true;
 
   Future<void> skipPermissionPrompt() async {
-    await Hive.box('app_prefs').put('notif_prompted', true);
+    await (await _prefs()).put('notif_prompted', true);
     await _ref.read(analyticsServiceProvider).permissionPrompt(
           type: 'notifications',
           result: 'skipped',
@@ -80,7 +88,7 @@ class FcmCoordinator {
   }
 
   Future<void> requestPermissionIfNeeded() async {
-    final prefs = Hive.box('app_prefs');
+    final prefs = await _prefs();
     if (prefs.get('notif_prompted') == true) {
       if (await Permission.notification.isGranted) {
         await _afterPermissionGranted();

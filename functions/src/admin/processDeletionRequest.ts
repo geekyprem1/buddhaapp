@@ -3,6 +3,12 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { getAuth } from "firebase-admin/auth";
 import { writeAuditLog } from "../lib/audit";
+import {
+  USER_LINKED_COLLECTIONS,
+  USER_SUBCOLLECTIONS,
+  deleteUserLinkedDocs,
+  deleteUserSubcollection,
+} from "../lib/userDeletion";
 import { isSuperAdmin } from "./roles";
 
 interface ProcessDeletionRequestData {
@@ -19,10 +25,13 @@ interface ProcessDeletionRequestData {
  * destructive action. Super Admin only; writes a proof record on the
  * request doc and an audit log entry (who, when, what was removed).
  *
- * Deletes: `users/{uid}` doc, its `alarms` subcollection, the Storage avatar,
- * and the Firebase Auth account. Content the user personalised on-device
+ * Deletes: `users/{uid}` doc, all its subcollections (alarms, favourites,
+ * progress — the parent delete does NOT remove these, B5), separately stored
+ * user-linked records (aiUsage, contactMessages), the Storage avatar, and
+ * the Firebase Auth account. Content the user personalised on-device
  * (status photos) never left the device (FR-12.10), so there's nothing
- * server-side to remove for that.
+ * server-side to remove for that. The request doc and audit log are kept as
+ * the compliance proof record.
  */
 export const processDeletionRequest = onCall(
   { region: "asia-south1" },
@@ -58,13 +67,16 @@ export const processDeletionRequest = onCall(
 
     const removed: string[] = [];
 
-    // Alarms subcollection.
-    const alarms = await db.collection(`users/${uid}/alarms`).get();
-    if (!alarms.empty) {
-      const batch = db.batch();
-      for (const doc of alarms.docs) batch.delete(doc.ref);
-      await batch.commit();
-      removed.push(`${alarms.size} alarm(s)`);
+    // User subcollections (B5) — see lib/userDeletion for the full list.
+    for (const sub of USER_SUBCOLLECTIONS) {
+      const n = await deleteUserSubcollection(uid, sub);
+      if (n > 0) removed.push(`${n} ${sub}`);
+    }
+
+    // Separately stored user-linked records (B5).
+    for (const collection of USER_LINKED_COLLECTIONS) {
+      const n = await deleteUserLinkedDocs(collection, uid);
+      if (n > 0) removed.push(`${n} ${collection} doc(s)`);
     }
 
     // Storage avatar.

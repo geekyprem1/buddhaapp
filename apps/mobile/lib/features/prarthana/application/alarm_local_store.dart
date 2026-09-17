@@ -28,7 +28,16 @@ class AlarmLocalStore {
   }
 
   List<Alarm> getAll() {
-    return _box.values.map(_decode).toList()
+    // Skips bookkeeping keys (B11): the box also holds the native-sync
+    // fingerprint, which is not an alarm payload.
+    final alarms = <Alarm>[];
+    for (final key in _box.keys) {
+      if (key == _syncIdsKey) continue;
+      final raw = _box.get(key);
+      if (raw == null) continue;
+      alarms.add(_decode(raw));
+    }
+    return alarms
       ..sort((a, b) {
         final h = a.timeHour.compareTo(b.timeHour);
         return h != 0 ? h : a.timeMinute.compareTo(b.timeMinute);
@@ -39,11 +48,28 @@ class AlarmLocalStore {
 
   Future<void> delete(String id) => _box.delete(id);
 
+  /// Fingerprint (sorted JSON id list) of the remote set last confirmed to the
+  /// native scheduler, or null when never confirmed (B11 recovery).
+  static const _syncIdsKey = '__native_sync_ids';
+
+  String? getNativeSyncedIds() => _box.get(_syncIdsKey);
+
+  Future<void> setNativeSyncedIds(Set<String> ids) {
+    final sorted = ids.toList()..sort();
+    return _box.put(_syncIdsKey, jsonEncode(sorted));
+  }
+
+  /// Replaces the whole mirror (B11). Stale ids go first, then one batched
+  /// write — so a crash can leave stale extras or drop not-yet-written new
+  /// ids, but never wipes a populated store (unlike clear-then-loop). Any
+  /// partial result heals on the next visit via the sync fingerprint above.
   Future<void> replaceAll(Iterable<Alarm> alarms) async {
-    await _box.clear();
-    for (final alarm in alarms) {
-      await _box.put(alarm.id, _encode(alarm));
-    }
+    final entries = <String, String>{
+      for (final alarm in alarms) alarm.id: _encode(alarm),
+    };
+    final stale = _box.keys.where((k) => !entries.containsKey(k)).toList();
+    if (stale.isNotEmpty) await _box.deleteAll(stale);
+    await _box.putAll(entries);
   }
 
   String _encode(Alarm alarm) {

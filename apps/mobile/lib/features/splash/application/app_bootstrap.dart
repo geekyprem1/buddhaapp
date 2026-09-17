@@ -30,6 +30,7 @@ class AppBootstrapLoader {
   AppBootstrapLoader({
     required this.fetchFirestore,
     required this.installedVersion,
+    this.versionKnown = true,
     this.fetchRemoteOverlay,
     this.readCache,
     this.writeCache,
@@ -43,6 +44,11 @@ class AppBootstrapLoader {
   final AppConfig? Function()? readCache;
   final Future<void> Function(AppConfig config)? writeCache;
   final String installedVersion;
+
+  /// False when the installed version could not be read (B10): the
+  /// force-update gate must fail open rather than lock the user on `/update`
+  /// over a placeholder version.
+  final bool versionKnown;
   final DateTime Function()? now;
   final Duration maxWait;
   final Duration minWait;
@@ -75,16 +81,24 @@ class AppBootstrapLoader {
     return AppBootstrap(
       config: config,
       installedVersion: installedVersion,
-      gate: _gate(config, installedVersion),
+      gate: _gate(config, installedVersion, versionKnown: versionKnown),
     );
   }
 
-  static AppGate _gate(AppConfig config, String installed) {
-    if (needsForceUpdate(
-      forceUpdate: config.forceUpdate,
-      minSupportedVersion: config.minSupportedVersion,
-      installedVersion: installed,
-    )) {
+  static AppGate _gate(
+    AppConfig config,
+    String installed, {
+    required bool versionKnown,
+  }) {
+    // Unknown install must never trigger force-update (B10): any comparison
+    // against a placeholder like 0.0.0 is meaningless. Maintenance still
+    // applies — it doesn't depend on the version.
+    if (versionKnown &&
+        needsForceUpdate(
+          forceUpdate: config.forceUpdate,
+          minSupportedVersion: config.minSupportedVersion,
+          installedVersion: installed,
+        )) {
       return AppGate.forceUpdate;
     }
     if (config.maintenanceMode) return AppGate.maintenance;
@@ -95,17 +109,21 @@ class AppBootstrapLoader {
 @Riverpod(keepAlive: true)
 Future<AppBootstrap> appBootstrap(Ref ref) async {
   // Never let a hanging platform channel block the splash forever — fall
-  // back to a placeholder version so the gate check still runs.
+  // back to a placeholder version AND mark it unknown so the force-update
+  // gate fails open instead of locking on `/update` (B10).
   var version = '0.0.0';
+  var versionKnown = false;
   try {
     final info = await PackageInfo.fromPlatform()
         .timeout(const Duration(seconds: 3));
     version = info.version;
+    versionKnown = true;
   } catch (_) {
-    // keep the placeholder
+    // keep the placeholder as unknown
   }
   final loader = AppBootstrapLoader(
     installedVersion: version,
+    versionKnown: versionKnown,
     fetchFirestore: () => ref.read(configRepositoryProvider).getAppConfig(),
     fetchRemoteOverlay: _overlayRemoteConfig,
     readCache: _readCachedConfig,
@@ -117,6 +135,9 @@ Future<AppBootstrap> appBootstrap(Ref ref) async {
 const _cacheKey = 'app_config';
 
 AppConfig? _readCachedConfig() {
+  // Best-effort startup may have left the box unopened (B9) — cached config
+  // is optional, so degrade to "no cache" instead of throwing.
+  if (!Hive.isBoxOpen('app_prefs')) return null;
   final raw = Hive.box('app_prefs').get(_cacheKey);
   if (raw is! String || raw.isEmpty) return null;
   try {
@@ -128,7 +149,16 @@ AppConfig? _readCachedConfig() {
   }
 }
 
-Future<void> _writeCachedConfig(AppConfig config) {
+Future<void> _writeCachedConfig(AppConfig config) async {
+  // Recover the box when startup init was skipped/failed (B9); a cache write
+  // is never worth crashing over.
+  if (!Hive.isBoxOpen('app_prefs')) {
+    try {
+      await Hive.openBox('app_prefs');
+    } catch (_) {
+      return;
+    }
+  }
   final map = <String, dynamic>{
     'minSupportedVersion': config.minSupportedVersion,
     'latestVersion': config.latestVersion,

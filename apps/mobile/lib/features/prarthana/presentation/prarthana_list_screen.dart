@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:convert';
 
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
@@ -11,11 +11,57 @@ import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/prarthana_providers.dart';
 
-class PrarthanaListScreen extends ConsumerWidget {
+class PrarthanaListScreen extends ConsumerStatefulWidget {
   const PrarthanaListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PrarthanaListScreen> createState() =>
+      _PrarthanaListScreenState();
+}
+
+class _PrarthanaListScreenState extends ConsumerState<PrarthanaListScreen> {
+  /// One-shot seed guards (B11): the restore below must run at most once per
+  /// mount and never inside `build` — the old fire-and-forget in the builder
+  /// re-fired on every rebuild and raced native sync.
+  bool _restoreInFlight = false;
+  bool _restoreDone = false;
+
+  /// Seeds the on-device mirror and confirms it to the native scheduler
+  /// (B11). Runs post-frame, at most once per mount, and only when needed:
+  /// ids differ (first run / healed edits) or a previous native sync never
+  /// confirmed (its failure used to be skipped forever once the store was
+  /// nonempty). Any failure resets the done-flag so a later visit retries.
+  void _maybeSeedLocal(List<Alarm> items) {
+    if (_restoreDone || _restoreInFlight || items.isEmpty) return;
+    _restoreDone = true;
+    _restoreInFlight = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (!mounted) return;
+        final store = ref.read(alarmLocalStoreProvider);
+        final remoteIds = {for (final a in items) a.id};
+        final localIds = {
+          for (final a in store.getAll()) a.id,
+        };
+        final fingerprint = jsonEncode((remoteIds.toList()..sort()));
+        if (!setEquals(localIds, remoteIds)) {
+          await store.replaceAll(items);
+        }
+        if (!mounted) return;
+        if (store.getNativeSyncedIds() != fingerprint) {
+          await ref.read(alarmServiceProvider).syncAlarms(items);
+          await store.setNativeSyncedIds(remoteIds);
+        }
+      } catch (_) {
+        _restoreDone = false;
+      } finally {
+        _restoreInFlight = false;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final alarms = ref.watch(userAlarmsProvider);
     return Scaffold(
@@ -44,15 +90,7 @@ class PrarthanaListScreen extends ConsumerWidget {
           message: l10n?.prarthanaLoadFailed ?? 'Could not load alarms.',
         ),
         data: (items) {
-          if (items.isNotEmpty) {
-            unawaited(() async {
-              final store = ref.read(alarmLocalStoreProvider);
-              if (store.getAll().isEmpty) {
-                await store.replaceAll(items);
-                await ref.read(alarmServiceProvider).syncAlarms(items);
-              }
-            }());
-          }
+          _maybeSeedLocal(items);
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [

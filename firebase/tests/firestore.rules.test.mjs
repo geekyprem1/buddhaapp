@@ -7,7 +7,7 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const RULES = readFileSync(resolve(here, '../firestore.rules'), 'utf8');
@@ -145,15 +145,96 @@ describe('Firestore rules', () => {
     );
   });
 
-  it('lets signed-in users create events but never read them', async () => {
+  it('lets the owner create a user doc without entitlement fields', async () => {
+    await assertSucceeds(
+      setDoc(doc(user('user1'), 'users/user1'), {
+        name: 'A',
+        isBlocked: false,
+      }),
+    );
+  });
+
+  it('blocks the owner from seeding premium on create (B1)', async () => {
+    await assertFails(
+      setDoc(doc(user('user1'), 'users/user1'), {
+        name: 'A',
+        premiumUntil: Timestamp.fromMillis(Date.now() + 86_400_000),
+      }),
+    );
+    await assertFails(
+      setDoc(doc(user('user1'), 'users/user1'), {
+        name: 'A',
+        premiumToken: 'tok_1',
+      }),
+    );
+  });
+
+  it('blocks the owner from writing entitlement fields on update (B1)', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/user1'), { name: 'A' });
+    });
+    await assertFails(
+      updateDoc(doc(user('user1'), 'users/user1'), {
+        premiumUntil: Timestamp.fromMillis(Date.now() + 86_400_000),
+      }),
+    );
+  });
+
+  it('lets signed-in users create valid events but never read them', async () => {
     const ref = await assertSucceeds(
       addDoc(collection(user(), 'events'), {
         collection: 'songs',
         itemId: 's1',
         type: 'play',
+        createdAt: Timestamp.now(),
       }),
     );
     await assertFails(getDoc(doc(user(), `events/${ref.id}`)));
+  });
+
+  it('denies malformed events (B15)', async () => {
+    const events = collection(user(), 'events');
+    await assertFails(
+      addDoc(events, {
+        collection: 'songs',
+        itemId: 's1',
+        type: 'play',
+      }),
+    );
+    await assertFails(
+      addDoc(events, {
+        collection: 'songs',
+        itemId: 'x/y',
+        type: 'play',
+        createdAt: Timestamp.now(),
+      }),
+    );
+    await assertFails(
+      addDoc(events, {
+        collection: 'songs',
+        itemId: 's1',
+        type: 'not-a-type',
+        createdAt: Timestamp.now(),
+      }),
+    );
+  });
+
+  it('blocks stealing or deleting someone else\'s id card (B4)', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'idCards/c1'), { uid: 'user1' });
+    });
+    await assertFails(
+      setDoc(doc(user('user2'), 'idCards/c1'), { uid: 'user2' }),
+    );
+    await assertFails(deleteDoc(doc(user('user2'), 'idCards/c1')));
+    await assertSucceeds(deleteDoc(doc(user('user1'), 'idCards/c1')));
+  });
+
+  it('denies all client access to purchaseTokens', async () => {
+    await assertFails(getDoc(doc(user(), 'purchaseTokens/abc')));
+    await assertFails(
+      setDoc(doc(user(), 'purchaseTokens/abc'), { uid: 'user1' }),
+    );
   });
 
   it('denies all client access to otpGuards', async () => {
