@@ -173,10 +173,6 @@
       { "fieldPath": "language", "order": "ASCENDING" },
       { "fieldPath": "createdAt", "order": "DESCENDING" }
     ]},
-    { "collectionGroup": "users", "queryScope": "COLLECTION", "fields": [
-      { "fieldPath": "platform", "order": "ASCENDING" },
-      { "fieldPath": "__name__", "order": "ASCENDING" }
-    ]},
 
     { "collectionGroup": "notifications", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "status", "order": "ASCENDING" },

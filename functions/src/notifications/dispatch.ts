@@ -82,8 +82,9 @@ async function tokensForUser(uid: string): Promise<OwnedToken[]> {
 async function tokensForPlatform(platform: string): Promise<OwnedToken[]> {
   // Full cursor pagination (B8): the old limit(2000) + 5000-token cutoff
   // silently dropped everyone past the cap while the campaign was still
-  // marked sent. Requires the (platform, __name__) composite index shipped
-  // in firebase/firestore.indexes.json.
+  // marked sent. Equality on `platform` plus orderBy document id uses the
+  // automatic single-field index — a composite (platform, __name__) is
+  // rejected by Firestore as unnecessary.
   const db = getFirestore();
   const tokens: OwnedToken[] = [];
   let cursor: QueryDocumentSnapshot | null = null;
