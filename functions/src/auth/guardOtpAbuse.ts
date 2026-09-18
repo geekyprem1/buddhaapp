@@ -56,7 +56,11 @@ function ipKey(ip: string): string {
 }
 
 export const guardOtpAbuse = onCall(
-  { region: "asia-south1", enforceAppCheck: true },
+  // App Check enforcement is temporarily disabled because the currently
+  // published Android build is not attaching an App Check token to callable
+  // requests. The per-number and per-IP transaction limits below remain
+  // active; re-enable enforcement after a corrected Play build is adopted.
+  { region: "asia-south1" },
   async (request) => {
     const data = (request.data ?? {}) as GuardOtpAbuseRequest;
     const phoneNumber = data.phoneNumber?.trim();
