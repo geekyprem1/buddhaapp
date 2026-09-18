@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:core/core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -41,18 +44,28 @@ FcmCoordinator fcmCoordinator(Ref ref) {
 class FcmCoordinator {
   FcmCoordinator(this._ref);
 
+  static const _pushChannel = AndroidNotificationChannel(
+    'dhamma_path_push',
+    'Dhamma Path updates',
+    description: 'Wisdom, practice, and Dhamma Path updates',
+    importance: Importance.high,
+  );
+
   final Ref _ref;
   final _messaging = FirebaseMessaging.instance;
+  final _localNotifications = FlutterLocalNotificationsPlugin();
   final Set<String> _topics = {};
   StreamSubscription<String>? _tokenSub;
   StreamSubscription<RemoteMessage>? _foregroundSub;
   StreamSubscription<RemoteMessage>? _openedSub;
+  var _localNotificationsReady = false;
   var _started = false;
 
   Future<void> start() async {
     if (_started) return;
     _started = true;
 
+    await _initializeLocalNotifications();
     _tokenSub = _messaging.onTokenRefresh.listen(_saveToken);
     _foregroundSub = FirebaseMessaging.onMessage.listen(_onForeground);
     _openedSub = FirebaseMessaging.onMessageOpenedApp.listen(_onOpened);
@@ -122,6 +135,8 @@ class FcmCoordinator {
 
   Future<void> _afterPermissionGranted() async {
     await _messaging.setForegroundNotificationPresentationOptions(
+      // Apple can present FCM notifications natively in the foreground.
+      // Android foreground messages are posted through local notifications.
       alert: true,
       badge: true,
       sound: true,
@@ -172,33 +187,36 @@ class FcmCoordinator {
     if (user?.notificationPrefs.push == false) return;
     unawaited(
       _ref.read(analyticsServiceProvider).notificationReceived(
-            campaignId: message.data['campaignId']?.toString() ?? message.messageId ?? '',
+            campaignId: message.data['campaignId']?.toString() ??
+                message.messageId ??
+                '',
           ),
     );
-    final title = message.notification?.title ?? 'Dhamma Path';
-    final body = message.notification?.body ?? '';
-    rootMessengerKey.currentState?.showSnackBar(
-      SnackBar(
-        content: Text(body.isEmpty ? title : '$title — $body'),
-        action: SnackBarAction(
-          label: 'Open',
-          onPressed: () => _handleTap(message, fromTerminated: false),
-        ),
-      ),
-    );
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      unawaited(_showAndroidNotification(message));
+    }
   }
 
   void _onOpened(RemoteMessage message) {
     unawaited(
       _ref.read(analyticsServiceProvider).notificationOpen(
-            campaignId: message.data['campaignId']?.toString() ?? message.messageId ?? '',
+            campaignId: message.data['campaignId']?.toString() ??
+                message.messageId ??
+                '',
           ),
     );
     _handleTap(message, fromTerminated: false);
   }
 
   void _handleTap(RemoteMessage message, {required bool fromTerminated}) {
-    final target = parsePushData(message.data);
+    _handleData(message.data, fromTerminated: fromTerminated);
+  }
+
+  void _handleData(
+    Map<String, dynamic> data, {
+    required bool fromTerminated,
+  }) {
+    final target = parsePushData(data);
     if (target.externalUrl != null) {
       unawaited(
         launchUrl(target.externalUrl!, mode: LaunchMode.externalApplication),
@@ -223,5 +241,83 @@ class FcmCoordinator {
     unawaited(_tokenSub?.cancel());
     unawaited(_foregroundSub?.cancel());
     unawaited(_openedSub?.cancel());
+  }
+
+  Future<void> _initializeLocalNotifications() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      await _localNotifications.initialize(
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('ic_stat_dhamma'),
+        ),
+        onDidReceiveNotificationResponse: (response) {
+          _openLocalNotification(response.payload, fromTerminated: false);
+        },
+      );
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(_pushChannel);
+      _localNotificationsReady = true;
+
+      final launch =
+          await _localNotifications.getNotificationAppLaunchDetails();
+      if (launch?.didNotificationLaunchApp ?? false) {
+        _openLocalNotification(
+          launch?.notificationResponse?.payload,
+          fromTerminated: true,
+        );
+      }
+    } catch (_) {
+      _localNotificationsReady = false;
+    }
+  }
+
+  Future<void> _showAndroidNotification(RemoteMessage message) async {
+    if (!_localNotificationsReady) return;
+    final notification = message.notification;
+    final title = notification?.title ?? 'Dhamma Path';
+    final body = notification?.body ?? '';
+    final payload = jsonEncode({
+      'data': message.data,
+      'messageId': message.messageId,
+    });
+    await _localNotifications.show(
+      id: DateTime.now().millisecondsSinceEpoch.remainder(0x7fffffff),
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'dhamma_path_push',
+          'Dhamma Path updates',
+          channelDescription: 'Wisdom, practice, and Dhamma Path updates',
+          icon: 'ic_stat_dhamma',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      payload: payload,
+    );
+  }
+
+  void _openLocalNotification(
+    String? payload, {
+    required bool fromTerminated,
+  }) {
+    if (payload == null || payload.isEmpty) return;
+    try {
+      final decoded = jsonDecode(payload) as Map<String, dynamic>;
+      final data = Map<String, dynamic>.from(decoded['data'] as Map);
+      final messageId = decoded['messageId']?.toString();
+      unawaited(
+        _ref.read(analyticsServiceProvider).notificationOpen(
+              campaignId:
+                  data['campaignId']?.toString() ?? messageId ?? 'foreground',
+            ),
+      );
+      _handleData(data, fromTerminated: fromTerminated);
+    } catch (_) {
+      // Ignore malformed payloads rather than opening an unrelated route.
+    }
   }
 }
