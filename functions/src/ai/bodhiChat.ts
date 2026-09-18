@@ -24,6 +24,29 @@ interface BodhiChatRequest {
 
 const SUPPORTED_LANGS = new Set(["en", "hi", "mr"]);
 const MAX_QUESTION_CHARS = 2000;
+const DEFAULT_REPLY_MAX_TOKENS = 200;
+const DEFAULT_REPLY_MAX_WORDS = 80;
+
+/** True only when the user explicitly asks for a longer explanation. */
+function requestsDetailedAnswer(question: string): boolean {
+  return /\b(?:in[ -]?depth|detailed?|detail mein|deep(?:ly)?|long answer|full explanation|vistar|vistaar|sawistar|savistar|tapsheelwar|tafseel)\b|(?:विस्तार|विस्तृत|गहराई|सविस्तर|तपशीलवार)/iu
+    .test(question);
+}
+
+/** Keep ordinary replies short without cutting them in the middle of a sentence. */
+function shortenOrdinaryReply(content: string): string {
+  const words = content.trim().split(/\s+/u);
+  if (words.length <= DEFAULT_REPLY_MAX_WORDS) return content.trim();
+
+  const prefix = words.slice(0, DEFAULT_REPLY_MAX_WORDS).join(" ");
+  // Greedy match deliberately selects the last complete sentence that fits.
+  const complete = prefix.match(/^[\s\S]*[.!?।](?=\s|$)/u)?.[0].trim();
+  if (complete && complete.split(/\s+/u).length >= 15) return complete;
+
+  // A provider may omit sentence punctuation. In that rare case, cap the
+  // words cleanly instead of leaking an arbitrarily long reply.
+  return `${prefix.replace(/[,:;\-–—]+$/u, "")}…`;
+}
 
 /**
  * The Bodhi AI chat proxy (see `.kiro/specs/bodhi-ai-chat/design.md`).
@@ -99,12 +122,25 @@ export const bodhiChat = onCall(
     // instead of a paywall.
     let result;
     try {
+      const detailedAnswer = requestsDetailedAnswer(question);
+      const outputTokenBudget = detailedAnswer
+        ? config.maxTokens
+        : Math.min(config.maxTokens, DEFAULT_REPLY_MAX_TOKENS);
       result = await chatCompletion({
         model: config.model,
         messages,
-        maxTokens: config.maxTokens,
+        maxTokens: outputTokenBudget,
         temperature: config.temperature,
+        // Bodhi Chat favours quick, concise guidance over a hidden reasoning
+        // pass. This also leaves the full completion budget for visible text.
+        disableReasoning: true,
       });
+      if (!detailedAnswer) {
+        result = {
+          ...result,
+          content: shortenOrdinaryReply(result.content),
+        };
+      }
       if (result.content.length === 0) {
         throw new HttpsError("unavailable", "The AI returned an empty reply.");
       }

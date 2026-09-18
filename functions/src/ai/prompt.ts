@@ -54,7 +54,12 @@ function scopePreamble(lang: string): string {
     "  Buddhist perspective on wellbeing instead.",
     "",
     `Reply in the user's language (code: ${lang}) unless they write in another.`,
-    "Keep answers warm, concise, and grounded in Buddhist sources.",
+    "Keep answers warm, direct, and grounded in Buddhist sources.",
+    "For an ordinary question, answer in 40-80 words and at most two short " +
+      "paragraphs. Give only the core answer; do not restate the question, add " +
+      "a long introduction, or continue after the question is answered.",
+    "Give a longer, more detailed answer only when the user explicitly asks " +
+      "for detail, depth, a full explanation, or a long answer.",
     "Reply in plain text only. Do NOT use Markdown formatting — no **, __, *, " +
       "backticks, #, or tables. Use short paragraphs, and a simple '-' for any " +
       "list item.",

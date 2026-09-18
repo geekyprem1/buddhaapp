@@ -247,7 +247,7 @@ class _$BodhiAiConfigImpl implements _BodhiAiConfig {
       this.systemInstruction = const LocalisedText(),
       this.freeDailyMessages = 15,
       this.paidDailyMessages = 120,
-      this.maxTokens = 700,
+      this.maxTokens = 300,
       this.temperature = 0.4,
       @TimestampConverter() this.updatedAt});
 

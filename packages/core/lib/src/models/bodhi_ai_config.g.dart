@@ -16,7 +16,7 @@ _$BodhiAiConfigImpl _$$BodhiAiConfigImplFromJson(Map json) =>
               Map<String, dynamic>.from(json['systemInstruction'] as Map)),
       freeDailyMessages: (json['freeDailyMessages'] as num?)?.toInt() ?? 15,
       paidDailyMessages: (json['paidDailyMessages'] as num?)?.toInt() ?? 120,
-      maxTokens: (json['maxTokens'] as num?)?.toInt() ?? 700,
+      maxTokens: (json['maxTokens'] as num?)?.toInt() ?? 300,
       temperature: (json['temperature'] as num?)?.toDouble() ?? 0.4,
       updatedAt: const TimestampConverter().fromJson(json['updatedAt']),
     );

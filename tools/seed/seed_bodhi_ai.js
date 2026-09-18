@@ -64,7 +64,7 @@ const config = {
   // it was removed because it drained while the user was reading or thinking.
   freeDailyMessages: 15,
   paidDailyMessages: 120,
-  maxTokens: 700,
+  maxTokens: 300,
   temperature: 0.4,
   updatedAt: new Date(),
 };

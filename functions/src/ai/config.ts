@@ -21,7 +21,7 @@ const DEFAULTS: BodhiAiConfig = {
   systemInstruction: { en: "", hi: "", mr: "" },
   freeDailyMessages: 15,
   paidDailyMessages: 120,
-  maxTokens: 700,
+  maxTokens: 300,
   temperature: 0.4,
 };
 

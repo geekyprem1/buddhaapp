@@ -34,6 +34,7 @@ class BodhiChatState {
     this.messages = const [],
     this.sending = false,
     this.remainingMessages,
+    this.failedQuestion,
   });
 
   final List<BodhiMessage> messages;
@@ -43,15 +44,23 @@ class BodhiChatState {
   /// reply) lands, so the counter is hidden rather than showing a wrong zero.
   final int? remainingMessages;
 
+  /// Last question that failed for a retryable reason. Kept outside the
+  /// transcript so it is never persisted or sent back as successful context.
+  final String? failedQuestion;
+
   BodhiChatState copyWith({
     List<BodhiMessage>? messages,
     bool? sending,
     int? remainingMessages,
+    String? failedQuestion,
+    bool clearFailedQuestion = false,
   }) {
     return BodhiChatState(
       messages: messages ?? this.messages,
       sending: sending ?? this.sending,
       remainingMessages: remainingMessages ?? this.remainingMessages,
+      failedQuestion:
+          clearFailedQuestion ? null : failedQuestion ?? this.failedQuestion,
     );
   }
 }
@@ -94,9 +103,11 @@ class BodhiChatController extends _$BodhiChatController {
   /// Recent turns sent to the server for context. The server re-sanitises and
   /// re-caps this, so it is only a courtesy trim.
   List<BodhiChatTurn> _history() {
-    final settled = state.messages.where((m) => !m.pending && m.text.isNotEmpty);
+    final settled =
+        state.messages.where((m) => !m.pending && m.text.isNotEmpty);
     return [
-      for (final m in settled.toList().reversed.take(_historyTurns).toList().reversed)
+      for (final m
+          in settled.toList().reversed.take(_historyTurns).toList().reversed)
         m.isUser ? BodhiChatTurn.user(m.text) : BodhiChatTurn.assistant(m.text),
     ];
   }
@@ -116,7 +127,11 @@ class BodhiChatController extends _$BodhiChatController {
       BodhiMessage(role: 'user', text: question),
       const BodhiMessage(role: 'assistant', text: '', pending: true),
     ];
-    state = state.copyWith(messages: withUser, sending: true);
+    state = state.copyWith(
+      messages: withUser,
+      sending: true,
+      clearFailedQuestion: true,
+    );
 
     final buffer = StringBuffer();
     var outcome = BodhiSendOutcome.ok;
@@ -138,15 +153,13 @@ class BodhiChatController extends _$BodhiChatController {
               result.reply.isNotEmpty ? result.reply : buffer.toString(),
               pending: false,
             );
-            state =
-                state.copyWith(remainingMessages: result.remainingMessages);
+            state = state.copyWith(remainingMessages: result.remainingMessages);
             outcome =
                 result.onTopic ? BodhiSendOutcome.ok : BodhiSendOutcome.refused;
         }
       }
       // Stream ended without a done event carrying text.
-      if (buffer.isEmpty &&
-          (state.messages.lastOrNull?.text ?? '').isEmpty) {
+      if (buffer.isEmpty && (state.messages.lastOrNull?.text ?? '').isEmpty) {
         _updateLastAssistant('', pending: false, drop: true);
       }
     } on FirebaseFunctionsException catch (e) {
@@ -158,11 +171,15 @@ class BodhiChatController extends _$BodhiChatController {
       // would be persisted and re-sent as "successful" context next time.
       // The screen restores the text into the composer for retry.
       _removeLastUserTurn(question);
+      if (outcome == BodhiSendOutcome.error) {
+        state = state.copyWith(failedQuestion: question);
+      }
     } catch (_) {
       if (gen != _generation) return BodhiSendOutcome.ok;
       outcome = BodhiSendOutcome.error;
       _updateLastAssistant('', pending: false, drop: true);
       _removeLastUserTurn(question);
+      state = state.copyWith(failedQuestion: question);
     } finally {
       // Only the current generation may settle flags or persist (N1): a late
       // reply must not unblock a newer send or save over its transcript.

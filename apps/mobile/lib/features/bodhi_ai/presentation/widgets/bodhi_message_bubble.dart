@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
@@ -45,12 +48,20 @@ String stripMarkdown(String input) {
 class BodhiMessageBubble extends StatelessWidget {
   const BodhiMessageBubble({
     required this.message,
+    this.animateReveal = false,
+    this.onCopy,
     this.onReport,
+    this.onRevealProgress,
+    this.onRevealComplete,
     super.key,
   });
 
   final BodhiMessage message;
+  final bool animateReveal;
+  final VoidCallback? onCopy;
   final VoidCallback? onReport;
+  final VoidCallback? onRevealProgress;
+  final VoidCallback? onRevealComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -73,26 +84,154 @@ class BodhiMessageBubble extends StatelessWidget {
           bottomLeft: Radius.circular(isUser ? 16 : 4),
           bottomRight: Radius.circular(isUser ? 4 : 16),
         ),
-        border: isUser
-            ? null
-            : Border.all(color: AppColors.divider),
+        border: isUser ? null : Border.all(color: AppColors.divider),
       ),
-      child: message.pending && message.text.isEmpty
+      child: message.pending
           ? const _TypingDots()
-          : Text(
-              // User text is shown verbatim; only assistant Markdown is
-              // flattened.
-              isUser ? message.text : stripMarkdown(message.text),
-              style: TextStyle(color: fg, height: 1.35),
-            ),
+          : isUser
+              ? Text(message.text, style: TextStyle(color: fg, height: 1.35))
+              : animateReveal
+                  ? _ProgressiveAssistantText(
+                      text: stripMarkdown(message.text),
+                      style: TextStyle(color: fg, height: 1.35),
+                      onProgress: onRevealProgress,
+                      onComplete: onRevealComplete,
+                    )
+                  : Text(
+                      stripMarkdown(message.text),
+                      style: TextStyle(color: fg, height: 1.35),
+                    ),
     );
 
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: GestureDetector(
-        onLongPress: onReport,
-        child: bubble,
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+          child: GestureDetector(onLongPress: onReport, child: bubble),
+        ),
+        if (!isUser && !message.pending && message.text.isNotEmpty)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  tooltip: 'Copy response',
+                  onPressed: onCopy,
+                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  color: AppColors.textSecondary,
+                  visualDensity: VisualDensity.compact,
+                ),
+                IconButton(
+                  tooltip: 'Report response',
+                  onPressed: onReport,
+                  icon: const Icon(Icons.flag_outlined, size: 18),
+                  color: AppColors.textSecondary,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Reveals a completed assistant reply progressively. The backend currently
+/// returns one safe, final chunk; this keeps that correctness while avoiding
+/// an abrupt wall-of-text insertion. Reduced-motion users see it immediately.
+class _ProgressiveAssistantText extends StatefulWidget {
+  const _ProgressiveAssistantText({
+    required this.text,
+    required this.style,
+    this.onProgress,
+    this.onComplete,
+  });
+
+  final String text;
+  final TextStyle style;
+  final VoidCallback? onProgress;
+  final VoidCallback? onComplete;
+
+  @override
+  State<_ProgressiveAssistantText> createState() =>
+      _ProgressiveAssistantTextState();
+}
+
+class _ProgressiveAssistantTextState extends State<_ProgressiveAssistantText>
+    with AutomaticKeepAliveClientMixin {
+  Timer? _timer;
+  int _visibleCharacters = 0;
+  bool _started = false;
+  bool _completed = false;
+
+  @override
+  bool get wantKeepAlive => !_completed;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_started) {
+      _started = true;
+      _startReveal();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProgressiveAssistantText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      _visibleCharacters = math.min(_visibleCharacters, widget.text.length);
+      _completed = false;
+      updateKeepAlive();
+      _startReveal();
+    }
+  }
+
+  void _startReveal() {
+    _timer?.cancel();
+    if (MediaQuery.disableAnimationsOf(context) || widget.text.isEmpty) {
+      setState(() => _visibleCharacters = widget.text.length);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _completeReveal());
+      return;
+    }
+    final step = math.max(1, (widget.text.length / 45).ceil());
+    _timer = Timer.periodic(const Duration(milliseconds: 22), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final next = math.min(widget.text.length, _visibleCharacters + step);
+      setState(() => _visibleCharacters = next);
+      widget.onProgress?.call();
+      if (next >= widget.text.length) {
+        timer.cancel();
+        _completeReveal();
+      }
+    });
+  }
+
+  void _completeReveal() {
+    if (!mounted || _completed) return;
+    _completed = true;
+    updateKeepAlive();
+    widget.onComplete?.call();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Text(
+      widget.text.substring(0, _visibleCharacters),
+      style: widget.style,
     );
   }
 }

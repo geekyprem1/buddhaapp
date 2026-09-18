@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
@@ -31,6 +32,9 @@ class AskBuddhaScreen extends ConsumerStatefulWidget {
 class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
   final _input = TextEditingController();
   final _scroll = ScrollController();
+  bool _showJumpToLatest = false;
+  bool _revealScrollScheduled = false;
+  String? _replyToReveal;
 
   BodhiChatController get _controller =>
       ref.read(bodhiChatControllerProvider.notifier);
@@ -58,6 +62,7 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
   Future<void> _submit() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
+    AppHaptics.impact();
     _input.clear();
     final lang = ref.read(currentAppUserProvider).valueOrNull?.language ?? 'en';
     final outcome = await _controller.send(text, lang: lang);
@@ -70,8 +75,7 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
     // retyping. Refusals already have an answer bubble, so they restore
     // nothing.
     final failed = outcome == BodhiSendOutcome.quotaExhausted ||
-        outcome == BodhiSendOutcome.disabled ||
-        outcome == BodhiSendOutcome.error;
+        outcome == BodhiSendOutcome.disabled;
     if (failed) _fill(text);
 
     switch (outcome) {
@@ -90,7 +94,7 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
       case BodhiSendOutcome.disabled:
         _snack(l10n?.aiChatDisabled ?? 'Bodhi AI is currently unavailable.');
       case BodhiSendOutcome.error:
-        _snack(l10n?.aiChatError ?? 'Something went wrong. Please try again.');
+        AppHaptics.error();
       case BodhiSendOutcome.ok:
       case BodhiSendOutcome.refused:
         break;
@@ -123,7 +127,12 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
   void _trackBottom() {
     if (!_scroll.hasClients) return;
     final pos = _scroll.position;
-    _wasAtBottom = pos.pixels >= pos.maxScrollExtent - 200;
+    final atBottom = pos.pixels >= pos.maxScrollExtent - 200;
+    _wasAtBottom = atBottom;
+    final show = !atBottom;
+    if (show != _showJumpToLatest && mounted) {
+      setState(() => _showJumpToLatest = show);
+    }
   }
 
   /// Follows the streaming reply (C3), but only while the user never left
@@ -137,13 +146,47 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
     );
   }
 
+  /// Keeps the latest line visible while the assistant's completed reply is
+  /// progressively revealed, without stacking dozens of scroll animations.
+  void _followReveal() {
+    if (!_wasAtBottom || _revealScrollScheduled) return;
+    _revealScrollScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _revealScrollScheduled = false;
+      if (!mounted || !_wasAtBottom || !_scroll.hasClients) return;
+      _scroll.jumpTo(_scroll.position.maxScrollExtent);
+    });
+  }
+
+  void _finishReveal(String reply) {
+    if (_replyToReveal != reply || !mounted) return;
+    setState(() => _replyToReveal = null);
+  }
+
+  void _jumpToLatest() {
+    _wasAtBottom = true;
+    if (_showJumpToLatest) setState(() => _showJumpToLatest = false);
+    _scrollToBottom();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(bodhiChatControllerProvider);
     // Follow-up to every chat state change (deltas included); the follow
     // itself is post-frame and near-bottom-guarded.
-    ref.listen(bodhiChatControllerProvider, (_, __) {
+    ref.listen(bodhiChatControllerProvider, (previous, next) {
+      final before = previous?.messages.lastOrNull;
+      final after = next.messages.lastOrNull;
+      if (before?.pending == true &&
+          after != null &&
+          !after.isUser &&
+          !after.pending &&
+          after.text.isNotEmpty) {
+        _replyToReveal = after.text;
+      } else if (after?.pending == true) {
+        _replyToReveal = null;
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) => _followStream());
     });
     // Only reserve clearance for the mini player, which is an overlay. The
@@ -158,7 +201,7 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
           if (state.messages.isNotEmpty)
             IconButton(
               tooltip: l10n?.aiChatClear ?? 'Clear chat',
-              onPressed: () => _controller.clear(),
+              onPressed: _confirmClear,
               icon: const Icon(Icons.delete_outline),
             ),
         ],
@@ -170,28 +213,60 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
             l10n: l10n,
           ),
           Expanded(
-            child: state.messages.isEmpty
-                ? _Empty(l10n: l10n, onPick: _fill)
-                : ListView.builder(
-                    controller: _scroll,
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.md,
-                      AppSpacing.md,
-                      AppSpacing.md,
-                      mediaPlaying ? 72 : AppSpacing.md,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: state.messages.isEmpty
+                      ? _Empty(l10n: l10n, onPick: _fill)
+                      : ListView.builder(
+                          controller: _scroll,
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          padding: EdgeInsets.fromLTRB(
+                            AppSpacing.md,
+                            AppSpacing.md,
+                            AppSpacing.md,
+                            mediaPlaying ? 72 : AppSpacing.md,
+                          ),
+                          itemCount: state.messages.length,
+                          itemBuilder: (context, i) {
+                            final m = state.messages[i];
+                            return BodhiMessageBubble(
+                              message: m,
+                              animateReveal: i == state.messages.length - 1 &&
+                                  !m.isUser &&
+                                  _replyToReveal == m.text,
+                              onCopy:
+                                  m.isUser || m.pending ? null : () => _copy(m),
+                              onReport: m.isUser || m.pending
+                                  ? null
+                                  : () => _report(m),
+                              onRevealProgress: m.isUser ? null : _followReveal,
+                              onRevealComplete:
+                                  m.isUser ? null : () => _finishReveal(m.text),
+                            );
+                          },
+                        ),
+                ),
+                if (_showJumpToLatest)
+                  Positioned(
+                    right: AppSpacing.md,
+                    bottom: AppSpacing.sm,
+                    child: FloatingActionButton.small(
+                      heroTag: 'bodhi-jump-latest',
+                      tooltip: 'Jump to latest message',
+                      onPressed: _jumpToLatest,
+                      child: const Icon(Icons.keyboard_arrow_down_rounded),
                     ),
-                    itemCount: state.messages.length,
-                    itemBuilder: (context, i) {
-                      final m = state.messages[i];
-                      return BodhiMessageBubble(
-                        message: m,
-                        onReport: m.isUser || m.pending
-                            ? null
-                            : () => _report(m),
-                      );
-                    },
                   ),
+              ],
+            ),
           ),
+          if (state.failedQuestion case final question?)
+            _RetryCard(
+              question: question,
+              onRetry: () => _retry(question),
+            ),
           _Composer(
             controller: _input,
             sending: state.sending,
@@ -205,8 +280,41 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
 
   void _fill(String text) {
     _input.text = text;
-    _input.selection =
-        TextSelection.collapsed(offset: _input.text.length);
+    _input.selection = TextSelection.collapsed(offset: _input.text.length);
+  }
+
+  void _retry(String question) {
+    _fill(question);
+    unawaited(_submit());
+  }
+
+  Future<void> _copy(BodhiMessage message) async {
+    await Clipboard.setData(ClipboardData(text: stripMarkdown(message.text)));
+    AppHaptics.light();
+    if (mounted) _snack('Response copied.');
+  }
+
+  Future<void> _confirmClear() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Clear this conversation?'),
+        content: const Text('This removes the chat history from this device.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Clear chat'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    AppHaptics.light();
+    await _controller.clear();
   }
 
   Future<void> _report(BodhiMessage message) async {
@@ -295,6 +403,9 @@ class _Composer extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(2000),
+                  ],
                   minLines: 1,
                   maxLines: 5,
                   textInputAction: TextInputAction.send,
@@ -302,6 +413,7 @@ class _Composer extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: hint,
                     isDense: true,
+                    counterText: '',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -309,19 +421,81 @@ class _Composer extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.xs),
-              IconButton.filled(
-                onPressed: sending ? null : onSubmit,
-                icon: sending
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.send_rounded),
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: controller,
+                builder: (context, value, _) => IconButton.filled(
+                  tooltip: sending ? 'Sending message' : 'Send message',
+                  onPressed:
+                      sending || value.text.trim().isEmpty ? null : onSubmit,
+                  icon: sending
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.send_rounded),
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _RetryCard extends StatelessWidget {
+  const _RetryCard({required this.question, required this.onRetry});
+
+  final String question;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.refresh_rounded, color: scheme.onErrorContainer),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reply couldn\'t be loaded.',
+                  style: TextStyle(
+                    color: scheme.onErrorContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  question,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: scheme.onErrorContainer),
+                ),
+              ],
+            ),
+          ),
+          TextButton(onPressed: onRetry, child: const Text('Retry')),
+        ],
       ),
     );
   }

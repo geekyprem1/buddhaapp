@@ -50,7 +50,7 @@ class BodhiAiConfig with _$BodhiAiConfig {
 
     /// Per-reply output ceiling, so one "write me an essay" prompt cannot
     /// produce an outsized bill.
-    @Default(700) int maxTokens,
+    @Default(300) int maxTokens,
 
     /// Lower is more factual. Doctrinal answers should not be inventive.
     @Default(0.4) double temperature,
