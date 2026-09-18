@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup / device-transfer rules for Android 12 (API 31) and newer.
+
+  `shared_prefs` is excluded because Firebase keeps machine-specific state
+  there, most importantly Firebase Auth's session store
+  (com.google.firebase.auth.api.Store.<persistenceKey>.xml).
+
+  Auto Backup includes SharedPreferences by default, so that store travels
+  through cloud backup and device-to-device transfer. A restored copy lands on
+  the new device holding another install's session: we observed a store file
+  for an unrelated uid sitting in shared_prefs with a bogus 1970 timestamp,
+  which left Firebase Auth unable to restore a usable session and dropped the
+  user on the login screen.
+
+  Nothing of ours is lost by excluding it: app state lives in Hive (files/) and
+  in Firestore. Everything in shared_prefs is Firebase/Play-services internal
+  (auth store, FCM/instance id, analytics), none of which should be restored
+  onto a different install anyway.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" />
+    </device-transfer>
+</data-extraction-rules>

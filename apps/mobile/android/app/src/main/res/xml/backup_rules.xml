@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Auto Backup rules for Android 11 (API 30) and older, where
+  `android:fullBackupContent` is used instead of `dataExtractionRules`.
+  Keep in sync with data_extraction_rules.xml — see that file for why
+  shared_prefs must not be backed up or restored.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" />
+</full-backup-content>

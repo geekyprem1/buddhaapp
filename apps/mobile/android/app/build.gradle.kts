@@ -80,6 +80,15 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // Flutter turns on R8 for every release build. Without these rules
+            // R8 strips the no-arg constructors of Firebase's ComponentRegistrar
+            // classes, so Firebase component discovery fails at startup and the
+            // restored auth session never reaches Dart (user lands on /login
+            // after every cold start). See proguard-rules.pro.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

@@ -17,6 +17,13 @@ import '../features/notifications/application/fcm_background.dart';
 import '../features/player/application/dhamma_audio_handler.dart';
 import '../features/prarthana/application/alarm_local_store.dart';
 import 'app.dart';
+import 'auth_persistence_probe.dart';
+
+/// Turns on the auth-persistence diagnostic (see [runAuthPersistenceProbe]).
+/// Always on in debug; enable on a release/internal build with
+/// `flutter build apk --dart-define=AUTH_DIAG=true`.
+const bool _kAuthPersistenceDiag =
+    kDebugMode || bool.fromEnvironment('AUTH_DIAG');
 
 /// Shared mobile bootstrap for both flavours (T2.1, T0.6, T2.73).
 ///
@@ -38,7 +45,15 @@ Future<void> bootstrapAndRun({
     await Firebase.initializeApp(options: options);
   } catch (error, stack) {
     if (Firebase.apps.isEmpty) rethrow; // genuine init failure
-    debugPrint('Firebase.initializeApp reported a plugin error: $error');
+    // Tagged AUTH_PERSIST because this is a prime suspect for the
+    // "logged out after restart" bug: the plugin-constants gather is also
+    // what hands the restored Firebase Auth user to the Dart side, so if it
+    // throws here, `FirebaseAuth.instance.currentUser` starts out null even
+    // though the session is still on disk.
+    debugPrint(
+      'AUTH_PERSIST: Firebase.initializeApp THREW during the plugin-constants '
+      'gather: $error — the restored auth user may not have reached Dart.',
+    );
     await _safeRecordError(error, stack, reason: 'firebase.initializeApp');
   }
 
@@ -57,6 +72,16 @@ Future<void> bootstrapAndRun({
     () => _activateAppCheck(debugAppCheck),
     timeout: const Duration(seconds: 6),
   );
+
+  // Diagnose the "logged out after restart" bug: log whether the session was
+  // restored from disk and, if so, reproduce the cold-start token refresh so
+  // any rejection (and its cause) is visible in the device log. Runs after
+  // App Check activation so its token probe is meaningful. Diagnostic-only —
+  // never changes auth state.
+  if (_kAuthPersistenceDiag) {
+    runAuthPersistenceProbe();
+  }
+
   await _guardInit('fcm_background', () async {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   });
