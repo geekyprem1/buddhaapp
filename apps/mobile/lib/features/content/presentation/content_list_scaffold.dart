@@ -3,6 +3,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/category_filter_providers.dart';
 import '../application/content_list_controller.dart';
@@ -104,6 +105,7 @@ class _ContentListScaffoldState extends ConsumerState<ContentListScaffold> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const HomeAppBarButton(),
         title: Text(
           widget.title,
           maxLines: 1,

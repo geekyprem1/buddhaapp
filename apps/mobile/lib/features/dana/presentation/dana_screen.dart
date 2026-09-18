@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../wallpaper/application/wallpaper_providers.dart';
 
@@ -74,7 +75,10 @@ class _DanaScreenState extends ConsumerState<DanaScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n?.danaTitle ?? 'Donation & Support')),
+      appBar: AppBar(
+        leading: const HomeAppBarButton(),
+        title: Text(l10n?.danaTitle ?? 'Donation & Support'),
+      ),
       body: ListView(
         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
         children: [

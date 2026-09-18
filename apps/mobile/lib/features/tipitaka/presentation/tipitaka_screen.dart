@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 /// Tipitaka — the Pali canon, embedded from https://tipitaka.app inside an
@@ -67,6 +68,7 @@ class _TipitakaScreenState extends State<TipitakaScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
+        leading: const HomeAppBarButton(),
         title: Text(l10n?.homeTipitaka ?? 'Tipitaka'),
         actions: [
           IconButton(

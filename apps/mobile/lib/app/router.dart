@@ -11,6 +11,7 @@ import '../features/bodhi_ai/presentation/ask_buddha_screen.dart';
 import '../features/buddhist_calendar/presentation/buddhist_calendar_screen.dart';
 import '../features/chanting/presentation/chanting_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/home/presentation/feature_coming_soon_screen.dart';
 import '../features/dana/presentation/dana_screen.dart';
 import '../features/premium/presentation/premium_screen.dart';
 import '../features/places/presentation/place_detail_screen.dart';
@@ -60,6 +61,7 @@ abstract class AppRoutes {
   static const onboardingLanguage = '/onboarding/language';
   static const onboardingPersonInfo = '/onboarding/person-info';
   static const home = '/home';
+  static const comingSoon = '/coming-soon';
   static const explore = '/explore';
   static const videos = '/videos';
   static const videoPlayer = '/videos/play';
@@ -278,6 +280,12 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.comingSoon,
+        builder: (context, state) => FeatureComingSoonScreen(
+          title: state.extra as String? ?? 'Coming soon',
+        ),
       ),
       GoRoute(
         path: AppRoutes.wisdomDetail,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/generated/app_localizations.dart';
+import 'app_visible_route.dart';
 import 'router.dart';
 
 /// The bottom-nav destinations, in order. Each maps to a top-level route so
@@ -74,13 +75,9 @@ class PersistentBottomNav extends StatelessWidget {
           : AppColors.background;
 
   int? _currentIndex() {
-    try {
-      final path = router.routerDelegate.currentConfiguration.uri.path;
-      final index = _navRoutes.indexOf(path);
-      return index < 0 ? null : index;
-    } catch (_) {
-      return null;
-    }
+    final path = visibleRoutePathOf(router);
+    final index = _navRoutes.indexOf(path);
+    return index < 0 ? null : index;
   }
 
   void _onTap(int index) {
@@ -118,8 +115,9 @@ class PersistentBottomNav extends StatelessWidget {
       selectedIndex: current ?? 0,
       onDestinationSelected: _onTap,
       backgroundColor: backgroundOf(context),
-      indicatorColor:
-          current == null ? Colors.transparent : cs.primary.withValues(alpha: 0.14),
+      indicatorColor: current == null
+          ? Colors.transparent
+          : cs.primary.withValues(alpha: 0.14),
       // `tooltip: ''` on every destination is required, not cosmetic:
       // NavigationDestination defaults its tooltip to the label, and Tooltip
       // needs an Overlay ancestor. This bar is mounted in the
@@ -127,15 +125,15 @@ class PersistentBottomNav extends StatelessWidget {
       // tooltip would throw "No Overlay widget found." and each destination
       // would render as an error box.
       destinations: [
-        _destinationFor(cs, Icons.home_outlined, Icons.home,
-            l10n?.navHome ?? 'Home'),
+        _destinationFor(
+            cs, Icons.home_outlined, Icons.home, l10n?.navHome ?? 'Home'),
         _destinationFor(cs, Icons.calendar_month_outlined, Icons.calendar_month,
             l10n?.navCalendar ?? 'Calendar'),
         if (bodhiAiEnabled)
           _destinationFor(cs, Icons.self_improvement, Icons.self_improvement,
               l10n?.navAskBuddha ?? 'Ask Buddha'),
-        _destinationFor(cs, Icons.spa_outlined, Icons.spa,
-            l10n?.navPractice ?? 'Practice'),
+        _destinationFor(
+            cs, Icons.spa_outlined, Icons.spa, l10n?.navPractice ?? 'Practice'),
         _destinationFor(cs, Icons.play_circle_outline, Icons.play_circle,
             l10n?.homeVideo ?? 'Videos'),
       ],

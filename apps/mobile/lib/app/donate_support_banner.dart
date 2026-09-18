@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/generated/app_localizations.dart';
+import 'app_visible_route.dart';
 import 'router.dart';
 
 /// A persistent, full-width "Donate & Support" banner that sits just above the
@@ -127,6 +128,150 @@ class DonateSupportBanner extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact bottom action row used away from Home. It replaces both the full
+/// donation banner and the tab bar so secondary screens keep only the two
+/// primary actions requested by the product.
+class DaanAskBuddhaBar extends StatelessWidget {
+  const DaanAskBuddhaBar({
+    required this.router,
+    required this.bodhiAiEnabled,
+    super.key,
+  });
+
+  final GoRouter router;
+  final bool bodhiAiEnabled;
+
+  static const double height = 52;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!bodhiAiEnabled) {
+      return ColoredBox(
+        color: AppColors.primary,
+        child: SafeArea(
+          top: false,
+          child: DonateSupportBanner(router: router),
+        ),
+      );
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final currentPath = visibleRoutePathOf(router);
+    return Material(
+      color: AppColors.primary,
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: height,
+          child: MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.2,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _CompactAction(
+                    icon: Icons.volunteer_activism,
+                    label: l10n?.homeDana ?? 'Daan',
+                    subtitle: l10n?.homeDanaSubtitle ?? 'Support this app',
+                    selected: currentPath == AppRoutes.dana,
+                    onTap: currentPath == AppRoutes.dana
+                        ? null
+                        : () => router.push(AppRoutes.dana),
+                  ),
+                ),
+                Container(
+                  width: 1,
+                  height: 30,
+                  color: AppColors.surface.withValues(alpha: 0.35),
+                ),
+                Expanded(
+                  child: _CompactAction(
+                    icon: Icons.self_improvement,
+                    label: l10n?.navAskBuddha ?? 'Ask Buddha',
+                    subtitle: 'Powered by Bodhi AI',
+                    selected: currentPath == AppRoutes.askBuddha,
+                    onTap: currentPath == AppRoutes.askBuddha
+                        ? null
+                        : () => router.go(AppRoutes.askBuddha),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactAction extends StatelessWidget {
+  const _CompactAction({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = AppColors.surface.withValues(alpha: selected ? 1 : 0.92);
+    return InkWell(
+      onTap: onTap,
+      child: Ink(
+        color: selected
+            ? AppColors.surface.withValues(alpha: 0.12)
+            : Colors.transparent,
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: foreground, size: 18),
+              const SizedBox(width: AppSpacing.xs),
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: foreground,
+                        fontSize: 13.5,
+                        fontWeight:
+                            selected ? FontWeight.w700 : FontWeight.w600,
+                        height: 1.15,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: foreground.withValues(alpha: 0.85),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

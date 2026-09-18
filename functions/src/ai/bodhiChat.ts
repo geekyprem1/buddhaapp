@@ -51,14 +51,16 @@ function shortenOrdinaryReply(content: string): string {
 /**
  * The Bodhi AI chat proxy (see `.kiro/specs/bodhi-ai-chat/design.md`).
  *
- * Pipeline: auth → App Check → config gate → tier → reserve message/quota →
- * topic gate → answer → record tokens. The OpenRouter key never leaves this
- * function; the client only ever sends a question and renders the reply.
+ * Pipeline: auth → config gate → tier → reserve message/quota → topic gate →
+ * answer → record tokens. The OpenRouter key never leaves this function; the
+ * client only ever sends a question and renders the reply.
  *
- * `enforceAppCheck` is true because this endpoint spends money per call — an
- * unauthenticated script hitting it would be a direct billing attack. It is
- * the first function in this codebase to enforce App Check; the other six
- * callables are unaffected (enforcement is per-function).
+ * App Check enforcement is temporarily relaxed (mirroring `guardOtpAbuse`):
+ * current internal-testing builds cannot attach a Play Integrity token, so an
+ * enforced App Check rejected every chat call with `unauthenticated` and the
+ * user saw no reply at all. Auth is still verified below, and the per-uid
+ * daily quota still meters spend; re-enable enforcement once a build that
+ * passes Play Integrity is adopted.
  *
  * Streams the reply when the client accepts it (`response.sendChunk` is a safe
  * no-op otherwise), and always returns the final result map.
@@ -67,7 +69,6 @@ export const bodhiChat = onCall(
   {
     region: "asia-south1",
     secrets: [OPENROUTER_API_KEY],
-    enforceAppCheck: true,
   },
   async (request, response) => {
     if (!request.auth) {

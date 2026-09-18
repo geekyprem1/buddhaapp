@@ -1,6 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/buddhist_calendar_service.dart';
 
@@ -36,6 +37,7 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const HomeAppBarButton(),
         title: Text(l10n?.calendarTitle ?? 'Buddhist Calendar'),
         actions: [
           TextButton(
@@ -101,7 +103,8 @@ class _BuddhistCalendarScreenState extends State<BuddhistCalendarScreen> {
                 children: [
                   for (var i = 0; i < thisMonthEvents.length; i++) ...[
                     _thisMonthTile(context, thisMonthEvents[i]),
-                    if (i < thisMonthEvents.length - 1) const Divider(height: 1),
+                    if (i < thisMonthEvents.length - 1)
+                      const Divider(height: 1),
                   ],
                 ],
               ),

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
-import 'feature_coming_soon_screen.dart';
 
 /// Shared rendering for the module catalogue (the 2-column grid of feature
 /// tiles). Used by both the Home tab (below the wisdom hero) and the Discover
@@ -70,10 +69,9 @@ List<Widget> moduleSectionSlivers(
 /// else pushes its route.
 void openModule(BuildContext context, AppLocalizations? l10n, String id) {
   if (HomeModuleIds.isComingSoon(id)) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => FeatureComingSoonScreen(title: moduleLabel(l10n, id)),
-      ),
+    context.push(
+      AppRoutes.comingSoon,
+      extra: moduleLabel(l10n, id),
     );
     return;
   }
@@ -152,6 +150,7 @@ String moduleRoute(String id) => switch (id) {
       HomeModuleIds.tipitaka => AppRoutes.tipitaka,
       HomeModuleIds.chanting => AppRoutes.chantings,
       HomeModuleIds.buddhistCalendar => AppRoutes.buddhistCalendar,
+      HomeModuleIds.dailyPaliWord => AppRoutes.comingSoon,
       HomeModuleIds.buddhistPlaces => AppRoutes.places,
       HomeModuleIds.prarthana => AppRoutes.prarthana,
       HomeModuleIds.status => AppRoutes.statuses,

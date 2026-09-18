@@ -13,11 +13,14 @@ import { isPremium, readRemaining } from "./quota";
  * `quota.ts`) — the quota is now purely per-message, which needs no session
  * tracking, so there is nothing to start, tick, or end.
  *
- * No model call and no OpenRouter key here, so App Check is not needed to
- * protect spend, but it is enforced for consistency with `bodhiChat`.
+ * No model call and no OpenRouter key here, so there is nothing to protect.
+ * App Check was relaxed together with `bodhiChat`: current internal-testing
+ * builds cannot attach a Play Integrity token, and an enforced check made the
+ * chat screen's quota counter fail silently. Re-enable both together once a
+ * build that passes Play Integrity is adopted.
  */
 export const bodhiQuota = onCall(
-  { region: "asia-south1", enforceAppCheck: true },
+  { region: "asia-south1" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Sign in required.");

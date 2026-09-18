@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../content/application/category_filter_providers.dart';
 import '../../content/application/content_list_controller.dart';
@@ -139,7 +140,8 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
                         videoUrl: videoUrl,
                         posterUrl: posterUrl,
                         onSet: () => _setLive(item.id, videoUrl),
-                        setLabel: l10n?.setWallpaperLive ?? 'Set live wallpaper',
+                        setLabel:
+                            l10n?.setWallpaperLive ?? 'Set live wallpaper',
                       );
                     }
 
@@ -163,7 +165,7 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
               },
             ),
           ),
-          // Top chrome: back button + category chips over a soft scrim.
+          // Top chrome: Home button + category chips over a soft scrim.
           Positioned(
             top: 0,
             left: 0,
@@ -172,7 +174,7 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
               categories: categoryChips,
               selectedCategoryId: categoryId,
               onSelect: _selectCategory,
-              onBack: () => context.pop(),
+              onHome: () => context.go(AppRoutes.home),
               allLabel: l10n?.filterAll ?? 'All',
             ),
           ),
@@ -182,21 +184,21 @@ class _WallpaperListScreenState extends ConsumerState<WallpaperListScreen> {
   }
 }
 
-/// Back button + horizontal category chips, styled for a dark full-screen
+/// Home button + horizontal category chips, styled for a dark full-screen
 /// backdrop, over a top gradient scrim.
 class _TopBar extends StatelessWidget {
   const _TopBar({
     required this.categories,
     required this.selectedCategoryId,
     required this.onSelect,
-    required this.onBack,
+    required this.onHome,
     required this.allLabel,
   });
 
   final List<TeacherChipData> categories;
   final String? selectedCategoryId;
   final ValueChanged<String?> onSelect;
-  final VoidCallback onBack;
+  final VoidCallback onHome;
   final String allLabel;
 
   @override
@@ -216,7 +218,11 @@ class _TopBar extends StatelessWidget {
           child: Row(
             children: [
               const SizedBox(width: 4),
-              _CircleIconButton(icon: Icons.arrow_back, onPressed: onBack),
+              _CircleIconButton(
+                icon: Icons.home_outlined,
+                tooltip: AppLocalizations.of(context)?.navHome ?? 'Home',
+                onPressed: onHome,
+              ),
               Expanded(
                 child: SizedBox(
                   height: 40,
@@ -346,8 +352,7 @@ class _LiveWallpaperPageState extends State<_LiveWallpaperPage> {
           CachedNetworkImage(
             imageUrl: widget.posterUrl!,
             fit: BoxFit.cover,
-            errorWidget: (_, __, ___) =>
-                const ColoredBox(color: Colors.black),
+            errorWidget: (_, __, ___) => const ColoredBox(color: Colors.black),
           )
         else
           const ColoredBox(color: Colors.black),
@@ -473,9 +478,14 @@ class _WallpaperPage extends StatelessWidget {
 }
 
 class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon, required this.onPressed});
+  const _CircleIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
 
   final IconData icon;
+  final String tooltip;
   final VoidCallback onPressed;
 
   @override
@@ -484,6 +494,7 @@ class _CircleIconButton extends StatelessWidget {
       color: Colors.black38,
       shape: const CircleBorder(),
       child: IconButton(
+        tooltip: tooltip,
         icon: Icon(icon, color: Colors.white),
         onPressed: onPressed,
       ),

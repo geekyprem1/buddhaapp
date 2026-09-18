@@ -1,6 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 class FeatureComingSoonScreen extends StatelessWidget {
@@ -12,7 +13,10 @@ class FeatureComingSoonScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        leading: const HomeAppBarButton(),
+        title: Text(title),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),

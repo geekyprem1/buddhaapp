@@ -7,7 +7,7 @@ import '../features/bodhi_ai/application/bodhi_chat_controller.dart';
 import '../features/notifications/application/fcm_coordinator.dart';
 import '../features/player/presentation/mini_player.dart';
 import '../l10n/generated/app_localizations.dart';
-import 'bottom_app_chrome.dart';
+import 'app_chrome_layout.dart';
 import 'offline_banner.dart';
 import 'router.dart';
 import 'theme_controller.dart';
@@ -45,55 +45,17 @@ class DhammaPathApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       builder: (context, child) {
-        // Bottom chrome that persists on EVERY ordinary screen: a Donate &
-        // Support banner sitting directly above a fixed navigation bar. Shown
-        // once the user is signed in and past the first onboarding steps (the
-        // same gate the old floating Daan bubble used), and hidden on the
-        // router's gate screens.
+        // Home keeps the full donation banner and tab bar. Other ordinary
+        // screens replace both with one compact Daan / Ask Buddha action row.
+        // Gate and immersive routes keep all bottom chrome hidden.
         //
-        // Rebuilt on every navigation so the active tab highlights correctly
-        // and the chrome disappears on gate/immersive routes.
-        return ListenableBuilder(
-          listenable: router.routerDelegate,
-          builder: (context, _) {
-            final showChrome = showDaan && BottomAppChrome.isVisibleFor(router);
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const OfflineBanner(),
-                    Expanded(child: child ?? const SizedBox.shrink()),
-                    if (showChrome)
-                      BottomAppChrome(
-                        router: router,
-                        bodhiAiEnabled: bodhiAiEnabled,
-                      ),
-                  ],
-                ),
-                // The mini player floats above the chrome so its controls
-                // stay reachable. When the chrome is present it already
-                // absorbs the system bottom inset, so strip it from the mini
-                // player to avoid an empty double gap.
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: showChrome
-                      ? Padding(
-                          padding: EdgeInsets.only(
-                            bottom: BottomAppChrome.heightOf(context),
-                          ),
-                          child: MediaQuery.removePadding(
-                            context: context,
-                            removeBottom: true,
-                            child: const MiniPlayer(),
-                          ),
-                        )
-                      : const MiniPlayer(),
-                ),
-              ],
-            );
-          },
+        return AppChromeLayout(
+          router: router,
+          body: child ?? const SizedBox.shrink(),
+          topBanner: const OfflineBanner(),
+          miniPlayer: const MiniPlayer(),
+          chromeEnabled: showDaan,
+          bodhiAiEnabled: bodhiAiEnabled,
         );
       },
     );

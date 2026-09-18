@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
@@ -20,6 +21,7 @@ class PlacesListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const HomeAppBarButton(),
         title: Text(
           l10n?.homeBuddhistPlaces ?? 'Buddhist Places',
           maxLines: 1,

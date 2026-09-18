@@ -14,8 +14,20 @@ BodhiChatStore bodhiChatStore(Ref ref) => BodhiChatStore();
 
 /// Live `config/bodhi_ai`, watched by the app shell to show/hide the tab and
 /// by the chat screen. Mirrors the `premiumConfigProvider` style.
+///
+/// The subscription is gated on a signed-in uid: `config/{docId}` reads
+/// require auth (rules), and a snapshots listener that starts before Firebase
+/// Auth resolves is killed permanently by PERMISSION_DENIED — it never
+/// resumes after login, which left the Ask Buddha tab hidden forever on a
+/// fresh install. Signed out, the disabled default is emitted without
+/// touching Firestore; signing in re-runs this provider and attaches the
+/// live stream on an already-authenticated connection.
 @riverpod
 Stream<BodhiAiConfig> bodhiAiConfig(Ref ref) {
+  final uid = ref.watch(
+    currentAppUserProvider.select((v) => v.valueOrNull?.uid),
+  );
+  if (uid == null) return Stream.value(const BodhiAiConfig());
   return ref.watch(configRepositoryProvider).watchBodhiAiConfig();
 }
 

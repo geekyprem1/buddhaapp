@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/prarthana_providers.dart';
@@ -66,6 +67,7 @@ class _PrarthanaListScreenState extends ConsumerState<PrarthanaListScreen> {
     final alarms = ref.watch(userAlarmsProvider);
     return Scaffold(
       appBar: AppBar(
+        leading: const HomeAppBarButton(),
         title: Text(
           l10n?.homeDailyPrarthana ?? 'Daily Practice',
           maxLines: 1,
@@ -104,8 +106,7 @@ class _PrarthanaListScreenState extends ConsumerState<PrarthanaListScreen> {
                         'No prarthana set yet. Tap Add to schedule one.',
                   ),
                 ),
-              for (final alarm in items)
-                _AlarmCard(alarm: alarm),
+              for (final alarm in items) _AlarmCard(alarm: alarm),
               if (kDebugMode && items.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.lg),
                 OutlinedButton(

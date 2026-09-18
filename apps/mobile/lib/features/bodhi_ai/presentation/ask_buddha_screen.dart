@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/home_app_bar_button.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../player/application/audio_providers.dart';
 import '../../premium/application/premium_controller.dart';
@@ -196,6 +197,7 @@ class _AskBuddhaScreenState extends ConsumerState<AskBuddhaScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const HomeAppBarButton(),
         title: Text(l10n?.navAskBuddha ?? 'Ask Buddha'),
         actions: [
           if (state.messages.isNotEmpty)
