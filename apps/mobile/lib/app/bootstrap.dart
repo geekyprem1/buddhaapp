@@ -116,10 +116,12 @@ Future<void> bootstrapAndRun({
 Future<void> _activateAppCheck(bool debugAppCheck) async {
   try {
     await FirebaseAppCheck.instance.activate(
-      androidProvider:
-          debugAppCheck ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-      appleProvider:
-          debugAppCheck ? AppleProvider.debug : AppleProvider.appAttest,
+      providerAndroid: debugAppCheck
+          ? const AndroidDebugProvider()
+          : const AndroidPlayIntegrityProvider(),
+      providerApple: debugAppCheck
+          ? const AppleDebugProvider()
+          : const AppleAppAttestProvider(),
     );
     if (kDebugMode) {
       final token = await FirebaseAppCheck.instance.getToken();

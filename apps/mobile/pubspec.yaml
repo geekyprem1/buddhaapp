@@ -1,7 +1,7 @@
 name: dhamma_path
 description: "Dhamma Path — Buddhist devotional content app."
 publish_to: 'none'
-version: 1.6.0+24
+version: 1.6.0+25
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
@@ -20,19 +20,19 @@ dependencies:
     path: ../../packages/design_system
 
   # Firebase
-  firebase_core: ^3.8.0
-  firebase_auth: ^5.3.3
-  cloud_firestore: ^5.5.0
-  firebase_storage: ^12.3.7
-  firebase_app_check: ^0.3.1+8
-  firebase_messaging: ^15.1.6
-  firebase_analytics: ^11.3.6
+  firebase_core: ^4.15.0
+  firebase_auth: ^6.7.0
+  cloud_firestore: ^6.10.0
+  firebase_storage: ^13.6.0
+  firebase_app_check: ^0.4.8
+  firebase_messaging: ^16.7.0
+  firebase_analytics: ^12.6.0
   # firebase_crashlytics temporarily removed: on AGP 9 / Android 16 the
   # Crashlytics native component failed to register and broke
   # Firebase.initializeApp on release builds. Re-add with a compatible SDK
   # before launch (TASKS T2.73 follow-up).
-  firebase_remote_config: ^5.3.0
-  cloud_functions: ^5.2.0
+  firebase_remote_config: ^6.7.0
+  cloud_functions: ^6.5.0
   google_sign_in: ^7.1.0
 
   # State + routing
