@@ -18,7 +18,6 @@ import '../features/player/application/dhamma_audio_handler.dart';
 import '../features/prarthana/application/alarm_local_store.dart';
 import 'app.dart';
 import 'auth_persistence_probe.dart';
-import 'auth_store_self_heal.dart';
 
 /// Turns on the auth-persistence diagnostic (see [runAuthPersistenceProbe]).
 /// Always on in debug; enable on a release/internal build with
@@ -73,12 +72,6 @@ Future<void> bootstrapAndRun({
     () => _activateAppCheck(debugAppCheck),
     timeout: const Duration(seconds: 6),
   );
-
-  // Repair devices that carry an unusable Firebase Auth session on disk (an
-  // encrypted store restored by Auto Backup without its device-bound crypto
-  // key). Only deletes when there is no current user, so a valid session is
-  // never touched. Runs in the background so it cannot delay launch.
-  unawaited(healUnusableAuthStore());
 
   // Diagnose the "logged out after restart" bug: log whether the session was
   // restored from disk and, if so, reproduce the cold-start token refresh so
