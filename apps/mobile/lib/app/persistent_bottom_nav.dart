@@ -57,10 +57,9 @@ class PersistentBottomNav extends StatelessWidget {
   /// above the bar.
   ///
   /// Material 3 defaults to 80, but a destination only needs ~52 (a 32 icon
-  /// indicator + 4 label padding + a ~16 label), so the default leaves 14 of
-  /// dead space above and below the icons. 62 keeps a small breathing margin
-  /// while giving the rest of that space back to the page.
-  static const double height = 62;
+  /// indicator + 4 label padding + a ~16 label). Trimmed further to 54 to keep
+  /// the bar compact and hand more of that space back to the page.
+  static const double height = 54;
 
   /// Headroom in [height] for the label to grow with the system font-size
   /// setting before it would overflow the tightened bar.
