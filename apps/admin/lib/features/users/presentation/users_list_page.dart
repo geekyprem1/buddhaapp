@@ -13,6 +13,8 @@ import '../application/users_providers.dart';
 
 enum _StatusFilter { all, active, blocked }
 
+enum _PremiumFilter { all, pro, free }
+
 /// Users table (T1.23, AR-5.1–5.3). Search + language/status filters over a
 /// newest-first page; block/unblock is Super Admin only — the UI hides the
 /// action for other roles but the real lock is the Firestore rule that lets
@@ -28,6 +30,7 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
   String _query = '';
   String? _language;
   _StatusFilter _status = _StatusFilter.all;
+  _PremiumFilter _premium = _PremiumFilter.all;
   final _busy = <String>{};
 
   bool _matches(AppUser user) {
@@ -38,6 +41,14 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
       case _StatusFilter.blocked:
         if (!user.isBlocked) return false;
       case _StatusFilter.all:
+        break;
+    }
+    switch (_premium) {
+      case _PremiumFilter.pro:
+        if (!user.isPremium) return false;
+      case _PremiumFilter.free:
+        if (user.isPremium) return false;
+      case _PremiumFilter.all:
         break;
     }
     if (_query.isEmpty) return true;
@@ -101,6 +112,60 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${AdminStrings.usersBlockFailed} $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy.remove(user.uid));
+    }
+  }
+
+  Future<void> _grantPremium(AppUser user) async {
+    final days = await showDialog<int>(
+      context: context,
+      builder: (context) => const _GrantPremiumDialog(),
+    );
+    if (days == null) return;
+
+    setState(() => _busy.add(user.uid));
+    try {
+      await ref
+          .read(adminFunctionsServiceProvider)
+          .grantPremium(uid: user.uid, days: days);
+      ref.invalidate(adminUsersProvider);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AdminStrings.usersGrantPremiumDone)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${AdminStrings.usersGrantPremiumFailed} $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy.remove(user.uid));
+    }
+  }
+
+  Future<void> _revokePremium(AppUser user) async {
+    final ok = await ConfirmDialog.show(
+      context,
+      title: AdminStrings.usersRevokePremiumTitle,
+      body: AdminStrings.usersRevokePremiumBody,
+      confirmLabel: AdminStrings.usersRevokePremiumConfirm,
+    );
+    if (!ok) return;
+
+    setState(() => _busy.add(user.uid));
+    try {
+      await ref.read(adminFunctionsServiceProvider).revokePremium(user.uid);
+      ref.invalidate(adminUsersProvider);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AdminStrings.usersRevokePremiumDone)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${AdminStrings.usersRevokePremiumFailed} $e')),
       );
     } finally {
       if (mounted) setState(() => _busy.remove(user.uid));
@@ -215,6 +280,29 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
                               () => _status = v ?? _StatusFilter.all,
                             ),
                           ),
+                          DropdownButtonFormField<_PremiumFilter>(
+                            initialValue: _premium,
+                            decoration: const InputDecoration(
+                              labelText: AdminStrings.usersPremiumFilter,
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: _PremiumFilter.all,
+                                child: Text(AdminStrings.usersAllStatus),
+                              ),
+                              DropdownMenuItem(
+                                value: _PremiumFilter.pro,
+                                child: Text(AdminStrings.usersProOnly),
+                              ),
+                              DropdownMenuItem(
+                                value: _PremiumFilter.free,
+                                child: Text(AdminStrings.usersFreeOnly),
+                              ),
+                            ],
+                            onChanged: (v) => setState(
+                              () => _premium = v ?? _PremiumFilter.all,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -239,6 +327,8 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
                         canManage: canManage,
                         busy: _busy.contains(user.uid),
                         onToggleBlock: () => _toggleBlock(user),
+                        onGrantPremium: () => _grantPremium(user),
+                        onRevokePremium: () => _revokePremium(user),
                       );
                     },
                   ),
@@ -257,17 +347,22 @@ class _UserRow extends StatelessWidget {
     required this.canManage,
     required this.busy,
     required this.onToggleBlock,
+    required this.onGrantPremium,
+    required this.onRevokePremium,
   });
 
   final AppUser user;
   final bool canManage;
   final bool busy;
   final VoidCallback onToggleBlock;
+  final VoidCallback onGrantPremium;
+  final VoidCallback onRevokePremium;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final action = !canManage
+    final isPremium = user.isPremium;
+    final Widget? action = !canManage
         ? null
         : busy
             ? const SizedBox(
@@ -275,20 +370,48 @@ class _UserRow extends StatelessWidget {
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : OutlinedButton(
-                onPressed: onToggleBlock,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor:
-                      user.isBlocked ? AppColors.success : AppColors.error,
-                  side: BorderSide(
-                    color: user.isBlocked ? AppColors.success : AppColors.error,
+            : Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.end,
+                children: [
+                  OutlinedButton(
+                    onPressed:
+                        isPremium ? onRevokePremium : onGrantPremium,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: isPremium
+                          ? AppColors.error
+                          : AppColors.primary,
+                      side: BorderSide(
+                        color: isPremium
+                            ? AppColors.error
+                            : AppColors.primary,
+                      ),
+                    ),
+                    child: Text(
+                      isPremium
+                          ? AdminStrings.usersRevokePremium
+                          : AdminStrings.usersGrantPremium,
+                    ),
                   ),
-                ),
-                child: Text(
-                  user.isBlocked
-                      ? AdminStrings.usersUnblock
-                      : AdminStrings.usersBlock,
-                ),
+                  OutlinedButton(
+                    onPressed: onToggleBlock,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor:
+                          user.isBlocked ? AppColors.success : AppColors.error,
+                      side: BorderSide(
+                        color: user.isBlocked
+                            ? AppColors.success
+                            : AppColors.error,
+                      ),
+                    ),
+                    child: Text(
+                      user.isBlocked
+                          ? AdminStrings.usersUnblock
+                          : AdminStrings.usersBlock,
+                    ),
+                  ),
+                ],
               );
     final profile = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,9 +436,16 @@ class _UserRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleMedium,
               ),
-              if (user.isBlocked) ...[
+              if (user.isBlocked || isPremium) ...[
                 const SizedBox(height: 4),
-                const _BlockedBadge(),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    if (user.isBlocked) const _BlockedBadge(),
+                    if (isPremium) const _ProBadge(),
+                  ],
+                ),
               ],
               const SizedBox(height: 2),
               Text(
@@ -344,6 +474,11 @@ class _UserRow extends StatelessWidget {
                     label:
                         '${AdminStrings.usersLastActive} ${_fmt(user.lastActiveAt)}',
                   ),
+                  if (isPremium)
+                    _MetaChip(
+                      label:
+                          '${AdminStrings.usersPremiumUntil} ${_fmt(user.premiumUntil)}',
+                    ),
                 ],
               ),
             ],
@@ -414,6 +549,85 @@ class _BlockedBadge extends StatelessWidget {
   }
 }
 
+class _ProBadge extends StatelessWidget {
+  const _ProBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.accent.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        child: Text(
+          AdminStrings.usersPremiumBadge,
+          style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+}
+
+/// Duration picker for a manual Pro grant. Returns the chosen number of days,
+/// or null on cancel.
+class _GrantPremiumDialog extends StatefulWidget {
+  const _GrantPremiumDialog();
+
+  @override
+  State<_GrantPremiumDialog> createState() => _GrantPremiumDialogState();
+}
+
+class _GrantPremiumDialogState extends State<_GrantPremiumDialog> {
+  // label → days
+  static const _options = <String, int>{
+    '1 month': 30,
+    '3 months': 90,
+    '6 months': 180,
+    '1 year': 365,
+    'Lifetime (10 years)': 3650,
+  };
+
+  int _days = 30;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(AdminStrings.usersGrantPremiumTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(AdminStrings.usersGrantPremiumBody),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<int>(
+            initialValue: _days,
+            decoration: const InputDecoration(
+              labelText: AdminStrings.usersGrantPremiumDuration,
+            ),
+            items: [
+              for (final entry in _options.entries)
+                DropdownMenuItem(value: entry.value, child: Text(entry.key)),
+            ],
+            onChanged: (v) => setState(() => _days = v ?? _days),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AdminStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_days),
+          child: const Text(AdminStrings.usersGrantPremiumConfirm),
+        ),
+      ],
+    );
+  }
+}
+
 /// DPDP/GDPR-style deletion queue (T1.24, AR-5.5, FR-2.8). Reviewed-then-
 /// executed by a Super Admin — see `processDeletionRequest.ts` for why this
 /// isn't an unattended trigger.
@@ -423,6 +637,13 @@ class _DeletionQueueSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(adminDeletionRequestsProvider);
+    // Reuse the already-loaded users page to resolve a uid to a name/phone/
+    // email — no extra Firestore reads. A requester outside the loaded page
+    // (or already erased) simply has no match and shows the uid alone.
+    final usersById = <String, AppUser>{
+      for (final u in ref.watch(adminUsersProvider).valueOrNull ?? const [])
+        u.uid: u,
+    };
     return Padding(
       padding: AdminResponsive.pagePadding(context, bottom: 0),
       child: async.when(
@@ -452,6 +673,7 @@ class _DeletionQueueSection extends ConsumerWidget {
                     _DeletionRow(
                       uid: req['uid'] as String,
                       requestedAt: _toDate(req['requestedAt']),
+                      user: usersById[req['uid'] as String],
                     ),
                 ],
               ),
@@ -469,10 +691,17 @@ class _DeletionQueueSection extends ConsumerWidget {
 }
 
 class _DeletionRow extends ConsumerStatefulWidget {
-  const _DeletionRow({required this.uid, required this.requestedAt});
+  const _DeletionRow({
+    required this.uid,
+    required this.requestedAt,
+    this.user,
+  });
 
   final String uid;
   final DateTime? requestedAt;
+
+  /// Matched account for this request, if it's within the loaded users page.
+  final AppUser? user;
 
   @override
   ConsumerState<_DeletionRow> createState() => _DeletionRowState();
@@ -527,16 +756,53 @@ class _DeletionRowState extends ConsumerState<_DeletionRow> {
             ),
             child: const Text(AdminStrings.usersDeletionExecute),
           );
-    final description = Text(
-      widget.requestedAt == null
-          ? widget.uid
-          : '${widget.uid} · ${AdminStrings.usersDeletionRequestedAt} ${widget.requestedAt}',
-      maxLines: 3,
-      overflow: TextOverflow.ellipsis,
+    final theme = Theme.of(context);
+    final user = widget.user;
+    final name = (user?.name.isNotEmpty ?? false)
+        ? user!.name
+        : AdminStrings.usersNoName;
+    // Contact/identity line: whatever we know, else fall back to the uid.
+    final contactBits = <String>[
+      if ((user?.phone ?? '').isNotEmpty) user!.phone!,
+      if ((user?.email ?? '').isNotEmpty) user!.email!,
+      widget.uid,
+    ];
+    final requested = widget.requestedAt == null
+        ? null
+        : '${AdminStrings.usersDeletionRequestedAt} ${_fmtDate(widget.requestedAt!)}';
+
+    final description = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleSmall,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          contactBits.join(' · '),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall
+              ?.copyWith(color: AppColors.textSecondary),
+        ),
+        if (requested != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            requested,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: AppColors.textSecondary),
+          ),
+        ],
+      ],
     );
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: AdminResponsive.isCompact(context)
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -554,6 +820,12 @@ class _DeletionRowState extends ConsumerState<_DeletionRow> {
               ],
             ),
     );
+  }
+
+  String _fmtDate(DateTime stamp) {
+    final l = stamp.toLocal();
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${l.year}-${two(l.month)}-${two(l.day)} ${two(l.hour)}:${two(l.minute)}';
   }
 }
 

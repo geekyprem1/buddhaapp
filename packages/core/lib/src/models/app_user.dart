@@ -27,6 +27,17 @@ class AppUser with _$AppUser {
     @Default(false) bool isBlocked,
     @Default('android') String platform,
     String? appVersion,
+
+    /// Server-verified premium entitlement. The app is premium ("Pro") while
+    /// `premiumUntil > now`. Written by `verifyPurchase`/`playRtdn` for real
+    /// Play subscriptions, or by the admin `grantPremium` callable for manual
+    /// grants. Never trust a local flag — this timestamp is the source of
+    /// truth (see BodhiAiConfigX.messagesFor).
+    @TimestampConverter() DateTime? premiumUntil,
+
+    /// Origin of the current entitlement, e.g. a Play subscription state or
+    /// `admin_grant` / `admin_revoke` for manual admin actions.
+    String? premiumState,
     @TimestampConverter() DateTime? createdAt,
     @TimestampConverter() DateTime? lastActiveAt,
   }) = _AppUser;
@@ -48,4 +59,9 @@ class NotificationPrefs with _$NotificationPrefs {
 
 extension AppUserX on AppUser {
   bool get hasCompletedOnboarding => onboardingStep == 'complete';
+
+  /// Premium ("Pro") while the server-verified entitlement is still in the
+  /// future. Mirrors the app's own `premiumUntil > now` rule.
+  bool get isPremium =>
+      premiumUntil != null && premiumUntil!.isAfter(DateTime.now());
 }

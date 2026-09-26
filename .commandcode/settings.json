@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(dir:*)",
+      "Shell(agent-browser:*)",
+      "Shell(git:*)",
+      "Shell(npx --no-install playwright --version 2 >& 1)",
+      "powershell",
+      "Shell(npm:*)",
+      "Shell(cat <<'EOF' | agent-browser --session adminbug eval --stdin const out = {}; out.bodyChildren = Array.from(document.body.children).map(e => e.tagName + '#' + (e.id||'') + '.' + (e.className && e.className.toString().slice(0,80))); out.flutterView = !!document.querySelector('flutter-view'); out.glassPane = !!document.querySelector('flt-glass-pane'); out.scene = !!document.querySelector('flt-scene-host'); out.canvasCount = document.querySelectorAll('canvas').length; out.bodyRect = document.body.getBoundingClientRect().toJSON(); out.innerW = window.innerWidth; out.innerH = window.innerHeight; out.hasFlutterLoader = !!(window._flutter && window._flutter.loader); out.buildConfig = window._flutter && window._flutter.buildConfig; JSON.stringify(out, null, 2); EOF)",
+      "Shell(type:*)",
+      "Shell($base = \"C:\\Users\\user\\Documents\\APP Creation\\New Buddha APP V2\\apps\\admin\" Get-ChildItem \"$base\\.dart_tool\\flutter_build\" -Filter web_plugin_registrant.dart -Recurse | ForEach-Object { $hasSP = (Select-String -Path $_.FullName -Pattern 'shared_preferences_web' -Quiet) \"$($_.Directory.Name) shared_preferences_web=$hasSP\" })",
+      "Shell(node \"C:\\Users\\user\\AppData\\Local\\Temp\\commandcode\\C--Users-user-Documents-APP-Creation-New-Buddha-APP-V2\\9ac3f1e0-6452-46a0-a947-2a3b5ec73e5e\\scratchpad\\serve.js\" \"C:\\Users\\user\\Documents\\APP Creation\\New Buddha APP V2\\apps\\admin\\build\\web\" 8123)",
+      "Shell(firebase:*)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}

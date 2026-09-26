@@ -30,6 +30,8 @@ _$AppUserImpl _$$AppUserImplFromJson(Map json) => _$AppUserImpl(
       isBlocked: json['isBlocked'] as bool? ?? false,
       platform: json['platform'] as String? ?? 'android',
       appVersion: json['appVersion'] as String?,
+      premiumUntil: const TimestampConverter().fromJson(json['premiumUntil']),
+      premiumState: json['premiumState'] as String?,
       createdAt: const TimestampConverter().fromJson(json['createdAt']),
       lastActiveAt: const TimestampConverter().fromJson(json['lastActiveAt']),
     );
@@ -50,6 +52,8 @@ Map<String, dynamic> _$$AppUserImplToJson(_$AppUserImpl instance) =>
       'isBlocked': instance.isBlocked,
       'platform': instance.platform,
       'appVersion': instance.appVersion,
+      'premiumUntil': const TimestampConverter().toJson(instance.premiumUntil),
+      'premiumState': instance.premiumState,
       'createdAt': const TimestampConverter().toJson(instance.createdAt),
       'lastActiveAt': const TimestampConverter().toJson(instance.lastActiveAt),
     };

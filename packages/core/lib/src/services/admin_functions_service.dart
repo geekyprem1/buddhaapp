@@ -100,6 +100,32 @@ class AdminFunctionsService {
     final data = Map<String, dynamic>.from(result.data);
     return (data['removed'] as List<dynamic>? ?? []).cast<String>();
   }
+
+  /// Manually grant premium ("Pro") to a user for [days] days from now
+  /// (super admin only, audit-logged). Writes the server-verified
+  /// `users/{uid}.premiumUntil` — see `functions/src/admin/grantPremium.ts`.
+  /// Returns the new expiry.
+  Future<DateTime> grantPremium({
+    required String uid,
+    required int days,
+  }) async {
+    final callable = _functions.httpsCallable(AppConstants.fnGrantPremium);
+    final result = await callable.call<Map<Object?, Object?>>({
+      'uid': uid,
+      'days': days,
+    });
+    final data = Map<String, dynamic>.from(result.data);
+    return DateTime.fromMillisecondsSinceEpoch(
+      (data['premiumUntil'] as num).toInt(),
+    );
+  }
+
+  /// Revoke a user's premium entitlement immediately (super admin only,
+  /// audit-logged). Clears `premiumUntil` so the account is treated as free.
+  Future<void> revokePremium(String uid) async {
+    final callable = _functions.httpsCallable(AppConstants.fnRevokePremium);
+    await callable.call<Map<Object?, Object?>>({'uid': uid});
+  }
 }
 
 class SendNotificationResult {

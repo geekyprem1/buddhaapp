@@ -38,6 +38,18 @@ mixin _$AppUser {
   bool get isBlocked => throw _privateConstructorUsedError;
   String get platform => throw _privateConstructorUsedError;
   String? get appVersion => throw _privateConstructorUsedError;
+
+  /// Server-verified premium entitlement. The app is premium ("Pro") while
+  /// `premiumUntil > now`. Written by `verifyPurchase`/`playRtdn` for real
+  /// Play subscriptions, or by the admin `grantPremium` callable for manual
+  /// grants. Never trust a local flag — this timestamp is the source of
+  /// truth (see BodhiAiConfigX.messagesFor).
+  @TimestampConverter()
+  DateTime? get premiumUntil => throw _privateConstructorUsedError;
+
+  /// Origin of the current entitlement, e.g. a Play subscription state or
+  /// `admin_grant` / `admin_revoke` for manual admin actions.
+  String? get premiumState => throw _privateConstructorUsedError;
   @TimestampConverter()
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @TimestampConverter()
@@ -72,6 +84,8 @@ abstract class $AppUserCopyWith<$Res> {
       bool isBlocked,
       String platform,
       String? appVersion,
+      @TimestampConverter() DateTime? premiumUntil,
+      String? premiumState,
       @TimestampConverter() DateTime? createdAt,
       @TimestampConverter() DateTime? lastActiveAt});
 
@@ -107,6 +121,8 @@ class _$AppUserCopyWithImpl<$Res, $Val extends AppUser>
     Object? isBlocked = null,
     Object? platform = null,
     Object? appVersion = freezed,
+    Object? premiumUntil = freezed,
+    Object? premiumState = freezed,
     Object? createdAt = freezed,
     Object? lastActiveAt = freezed,
   }) {
@@ -167,6 +183,14 @@ class _$AppUserCopyWithImpl<$Res, $Val extends AppUser>
           ? _value.appVersion
           : appVersion // ignore: cast_nullable_to_non_nullable
               as String?,
+      premiumUntil: freezed == premiumUntil
+          ? _value.premiumUntil
+          : premiumUntil // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      premiumState: freezed == premiumState
+          ? _value.premiumState
+          : premiumState // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -211,6 +235,8 @@ abstract class _$$AppUserImplCopyWith<$Res> implements $AppUserCopyWith<$Res> {
       bool isBlocked,
       String platform,
       String? appVersion,
+      @TimestampConverter() DateTime? premiumUntil,
+      String? premiumState,
       @TimestampConverter() DateTime? createdAt,
       @TimestampConverter() DateTime? lastActiveAt});
 
@@ -245,6 +271,8 @@ class __$$AppUserImplCopyWithImpl<$Res>
     Object? isBlocked = null,
     Object? platform = null,
     Object? appVersion = freezed,
+    Object? premiumUntil = freezed,
+    Object? premiumState = freezed,
     Object? createdAt = freezed,
     Object? lastActiveAt = freezed,
   }) {
@@ -305,6 +333,14 @@ class __$$AppUserImplCopyWithImpl<$Res>
           ? _value.appVersion
           : appVersion // ignore: cast_nullable_to_non_nullable
               as String?,
+      premiumUntil: freezed == premiumUntil
+          ? _value.premiumUntil
+          : premiumUntil // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      premiumState: freezed == premiumState
+          ? _value.premiumState
+          : premiumState // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -335,6 +371,8 @@ class _$AppUserImpl implements _AppUser {
       this.isBlocked = false,
       this.platform = 'android',
       this.appVersion,
+      @TimestampConverter() this.premiumUntil,
+      this.premiumState,
       @TimestampConverter() this.createdAt,
       @TimestampConverter() this.lastActiveAt})
       : _selectedTeachers = selectedTeachers,
@@ -396,6 +434,20 @@ class _$AppUserImpl implements _AppUser {
   final String platform;
   @override
   final String? appVersion;
+
+  /// Server-verified premium entitlement. The app is premium ("Pro") while
+  /// `premiumUntil > now`. Written by `verifyPurchase`/`playRtdn` for real
+  /// Play subscriptions, or by the admin `grantPremium` callable for manual
+  /// grants. Never trust a local flag — this timestamp is the source of
+  /// truth (see BodhiAiConfigX.messagesFor).
+  @override
+  @TimestampConverter()
+  final DateTime? premiumUntil;
+
+  /// Origin of the current entitlement, e.g. a Play subscription state or
+  /// `admin_grant` / `admin_revoke` for manual admin actions.
+  @override
+  final String? premiumState;
   @override
   @TimestampConverter()
   final DateTime? createdAt;
@@ -405,7 +457,7 @@ class _$AppUserImpl implements _AppUser {
 
   @override
   String toString() {
-    return 'AppUser(uid: $uid, name: $name, phone: $phone, email: $email, photoUrl: $photoUrl, language: $language, selectedTeachers: $selectedTeachers, authMethod: $authMethod, onboardingStep: $onboardingStep, fcmTokens: $fcmTokens, notificationPrefs: $notificationPrefs, isBlocked: $isBlocked, platform: $platform, appVersion: $appVersion, createdAt: $createdAt, lastActiveAt: $lastActiveAt)';
+    return 'AppUser(uid: $uid, name: $name, phone: $phone, email: $email, photoUrl: $photoUrl, language: $language, selectedTeachers: $selectedTeachers, authMethod: $authMethod, onboardingStep: $onboardingStep, fcmTokens: $fcmTokens, notificationPrefs: $notificationPrefs, isBlocked: $isBlocked, platform: $platform, appVersion: $appVersion, premiumUntil: $premiumUntil, premiumState: $premiumState, createdAt: $createdAt, lastActiveAt: $lastActiveAt)';
   }
 
   @override
@@ -437,6 +489,10 @@ class _$AppUserImpl implements _AppUser {
                 other.platform == platform) &&
             (identical(other.appVersion, appVersion) ||
                 other.appVersion == appVersion) &&
+            (identical(other.premiumUntil, premiumUntil) ||
+                other.premiumUntil == premiumUntil) &&
+            (identical(other.premiumState, premiumState) ||
+                other.premiumState == premiumState) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.lastActiveAt, lastActiveAt) ||
@@ -461,6 +517,8 @@ class _$AppUserImpl implements _AppUser {
       isBlocked,
       platform,
       appVersion,
+      premiumUntil,
+      premiumState,
       createdAt,
       lastActiveAt);
 
@@ -496,6 +554,8 @@ abstract class _AppUser implements AppUser {
       final bool isBlocked,
       final String platform,
       final String? appVersion,
+      @TimestampConverter() final DateTime? premiumUntil,
+      final String? premiumState,
       @TimestampConverter() final DateTime? createdAt,
       @TimestampConverter() final DateTime? lastActiveAt}) = _$AppUserImpl;
 
@@ -533,6 +593,20 @@ abstract class _AppUser implements AppUser {
   String get platform;
   @override
   String? get appVersion;
+
+  /// Server-verified premium entitlement. The app is premium ("Pro") while
+  /// `premiumUntil > now`. Written by `verifyPurchase`/`playRtdn` for real
+  /// Play subscriptions, or by the admin `grantPremium` callable for manual
+  /// grants. Never trust a local flag — this timestamp is the source of
+  /// truth (see BodhiAiConfigX.messagesFor).
+  @override
+  @TimestampConverter()
+  DateTime? get premiumUntil;
+
+  /// Origin of the current entitlement, e.g. a Play subscription state or
+  /// `admin_grant` / `admin_revoke` for manual admin actions.
+  @override
+  String? get premiumState;
   @override
   @TimestampConverter()
   DateTime? get createdAt;

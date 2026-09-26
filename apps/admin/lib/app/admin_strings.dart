@@ -229,6 +229,9 @@ abstract class AdminStrings {
   static const usersAllStatus = 'All';
   static const usersActiveOnly = 'Active';
   static const usersBlockedOnly = 'Blocked';
+  static const usersPremiumFilter = 'Plan';
+  static const usersProOnly = 'Pro';
+  static const usersFreeOnly = 'Free';
   static const usersEmpty = 'No users match these filters.';
   static const usersBlock = 'Block';
   static const usersUnblock = 'Unblock';
@@ -265,6 +268,26 @@ abstract class AdminStrings {
   static const usersDeletionCompleted = 'Completed';
   static const usersDeletionPending = 'Pending';
   static const usersDeletionRequestedAt = 'Requested';
+
+  static const usersPremiumBadge = 'Pro';
+  static const usersGrantPremium = 'Grant Pro';
+  static const usersRevokePremium = 'Revoke Pro';
+  static const usersPremiumUntil = 'Pro until';
+  static const usersGrantPremiumTitle = 'Grant Pro to this user?';
+  static const usersGrantPremiumBody =
+      'This gives the user a premium ("Pro") entitlement for the duration you '
+      'choose, without a Play purchase. It does not charge anyone.';
+  static const usersGrantPremiumDuration = 'Duration';
+  static const usersGrantPremiumConfirm = 'Grant Pro';
+  static const usersGrantPremiumDone = 'Pro granted.';
+  static const usersGrantPremiumFailed = 'Could not grant Pro.';
+  static const usersRevokePremiumTitle = 'Revoke Pro from this user?';
+  static const usersRevokePremiumBody =
+      'This ends the user\'s premium access immediately. If they later buy a '
+      'real subscription, it is restored automatically.';
+  static const usersRevokePremiumConfirm = 'Revoke Pro';
+  static const usersRevokePremiumDone = 'Pro revoked.';
+  static const usersRevokePremiumFailed = 'Could not revoke Pro.';
 
   static const contactSearchHint = 'Search subject, message or uid';
   static const contactAllStatus = 'All';

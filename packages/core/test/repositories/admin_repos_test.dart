@@ -280,6 +280,129 @@ void main() {
       );
       expect(next.single.thumbUrl, 'https://example.com/thumb.webp');
     });
+
+    // Regression: a freshly uploaded wallpaper "disappeared" from the desk.
+    // The admin query used orderBy('sortOrder').limit(100): Firestore drops
+    // docs with no sortOrder, and a new item (sortOrder 0) ranked below the
+    // 100 already-ordered rows, so it fell outside the page.
+    test('fetchAdminPage lists items past the old 100 cap', () async {
+      for (var i = 1; i <= 120; i++) {
+        await firestore.collection('wallpapers').doc('wp_$i').set({
+          'type': 'wallpaper',
+          'title': {'en': 'Old $i'},
+          'status': 'published',
+          'sortOrder': i,
+        });
+      }
+      // The newly uploaded item, left at the default sortOrder.
+      await firestore.collection('wallpapers').doc('fresh').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Fresh upload'},
+        'status': 'draft',
+        'sortOrder': 0,
+      });
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      final rows = await repo.fetchAdminPage();
+      expect(rows, hasLength(121));
+      expect(rows.map((r) => r.id), contains('fresh'));
+    });
+
+    test('fetchAdminPage keeps docs that have no sortOrder field', () async {
+      await firestore.collection('wallpapers').doc('no_sort').set({
+        'type': 'wallpaper',
+        'title': {'en': 'No sortOrder'},
+        'status': 'published',
+      });
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      final rows = await repo.fetchAdminPage();
+      expect(rows.map((r) => r.id), ['no_sort']);
+    });
+
+    test('fetchAdminPage skips an undecodable half-written doc', () async {
+      // What `onMediaUpload` leaves behind when its patch lands on a doc that
+      // no longer has the admin-written fields: no `type`, no `title`.
+      await firestore.collection('wallpapers').doc('ghost').set({
+        'mediaUrl': 'https://example.com/full.webp',
+        'thumbUrl': 'https://example.com/thumb.webp',
+      });
+      await firestore.collection('wallpapers').doc('good').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Good'},
+        'status': 'published',
+        'sortOrder': 3,
+      });
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      final rows = await repo.fetchAdminPage();
+      expect(rows.map((r) => r.id), ['good']);
+    });
+
+    test('nextSortOrder puts a new item above everything stored', () async {
+      await firestore.collection('wallpapers').doc('wp_1').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Top'},
+        'status': 'published',
+        'sortOrder': 100,
+      });
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      expect(await repo.nextSortOrder(), 101);
+    });
+
+    test('nextSortOrder starts at 1 for an empty collection', () async {
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      expect(await repo.nextSortOrder(), 1);
+    });
+
+    // Regression: the admin form never edits createdAt / createdBy /
+    // publishAt / teacherIds, so a form-built item carries nulls. Writing
+    // those nulls wiped the stored values (140 of 146 production wallpapers
+    // had lost createdAt).
+    test('update does not wipe fields the form never edits', () async {
+      final created = DateTime.utc(2026, 1, 2, 3, 4);
+      await firestore.collection('wallpapers').doc('wp_1').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Lotus'},
+        'status': 'published',
+        'sortOrder': 5,
+        'createdAt': created,
+        'createdBy': 'admin_uid',
+        'publishAt': created,
+        'teacherIds': ['t_1'],
+      });
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      await repo.update(
+        const ContentItem(
+          id: 'wp_1',
+          type: ContentType.wallpaper,
+          title: LocalisedText(en: 'Lotus bloom'),
+          status: ContentStatus.published,
+          sortOrder: 5,
+        ),
+      );
+      final saved = await repo.getById('wp_1');
+      expect(saved?.title.en, 'Lotus bloom');
+      expect(saved?.createdAt?.toUtc(), created);
+      expect(saved?.createdBy, 'admin_uid');
+      expect(saved?.publishAt?.toUtc(), created);
+      expect(saved?.teacherIds, ['t_1']);
+    });
   });
 
   group('AnalyticsService', () {

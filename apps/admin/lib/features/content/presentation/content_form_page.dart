@@ -105,6 +105,24 @@ class _ContentFormPageState extends ConsumerState<ContentFormPage> {
     if (widget.isNew) {
       _loaded = true;
       _docId = null;
+      // New items must outrank everything already stored, otherwise they sort
+      // last (default 0) and fall off the end of the admin + app lists.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _prefillSortOrder());
+    }
+  }
+
+  Future<void> _prefillSortOrder() async {
+    try {
+      final next = await ref
+          .read(contentRepositoryProvider(config.collection))
+          .nextSortOrder();
+      if (!mounted || !widget.isNew) return;
+      // Never clobber a value the admin already typed.
+      if (_sort.text.trim().isEmpty || _sort.text.trim() == '0') {
+        setState(() => _sort.text = '$next');
+      }
+    } catch (_) {
+      // Keep the 0 default — saving still works, the item just sorts last.
     }
   }
 

@@ -33,6 +33,8 @@ abstract class AppConstants {
   static const fnSendNotification = 'sendNotification';
   static const fnExportUsersCsv = 'exportUsersCsv';
   static const fnProcessDeletionRequest = 'processDeletionRequest';
+  static const fnGrantPremium = 'grantPremium';
+  static const fnRevokePremium = 'revokePremium';
   static const fnGuardOtpAbuse = 'guardOtpAbuse';
   static const fnBodhiChat = 'bodhiChat';
   static const fnBodhiQuota = 'bodhiQuota';

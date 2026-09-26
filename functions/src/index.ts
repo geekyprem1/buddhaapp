@@ -5,6 +5,7 @@ initializeApp();
 export { setAdminRole } from "./admin/setAdminRole";
 export { exportUsersCsv } from "./admin/exportUsersCsv";
 export { processDeletionRequest } from "./admin/processDeletionRequest";
+export { grantPremium, revokePremium } from "./admin/grantPremium";
 export { sendNotification } from "./notifications/sendNotification";
 export { sendScheduledNotification } from "./notifications/sendScheduledNotification";
 

@@ -89,6 +89,14 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
     setState(() => _running = true);
     final repo = ref.read(contentRepositoryProvider(config.collection));
     final storage = ref.read(storageServiceProvider);
+    // Bulk drafts must outrank existing items, else they default to sortOrder 0
+    // and sink to the bottom of the admin + app lists (looking "lost").
+    var nextSort = 1;
+    try {
+      nextSort = await repo.nextSortOrder();
+    } catch (_) {
+      // Fall back to 1 — worst case the batch keeps the old ordering.
+    }
 
     for (final file in _files) {
       if (file.status != _BulkStatus.queued) continue;
@@ -98,6 +106,7 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
       });
 
       final id = repo.newId();
+      final sortOrder = nextSort++;
       final path =
           StoragePaths.contentOriginal(config.collection, id, file.ext);
       try {
@@ -109,6 +118,7 @@ class _BulkUploadPageState extends ConsumerState<BulkUploadPage> {
             title: LocalisedText(en: _titleFromFilename(file.name)),
             language: _isAudio ? 'en' : null,
             storagePath: path,
+            sortOrder: sortOrder,
           ),
         );
 

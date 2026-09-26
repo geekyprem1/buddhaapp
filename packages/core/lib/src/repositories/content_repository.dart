@@ -16,6 +16,23 @@ class ContentRepository with RepoGuard {
   })  : _collectionName = collectionName,
         _firestore = firestore ?? FirebaseFirestore.instance;
 
+  /// How many documents the admin desk loads per content collection. The old
+  /// 100 cap silently hid items once a collection grew past it (wallpapers is
+  /// at 146 in production), which read as "my upload disappeared".
+  static const adminPageSize = 1000;
+
+  /// Fields the admin content form never edits. A form-built [ContentItem]
+  /// leaves them null/empty, so writing them back would erase the stored
+  /// value — this is what wiped `createdAt` off most production content.
+  static const _preserveWhenEmpty = <String>{
+    'createdAt',
+    'createdBy',
+    'publishAt',
+    'expireAt',
+    'deletedAt',
+    'teacherIds',
+  };
+
   final String _collectionName;
   final FirebaseFirestore _firestore;
 
@@ -24,6 +41,43 @@ class ContentRepository with RepoGuard {
 
   ContentItem _fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     return ContentItem.fromJson({...doc.data()!, 'id': doc.id});
+  }
+
+  /// Tolerant decode for admin listings. A half-written document — e.g. a
+  /// `onMediaUpload` patch that landed on an item deleted mid-upload, leaving
+  /// only `mediaUrl`/`thumbUrl` and no `type`/`title` — cannot be decoded.
+  /// Skipping it keeps one bad row from failing the entire list.
+  ContentItem? _tryFromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
+    if (doc.data() == null) return null;
+    try {
+      return _fromDoc(doc);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Admin ordering, applied in Dart rather than by Firestore.
+  ///
+  /// A Firestore `orderBy('sortOrder')` silently DROPS documents that have no
+  /// `sortOrder` field, and combined with a page limit it also pushed every
+  /// newly created item (which starts at the bottom of the order) outside the
+  /// window — so a freshly uploaded wallpaper looked like it had vanished.
+  /// Sorting client-side means every fetched document is always listed.
+  List<ContentItem> _sortedForAdmin(List<ContentItem> items) {
+    final sorted = [...items];
+    sorted.sort((a, b) {
+      final bySort = b.sortOrder.compareTo(a.sortOrder);
+      if (bySort != 0) return bySort;
+      // Tie-break newest-touched first so items sharing a sortOrder (e.g. the
+      // default 0) still surface the most recent work at the top.
+      final at = a.updatedAt ?? a.createdAt;
+      final bt = b.updatedAt ?? b.createdAt;
+      if (at != null && bt != null) return bt.compareTo(at);
+      if (bt != null) return 1;
+      if (at != null) return -1;
+      return a.id.compareTo(b.id);
+    });
+    return sorted;
   }
 
   Query<Map<String, dynamic>> _publishedQuery({
@@ -97,30 +151,48 @@ class ContentRepository with RepoGuard {
 
   String newId() => _collection.doc().id;
 
-  /// Admin list — every status, newest sort first. Status filter is applied
-  /// client-side so we never wait on a missing composite index.
-  Future<List<ContentItem>> fetchAdminPage({
-    int pageSize = 100,
-  }) {
-    return guardedRead('content.fetchAdminPage', () async {
+  /// `sortOrder` to give a brand-new item so it lands at the TOP of every
+  /// list (admin + app both order `sortOrder` DESCENDING). Without this a new
+  /// item defaults to 0 and sinks below everything already ordered.
+  Future<int> nextSortOrder() {
+    return guardedRead('content.nextSortOrder', () async {
       final snap = await _collection
           .orderBy('sortOrder', descending: true)
-          .limit(pageSize)
+          .limit(1)
           .get();
-      return snap.docs.map(_fromDoc).toList();
+      if (snap.docs.isEmpty) return 1;
+      final raw = snap.docs.first.data()['sortOrder'];
+      final top = raw is num ? raw.toInt() : 0;
+      return top + 1;
+    });
+  }
+
+  /// Admin list — every status, highest `sortOrder` first.
+  ///
+  /// The query itself is unordered on purpose (see [_sortedForAdmin]); status
+  /// filtering and ordering both happen client-side so nothing is hidden by a
+  /// missing field or a missing composite index.
+  Future<List<ContentItem>> fetchAdminPage({
+    int pageSize = adminPageSize,
+  }) {
+    return guardedRead('content.fetchAdminPage', () async {
+      final snap = await _collection.limit(pageSize).get();
+      return _sortedForAdmin(
+        snap.docs.map(_tryFromDoc).whereType<ContentItem>().toList(),
+      );
     });
   }
 
   /// Live admin list. Used so `onMediaUpload`'s `thumbUrl` / `mediaUrl` patch
   /// shows up without a manual refresh.
-  Stream<List<ContentItem>> watchAdminPage({int pageSize = 100}) {
+  Stream<List<ContentItem>> watchAdminPage({int pageSize = adminPageSize}) {
     return guardedStream(
       'content.watchAdminPage',
-      _collection
-          .orderBy('sortOrder', descending: true)
-          .limit(pageSize)
-          .snapshots()
-          .map((snap) => snap.docs.map(_fromDoc).toList()),
+      _collection.limit(pageSize).snapshots().map(
+            (snap) => _sortedForAdmin(
+              snap.docs.map(_tryFromDoc).whereType<ContentItem>().toList(),
+            ),
+          ),
     );
   }
 
@@ -163,6 +235,14 @@ class ContentRepository with RepoGuard {
       ..['updatedAt'] = DateTime.now();
     for (final key in unchangedKeys) {
       data.remove(key);
+    }
+    // Drop create-time / lifecycle fields the form does not own rather than
+    // overwriting them with the null (or empty list) a form-built item carries.
+    for (final key in _preserveWhenEmpty) {
+      final value = data[key];
+      if (value == null || (value is List && value.isEmpty)) {
+        data.remove(key);
+      }
     }
     return guardedWrite(
       'content.update',
