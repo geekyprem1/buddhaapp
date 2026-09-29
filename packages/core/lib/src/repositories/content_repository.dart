@@ -239,6 +239,11 @@ class ContentRepository with RepoGuard {
     // Drop create-time / lifecycle fields the form does not own rather than
     // overwriting them with the null (or empty list) a form-built item carries.
     for (final key in _preserveWhenEmpty) {
+      // If the item is not archived, deletedAt must be cleared (null) rather than preserved.
+      if (key == 'deletedAt' && item.status != ContentStatus.archived) {
+        data['deletedAt'] = null;
+        continue;
+      }
       final value = data[key];
       if (value == null || (value is List && value.isEmpty)) {
         data.remove(key);
@@ -292,11 +297,13 @@ class ContentRepository with RepoGuard {
   }
 
   Future<void> setStatus(String id, String status) {
+    final now = DateTime.now();
     return guardedWrite(
       'content.setStatus',
       () => _collection.doc(id).update({
         'status': status,
-        'updatedAt': DateTime.now(),
+        'updatedAt': now,
+        'deletedAt': status == ContentStatus.archived ? now : null,
       }),
     );
   }

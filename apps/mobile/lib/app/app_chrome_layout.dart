@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'bottom_app_chrome.dart';
+import '../platform/alarm_service.dart';
 
 /// Route-aware root layout for the persistent app chrome.
 ///
@@ -31,13 +32,33 @@ class AppChromeLayout extends StatefulWidget {
   State<AppChromeLayout> createState() => _AppChromeLayoutState();
 }
 
-class _AppChromeLayoutState extends State<AppChromeLayout> {
+class _AppChromeLayoutState extends State<AppChromeLayout>
+    with WidgetsBindingObserver {
   bool _listening = false;
+  bool _isAlarmRinging = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _attachAfterFrame();
+    _checkAlarmRinging();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkAlarmRinging();
+    }
+  }
+
+  Future<void> _checkAlarmRinging() async {
+    try {
+      final ringing = await AlarmService().isRinging();
+      if (mounted && ringing != _isAlarmRinging) {
+        setState(() => _isAlarmRinging = ringing);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -66,6 +87,7 @@ class _AppChromeLayoutState extends State<AppChromeLayout> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     if (_listening) {
       widget.router.routerDelegate.removeListener(_routeChanged);
     }
@@ -82,6 +104,41 @@ class _AppChromeLayoutState extends State<AppChromeLayout> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (_isAlarmRinging)
+              Container(
+                color: const Color(0xFF8B1A1A),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: SafeArea(
+                  bottom: false,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.alarm_on, color: Colors.white),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Prarthana is ringing',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF8B1A1A),
+                        ),
+                        onPressed: () async {
+                          await AlarmService().stopRinging();
+                          if (mounted) setState(() => _isAlarmRinging = false);
+                        },
+                        child: const Text('STOP'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             widget.topBanner,
             Expanded(child: widget.body),
             if (showChrome)

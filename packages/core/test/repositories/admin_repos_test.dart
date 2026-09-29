@@ -403,6 +403,54 @@ void main() {
       expect(saved?.publishAt?.toUtc(), created);
       expect(saved?.teacherIds, ['t_1']);
     });
+
+    test('setStatus(published) clears deletedAt; setStatus(archived) sets it', () async {
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      await firestore.collection('wallpapers').doc('wp_archived').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Archived item'},
+        'status': ContentStatus.archived,
+        'deletedAt': DateTime.utc(2026, 1, 1),
+      });
+
+      await repo.setStatus('wp_archived', ContentStatus.published);
+      final published = await repo.getById('wp_archived');
+      expect(published?.status, ContentStatus.published);
+      expect(published?.deletedAt, isNull);
+
+      await repo.setStatus('wp_archived', ContentStatus.archived);
+      final rearchived = await repo.getById('wp_archived');
+      expect(rearchived?.status, ContentStatus.archived);
+      expect(rearchived?.deletedAt, isNotNull);
+    });
+
+    test('update clears deletedAt when item status is published or draft', () async {
+      final repo = ContentRepository(
+        collectionName: 'wallpapers',
+        firestore: firestore,
+      );
+      await firestore.collection('wallpapers').doc('wp_draft').set({
+        'type': 'wallpaper',
+        'title': {'en': 'Draft item'},
+        'status': ContentStatus.archived,
+        'deletedAt': DateTime.utc(2026, 1, 1),
+      });
+
+      await repo.update(
+        const ContentItem(
+          id: 'wp_draft',
+          type: ContentType.wallpaper,
+          title: LocalisedText(en: 'Now Published'),
+          status: ContentStatus.published,
+        ),
+      );
+      final updated = await repo.getById('wp_draft');
+      expect(updated?.status, ContentStatus.published);
+      expect(updated?.deletedAt, isNull);
+    });
   });
 
   group('AnalyticsService', () {

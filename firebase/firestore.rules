@@ -119,7 +119,7 @@ service cloud.firestore {
           isSignedIn() && role() == 'moderator' &&
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['counters']) &&
           request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['status', 'isFeatured', 'sortOrder', 'updatedAt'])
+            .hasOnly(['status', 'isFeatured', 'sortOrder', 'updatedAt', 'deletedAt'])
         );
     }
 

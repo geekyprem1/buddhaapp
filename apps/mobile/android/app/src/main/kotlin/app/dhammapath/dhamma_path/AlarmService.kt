@@ -11,7 +11,9 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import java.io.File
@@ -23,6 +25,7 @@ class AlarmService : Service() {
         const val ACTION_SNOOZE = "app.dhammapath.ALARM_SNOOZE"
         const val CHANNEL_ID = "prarthana_alarm"
         const val NOTIFICATION_ID = 7101
+        @Volatile var isRinging: Boolean = false
     }
 
     private var player: MediaPlayer? = null
@@ -31,15 +34,19 @@ class AlarmService : Service() {
     private var currentPath: String? = null
     private var currentLabel: String = "Daily Prarthana"
     private var snoozeMinutes: Int = 10
+    private val autoStopHandler = Handler(Looper.getMainLooper())
+    private val autoStopRunnable = Runnable { stopEverything() }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
+        isRinging = true
         ensureChannel()
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "dhamma:prarthana")
         wakeLock?.acquire(15 * 60 * 1000L)
+        autoStopHandler.postDelayed(autoStopRunnable, 10 * 60 * 1000L)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -74,6 +81,8 @@ class AlarmService : Service() {
     }
 
     override fun onDestroy() {
+        isRinging = false
+        autoStopHandler.removeCallbacks(autoStopRunnable)
         stopPlayback()
         wakeLock?.let { if (it.isHeld) it.release() }
         wakeLock = null
@@ -119,6 +128,8 @@ class AlarmService : Service() {
     }
 
     private fun stopEverything() {
+        isRinging = false
+        autoStopHandler.removeCallbacks(autoStopRunnable)
         stopPlayback()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -186,6 +197,8 @@ class AlarmService : Service() {
             .setSound(null)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(content)
+            .setFullScreenIntent(content, true)
+            .setDeleteIntent(stop)
             .addAction(0, "Stop", stop)
             .addAction(0, "Snooze 10 min", snooze)
             .build()

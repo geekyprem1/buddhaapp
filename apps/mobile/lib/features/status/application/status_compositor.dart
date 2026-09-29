@@ -91,13 +91,13 @@ class StatusCompositor {
         maxLines: 1,
         ellipsis: '…',
       );
-      final maxW = style.w * srcW;
-      painter.layout(maxWidth: maxW <= 0 ? srcW : maxW);
+      final boxW = style.w <= 0 ? srcW : style.w * srcW;
+      painter.layout(maxWidth: boxW);
       var dx = style.x * srcW;
       if (style.align == 'center') {
-        dx -= painter.width / 2;
+        dx += (boxW - painter.width) / 2;
       } else if (style.align == 'right') {
-        dx -= painter.width;
+        dx += boxW - painter.width;
       }
       painter.paint(canvas, Offset(dx, style.y * srcH));
     }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:core/core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/painting.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
@@ -43,6 +44,7 @@ class StatusAvatar extends _$StatusAvatar {
     final dest = await _file();
     await dest.parent.create(recursive: true);
     await File(picked.path).copy(dest.path);
+    PaintingBinding.instance.imageCache.evict(FileImage(dest));
     state = dest;
     await ref.read(analyticsServiceProvider).statusPhotoAdded();
   }

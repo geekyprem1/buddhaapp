@@ -66,6 +66,25 @@ class DhammaAudioHandler extends BaseAudioHandler
     }
   }
 
+  LoopMode _loopMode = LoopMode.off;
+  bool _isShuffle = false;
+  List<int> _shuffledOrder = [];
+
+  void _generateShuffledOrder(int length, int currentIndex) {
+    if (length <= 0) {
+      _shuffledOrder = [];
+      return;
+    }
+    final remaining = [
+      for (var i = 0; i < length; i++)
+        if (i != currentIndex) i
+    ]..shuffle();
+    _shuffledOrder = [
+      if (currentIndex >= 0 && currentIndex < length) currentIndex,
+      ...remaining,
+    ];
+  }
+
   Future<void> playContent(
     ContentItem item, {
     List<ContentItem>? queue,
@@ -89,6 +108,13 @@ class DhammaAudioHandler extends BaseAudioHandler
 
     var index = playable.indexWhere((e) => e.id == item.id);
     if (index < 0) index = 0;
+    if (item.type != ContentType.meditation) {
+      sleepTimer.cancel();
+    }
+    if (_isShuffle) {
+      _generateShuffledOrder(playable.length, index);
+    }
+
 
     // Only the explicitly requested track resumes; later parts of a series
     // start from the beginning. A superseded load (B13) must not trigger
@@ -256,7 +282,7 @@ class DhammaAudioHandler extends BaseAudioHandler
     // A finished item has no meaningful resume point — clear it (FR-10.5).
     _clearProgress(mediaItem.value);
 
-    if (_player.loopMode == LoopMode.one) {
+    if (_loopMode == LoopMode.one) {
       await _player.seek(Duration.zero);
       await _player.play();
       return;
@@ -264,10 +290,24 @@ class DhammaAudioHandler extends BaseAudioHandler
     final items = queue.value;
     final current = mediaItem.value;
     if (current == null || items.isEmpty) return;
+
+    if (_isShuffle && _shuffledOrder.isNotEmpty) {
+      final curPos = _shuffledOrder
+          .indexOf(items.indexWhere((e) => e.id == current.id));
+      if (curPos >= 0 && curPos < _shuffledOrder.length - 1) {
+        await skipToNext();
+      } else if (_loopMode == LoopMode.all) {
+        if (await _loadIndex(_shuffledOrder.first)) await play();
+      } else {
+        await stop();
+      }
+      return;
+    }
+
     final index = items.indexWhere((e) => e.id == current.id);
     if (index >= 0 && index < items.length - 1) {
       await skipToNext();
-    } else if (_player.loopMode == LoopMode.all && items.isNotEmpty) {
+    } else if (_loopMode == LoopMode.all && items.isNotEmpty) {
       if (await _loadIndex(0)) await play();
     } else {
       await stop();
@@ -307,6 +347,7 @@ class DhammaAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> stop() async {
+    ++_loadGeneration;
     sleepTimer.cancel();
     await _player.stop();
     await super.stop();
@@ -324,12 +365,33 @@ class DhammaAudioHandler extends BaseAudioHandler
   Future<void> skipToNext() async {
     final items = queue.value;
     final current = mediaItem.value;
-    if (current == null) return;
-    final index = items.indexWhere((e) => e.id == current.id);
-    if (index < 0 || index >= items.length - 1) return;
+    if (current == null || items.isEmpty) return;
+
+    int nextIndex;
+    if (_isShuffle && _shuffledOrder.isNotEmpty) {
+      final curPos = _shuffledOrder
+          .indexOf(items.indexWhere((e) => e.id == current.id));
+      if (curPos >= 0 && curPos < _shuffledOrder.length - 1) {
+        nextIndex = _shuffledOrder[curPos + 1];
+      } else if (_loopMode == LoopMode.all) {
+        nextIndex = _shuffledOrder.first;
+      } else {
+        return;
+      }
+    } else {
+      final index = items.indexWhere((e) => e.id == current.id);
+      if (index >= 0 && index < items.length - 1) {
+        nextIndex = index + 1;
+      } else if (_loopMode == LoopMode.all) {
+        nextIndex = 0;
+      } else {
+        return;
+      }
+    }
+
     final wasPlaying = _player.playing;
     // A superseded load (B13) must not trigger playback for an older track.
-    if (await _loadIndex(index + 1) && wasPlaying) await play();
+    if (await _loadIndex(nextIndex) && wasPlaying) await play();
   }
 
   @override
@@ -340,14 +402,30 @@ class DhammaAudioHandler extends BaseAudioHandler
     }
     final items = queue.value;
     final current = mediaItem.value;
-    if (current == null) return;
-    final index = items.indexWhere((e) => e.id == current.id);
-    if (index <= 0) {
-      await seek(Duration.zero);
-      return;
+    if (current == null || items.isEmpty) return;
+
+    int prevIndex;
+    if (_isShuffle && _shuffledOrder.isNotEmpty) {
+      final curPos = _shuffledOrder
+          .indexOf(items.indexWhere((e) => e.id == current.id));
+      if (curPos > 0) {
+        prevIndex = _shuffledOrder[curPos - 1];
+      } else {
+        await seek(Duration.zero);
+        return;
+      }
+    } else {
+      final index = items.indexWhere((e) => e.id == current.id);
+      if (index > 0) {
+        prevIndex = index - 1;
+      } else {
+        await seek(Duration.zero);
+        return;
+      }
     }
+
     final wasPlaying = _player.playing;
-    if (await _loadIndex(index - 1) && wasPlaying) await play();
+    if (await _loadIndex(prevIndex) && wasPlaying) await play();
   }
 
   @override
@@ -365,17 +443,26 @@ class DhammaAudioHandler extends BaseAudioHandler
   }
 
   Future<void> cycleRepeat() async {
-    final next = switch (_player.loopMode) {
+    _loopMode = switch (_loopMode) {
       LoopMode.off => LoopMode.all,
       LoopMode.all => LoopMode.one,
       LoopMode.one => LoopMode.off,
     };
-    await _player.setLoopMode(next);
+    await _player.setLoopMode(
+      _loopMode == LoopMode.one ? LoopMode.one : LoopMode.off,
+    );
     _broadcastState(_player.playbackEvent);
   }
 
   Future<void> toggleShuffle() async {
-    await _player.setShuffleModeEnabled(!_player.shuffleModeEnabled);
+    _isShuffle = !_isShuffle;
+    if (_isShuffle) {
+      final current = mediaItem.value;
+      final idx = current != null
+          ? queue.value.indexWhere((e) => e.id == current.id)
+          : 0;
+      _generateShuffledOrder(queue.value.length, idx >= 0 ? idx : 0);
+    }
     _broadcastState(_player.playbackEvent);
   }
 
@@ -412,12 +499,12 @@ class DhammaAudioHandler extends BaseAudioHandler
           final i = queue.value.indexWhere((e) => e.id == current.id);
           return i < 0 ? null : i;
         }(),
-        repeatMode: switch (_player.loopMode) {
+        repeatMode: switch (_loopMode) {
           LoopMode.off => AudioServiceRepeatMode.none,
           LoopMode.one => AudioServiceRepeatMode.one,
           LoopMode.all => AudioServiceRepeatMode.all,
         },
-        shuffleMode: _player.shuffleModeEnabled
+        shuffleMode: _isShuffle
             ? AudioServiceShuffleMode.all
             : AudioServiceShuffleMode.none,
       ),

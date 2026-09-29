@@ -42,6 +42,14 @@ async function purgeSoftDeletes(): Promise<number> {
       .limit(PAGE)
       .get();
     for (const doc of snap.docs) {
+      const data = doc.data();
+      if (data.status !== "archived") {
+        logger.warn(
+          `Skipping purge of ${collection}/${doc.id}: status is '${data.status}', not 'archived'. Clearing stale deletedAt.`,
+        );
+        await doc.ref.update({ deletedAt: null });
+        continue;
+      }
       await deleteStorageFolder(`${collection}/${doc.id}/`);
       await doc.ref.delete();
       count += 1;

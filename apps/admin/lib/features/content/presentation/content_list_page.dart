@@ -31,10 +31,18 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
   ContentTypeConfig get config => widget.config;
 
   Future<void> _setStatus(ContentItem item, String status) async {
-    await ref
-        .read(contentRepositoryProvider(config.collection))
-        .setStatus(item.id, status);
-    ref.invalidate(adminContentListProvider(config.collection));
+    try {
+      await ref
+          .read(contentRepositoryProvider(config.collection))
+          .setStatus(item.id, status);
+      ref.invalidate(adminContentListProvider(config.collection));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not update status: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _archive(ContentItem item) async {
@@ -45,17 +53,33 @@ class _ContentListPageState extends ConsumerState<ContentListPage> {
       confirmLabel: AdminStrings.archive,
     );
     if (!ok) return;
-    await ref
-        .read(contentRepositoryProvider(config.collection))
-        .softDelete(item.id);
-    ref.invalidate(adminContentListProvider(config.collection));
+    try {
+      await ref
+          .read(contentRepositoryProvider(config.collection))
+          .softDelete(item.id);
+      ref.invalidate(adminContentListProvider(config.collection));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not archive item: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _restore(ContentItem item) async {
-    await ref
-        .read(contentRepositoryProvider(config.collection))
-        .restore(item.id);
-    ref.invalidate(adminContentListProvider(config.collection));
+    try {
+      await ref
+          .read(contentRepositoryProvider(config.collection))
+          .restore(item.id);
+      ref.invalidate(adminContentListProvider(config.collection));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not restore item: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _clone(ContentItem item) async {

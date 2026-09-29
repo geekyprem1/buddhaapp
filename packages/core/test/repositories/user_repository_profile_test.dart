@@ -36,4 +36,28 @@ void main() {
     expect(docs.docs.first.data()['uid'], 'u1');
     expect(docs.docs.first.data()['subject'], 'Help');
   });
+
+  test('ensureUserDocument writes user doc without blocked or premium fields', () async {
+    final firestore = FakeFirebaseFirestore();
+    final repo = UserRepository(firestore: firestore);
+    await repo.ensureUserDocument(
+      uid: 'u_new',
+      authMethod: 'phone',
+      phone: '9876543210',
+      name: 'Ashoka',
+    );
+    final doc = await firestore.collection('users').doc('u_new').get();
+    expect(doc.exists, isTrue);
+    final data = doc.data()!;
+    expect(data['name'], 'Ashoka');
+    expect(data['phone'], '9876543210');
+    expect(data['authMethod'], 'phone');
+    expect(data['onboardingStep'], 'language');
+    expect(data.containsKey('uid'), isFalse);
+    expect(data.containsKey('isBlocked'), isFalse);
+    expect(data.containsKey('premiumUntil'), isFalse);
+    expect(data.containsKey('premiumState'), isFalse);
+    expect(data.containsKey('premiumToken'), isFalse);
+    expect(data.containsKey('premiumUpdatedAt'), isFalse);
+  });
 }

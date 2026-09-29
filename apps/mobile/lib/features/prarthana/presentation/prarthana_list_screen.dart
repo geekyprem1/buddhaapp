@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
@@ -11,6 +10,7 @@ import '../../../app/home_app_bar_button.dart';
 import '../../../app/router.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/prarthana_providers.dart';
+import '../application/alarm_local_store.dart';
 
 class PrarthanaListScreen extends ConsumerStatefulWidget {
   const PrarthanaListScreen({super.key});
@@ -40,18 +40,16 @@ class _PrarthanaListScreenState extends ConsumerState<PrarthanaListScreen> {
       try {
         if (!mounted) return;
         final store = ref.read(alarmLocalStoreProvider);
-        final remoteIds = {for (final a in items) a.id};
-        final localIds = {
-          for (final a in store.getAll()) a.id,
-        };
-        final fingerprint = jsonEncode((remoteIds.toList()..sort()));
-        if (!setEquals(localIds, remoteIds)) {
+        final remoteFingerprint = AlarmLocalStore.computeFingerprint(items);
+        final localFingerprint =
+            AlarmLocalStore.computeFingerprint(store.getAll());
+        if (localFingerprint != remoteFingerprint) {
           await store.replaceAll(items);
         }
         if (!mounted) return;
-        if (store.getNativeSyncedIds() != fingerprint) {
+        if (store.getNativeSyncedFingerprint() != remoteFingerprint) {
           await ref.read(alarmServiceProvider).syncAlarms(items);
-          await store.setNativeSyncedIds(remoteIds);
+          await store.setNativeSyncedFingerprint(remoteFingerprint);
         }
       } catch (_) {
         _restoreDone = false;

@@ -45,6 +45,10 @@ class AlarmService {
   Future<void> stopRinging() {
     return _channel.invokeMethod<void>('stopRinging');
   }
+
+  Future<bool> isRinging() async {
+    return await _channel.invokeMethod<bool>('isRinging') ?? false;
+  }
 }
 
 Map<String, dynamic> alarmToChannel(Alarm alarm) => {

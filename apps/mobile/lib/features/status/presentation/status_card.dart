@@ -22,6 +22,11 @@ class StatusCard extends ConsumerWidget {
     final meta = statusMetaOf(item);
     final name = ref.watch(statusDisplayNameProvider);
     final photo = ref.watch(statusAvatarProvider);
+    final w = item.wallpaper?.width;
+    final h = item.wallpaper?.height;
+    final aspectRatio = (w != null && h != null && w > 0 && h > 0)
+        ? w / h
+        : 0.8;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -29,7 +34,7 @@ class StatusCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AspectRatio(
-            aspectRatio: 0.8,
+            aspectRatio: aspectRatio,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final size = Size(constraints.maxWidth, constraints.maxHeight);
@@ -128,6 +133,22 @@ class StatusCard extends ConsumerWidget {
                         ),
                       ),
                     ),
+                    if (meta.watermark)
+                      Positioned(
+                        right: size.width * 0.03,
+                        bottom: size.height * 0.02,
+                        child: Text(
+                          'Dhamma Path',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: size.height * 0.028,
+                            fontWeight: FontWeight.w600,
+                            shadows: const [
+                              Shadow(color: Color(0x80000000), blurRadius: 4),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 );
               },

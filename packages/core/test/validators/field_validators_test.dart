@@ -56,6 +56,11 @@ void main() {
         isNull,
       );
     });
+    test('accepts multi-label domains (e.g. .co.in, subdomains)', () {
+      expect(FieldValidators.emailOptional('x@yahoo.co.in'), isNull);
+      expect(FieldValidators.emailOptional('a@mail.company.com'), isNull);
+      expect(FieldValidators.emailOptional('a@dept.gov.in'), isNull);
+    });
   });
 
   group('FieldValidators.emailRequired', () {
@@ -67,6 +72,10 @@ void main() {
     });
     test('accepts a valid email', () {
       expect(FieldValidators.emailRequired('admin@dhammapath.app'), isNull);
+    });
+    test('accepts multi-label domains for required email', () {
+      expect(FieldValidators.emailRequired('admin@corp.dhammapath.app'), isNull);
+      expect(FieldValidators.emailRequired('mod@mail.co.in'), isNull);
     });
   });
 

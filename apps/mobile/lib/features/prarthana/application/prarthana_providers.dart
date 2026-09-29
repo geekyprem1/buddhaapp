@@ -46,36 +46,64 @@ class PrarthanaActions {
       prarthanaLocalPath: path,
       createdAt: alarm.createdAt ?? DateTime.now(),
     );
-    await _persist(stored);
+    await _ref.read(alarmLocalStoreProvider).put(stored);
     await _syncNative();
     final uid = _uid;
     if (uid != null) {
-      await _ref.read(analyticsServiceProvider).prarthanaSet(
-            time:
-                '${stored.timeHour.toString().padLeft(2, '0')}:${stored.timeMinute.toString().padLeft(2, '0')}',
-            days: stored.isEveryday
-                ? 'everyday'
-                : stored.repeatDays.join(','),
-            songId: stored.prarthanaId ?? '',
-          );
+      try {
+        await _ref
+            .read(alarmRepositoryProvider)
+            .upsert(uid, stored)
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {
+        // Offline or slow network — local schedule is already active on the device.
+      }
+      try {
+        await _ref.read(analyticsServiceProvider).prarthanaSet(
+              time:
+                  '${stored.timeHour.toString().padLeft(2, '0')}:${stored.timeMinute.toString().padLeft(2, '0')}',
+              days: stored.isEveryday
+                  ? 'everyday'
+                  : stored.repeatDays.join(','),
+              songId: stored.prarthanaId ?? '',
+            );
+      } catch (_) {}
     }
     return stored;
   }
 
   Future<void> toggle(Alarm alarm, bool enabled) async {
     final next = alarm.copyWith(isEnabled: enabled);
-    await _persist(next);
+    await _ref.read(alarmLocalStoreProvider).put(next);
     await _syncNative();
+    final uid = _uid;
+    if (uid != null) {
+      try {
+        await _ref
+            .read(alarmRepositoryProvider)
+            .upsert(uid, next)
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {
+        // Offline: local device schedule is already updated.
+      }
+    }
   }
 
   Future<void> delete(Alarm alarm) async {
-    final uid = _uid;
-    if (uid != null) {
-      await _ref.read(alarmRepositoryProvider).delete(uid, alarm.id);
-    }
     await _ref.read(alarmLocalStoreProvider).delete(alarm.id);
     await _ref.read(alarmServiceProvider).cancel(alarm.id);
     await _syncNative();
+    final uid = _uid;
+    if (uid != null) {
+      try {
+        await _ref
+            .read(alarmRepositoryProvider)
+            .delete(uid, alarm.id)
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {
+        // Offline: local device schedule is already cancelled.
+      }
+    }
   }
 
   Future<void> testIn60s(Alarm alarm) async {
@@ -88,18 +116,12 @@ class PrarthanaActions {
     await _ref.read(alarmServiceProvider).scheduleTest(id: alarm.id);
   }
 
-  Future<void> _persist(Alarm alarm) async {
-    await _ref.read(alarmLocalStoreProvider).put(alarm);
-    final uid = _uid;
-    if (uid != null) {
-      await _ref.read(alarmRepositoryProvider).upsert(uid, alarm);
-    }
-  }
 
-  Future<void> _syncNative() {
-    return _ref.read(alarmServiceProvider).syncAlarms(
-          _ref.read(alarmLocalStoreProvider).getAll(),
-        );
+  Future<void> _syncNative() async {
+    final alarms = _ref.read(alarmLocalStoreProvider).getAll();
+    await _ref.read(alarmServiceProvider).syncAlarms(alarms);
+    final fp = AlarmLocalStore.computeFingerprint(alarms);
+    await _ref.read(alarmLocalStoreProvider).setNativeSyncedFingerprint(fp);
   }
 
   Future<String> _download(String prarthanaId, String url) async {

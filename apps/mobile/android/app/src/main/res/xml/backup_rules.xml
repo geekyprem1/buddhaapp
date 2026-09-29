@@ -6,5 +6,6 @@
   shared_prefs must not be backed up or restored.
 -->
 <full-backup-content>
+    <include domain="sharedpref" path="dhamma_alarms.xml" />
     <exclude domain="sharedpref" />
 </full-backup-content>

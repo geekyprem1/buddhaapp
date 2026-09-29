@@ -11,7 +11,7 @@ abstract class FieldValidators {
   static final _namePattern = RegExp(r'^[a-zA-Z\u0900-\u097F\s.]{2,40}$');
   static final _phonePattern = RegExp(r'^[6-9]\d{9}$');
   static final _emailPattern = RegExp(
-    r'^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$',
+    r'^[\w.+-]+@(?:[\w-]+\.)+[a-zA-Z]{2,}$',
   );
 
   /// Full name: 2-40 chars, Latin letters, Devanagari, spaces and dots.

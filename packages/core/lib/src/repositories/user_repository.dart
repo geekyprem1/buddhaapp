@@ -63,7 +63,16 @@ class UserRepository with RepoGuard {
         createdAt: DateTime.now(),
         lastActiveAt: DateTime.now(),
       );
-      await doc.set(user.toJson()..remove('uid'));
+      final data = user.toJson()
+        ..remove('uid')
+        ..remove('isBlocked')
+        ..removeWhere((key, value) =>
+            value == null ||
+            key == 'premiumUntil' ||
+            key == 'premiumToken' ||
+            key == 'premiumState' ||
+            key == 'premiumUpdatedAt');
+      await doc.set(data, SetOptions(merge: true));
     });
   }
 

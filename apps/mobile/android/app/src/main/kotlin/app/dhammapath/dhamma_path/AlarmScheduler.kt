@@ -69,9 +69,17 @@ object AlarmScheduler {
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenMs, pi)
             return
         }
-        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenMs, pi)
+        val showIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val showPi = PendingIntent.getActivity(
+            context,
+            code,
+            showIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        am.setAlarmClock(AlarmManager.AlarmClockInfo(whenMs, showPi), pi)
     }
-
     fun nextTriggerMillis(alarm: JSONObject, nowMs: Long = System.currentTimeMillis()): Long? {
         if (!alarm.optBoolean("isEnabled", true)) return null
         val hour = alarm.optInt("timeHour", 6)

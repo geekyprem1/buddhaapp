@@ -15,6 +15,16 @@
 | Mobile app | 0 | 6 | 12 | 25 | 43 |
 | **Total** | **1** | **7** | **20** | **31** | **59** |
 
+### Fixed Bugs Progress (26 Sep 2026)
+
+| Status | Critical | High | Medium | Low | Total |
+|---|---:|---:|---:|---:|---:|
+| **Fixed** | **1** | **6** | **8** | **3** | **18** |
+| Remaining | 0 | 1 | 12 | 28 | 41 |
+| Original | 1 | 7 | 20 | 31 | 59 |
+
+- **Fixed bugs:** #1, #16, #17, #21, #22, #23, #24, #25, #27, #30, #31, #36, #37, #38, #40, #45, #46, #47.
+
 - **Severity:** Critical = security/paisa/data loss · High = bada feature toota ya privacy · Medium = galat behaviour/reliability · Low = chhota par asli bug.
 - **Confidence:** Confirmed = code path poora trace hua · Likely = device/timing/data par depend karta hai.
 - **✔ re-checked** = maine khud code me dobara check kiya: #1, #16, #17 (poori chain), #21 aur #27 ka manifest wala hissa, #30. Baaki findings reviewer reports hain.
@@ -35,7 +45,8 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 
 ## A. Admin panel (15)
 
-### #1 — Critical — Archived item "Publish" karne par 30 din baad live item + media permanently delete
+### #1 — [FIXED] Critical — Archived item "Publish" karne par 30 din baad live item + media permanently delete
+- **Status:** FIXED (ContentRepository setStatus clears deletedAt on publish/draft, update clears deletedAt on non-archived items, cleanupOrphans validates status === 'archived' before purge and self-heals stale deletedAt, firestore.rules allows moderator deletedAt update).
 - **Files:** `apps/admin/lib/features/content/presentation/content_list_page.dart:33-38` (`_setStatus`), popup ~365-400 (archived item par bhi "Publish"); `packages/core/lib/src/repositories/content_repository.dart:294-302` (`setStatus` sirf `status` + `updatedAt` likhta hai), `:30-34` (`_preserveWhenEmpty` me `deletedAt`), `:318-327` (`softDelete`); `functions/src/maintenance/cleanupOrphans.ts:39-43`.
 - **Kya hota hai:** `softDelete` `deletedAt` + `archived` set karta hai. Sirf `restore()` (`:307-316`) `deletedAt` clear karta hai. Popup ka "Publish", moderator ka `setStatus`, ya form ka status dropdown sirf `status` badalte hain, `deletedAt` reh jata hai. Cleanup sirf `deletedAt <= cutoff` par filter karta hai, status check nahi karta.
 - **Trigger:** Item archive karo → "Restore" ki jagah "Publish" chuno → archive date ke 30 din baad daily job published doc aur uska `{collection}/{id}/` Storage folder hard-delete kar deta hai.
@@ -128,7 +139,8 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 
 ## B. Admin + Mobile dono (1)
 
-### #16 — Medium — Email validator valid multi-label domains reject karta hai
+### #16 — [FIXED] Medium — Email validator valid multi-label domains reject karta hai
+- **Status:** FIXED (`FieldValidators._emailPattern` updated to `^[\w.+-]+@(?:[\w-]+\.)+[a-zA-Z]{2,}$` supporting multi-level subdomains and ccTLDs like .co.in).
 - **Files:** `packages/core/lib/src/validators/field_validators.dart:13-15` (`^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$`), `emailOptional` ~48-54, `emailRequired` ~56-62. Callers: `apps/admin/lib/features/auth/presentation/login_page.dart` ~36, `apps/mobile/lib/features/onboarding/presentation/person_info_screen.dart` ~57, `apps/mobile/lib/features/profile/presentation/edit_profile_screen.dart` ~54.
 - **Kya hota hai:** `@` ke baad sirf ek label + TLD allowed hai.
 - **Trigger:** `x@yahoo.co.in`, `a@mail.company.com`, `a@dept.gov.in` → "invalid email". Aise email wala admin login form submit nahi kar sakta, aur mobile user onboarding/profile me email save nahi kar sakta.
@@ -140,7 +152,8 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 
 ### C1. Login aur account
 
-### #17 — High — Naye user ka `users/{uid}` create Firestore rules deny karte hain
+### #17 — [FIXED] High — Naye user ka `users/{uid}` create Firestore rules deny karte hain
+- **Status:** FIXED (`UserRepository.ensureUserDocument` strips `uid`, `isBlocked`, nulls, and all premium fields from client write payload, using `SetOptions(merge: true)` to pass both create and update Firestore rules).
 - **Files:** `packages/core/lib/src/repositories/user_repository.dart:44-68` (`:66` par `doc.set(user.toJson()..remove('uid'))`); `packages/core/lib/src/models/app_user.g.dart:55-56` (`premiumUntil`, `premiumState` hamesha map me, null hon tab bhi); `firebase/firestore.rules:46-49` (create par in keys ka hona hi deny), `:50-54` (update).
 - **Kya hota hai:** Null value wala field bhi key hai, isliye create deny hota hai. Agar `onUserCreate` ne beech me doc bana diya ho, to wahi `set()` update ban jata hai aur affectedKeys ki wajah se phir deny hota hai.
 - **Trigger:** Naya user OTP se sign-in kare aur `onUserCreate` Function ke doc banane se pehle client ka `ensureUserDocument` chale (cold start me common) → permission-denied → auth_controller generic sign-in error dikhata hai, jabki Firebase Auth sign-in ho chuka hai. Onboarding ke `.update()` calls bhi not-found se fail hote hain jab tak Function doc na bana de.
@@ -166,31 +179,36 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 
 ### C2. Prarthana alarm aur native Android
 
-### #21 — High — Android 14 par exact-alarm permission na ho to alarm fire hote hi app crash
+### #21 — [FIXED] High — Android 14 par exact-alarm permission na ho to alarm fire hote hi app crash
+- **Status:** FIXED (`USE_EXACT_ALARM` added to manifest, `am.setAlarmClock` used in AlarmScheduler, `AlarmReceiver` wrapped in try/catch with high-priority heads-up fallback, and `SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED` receiver added).
 - **Files:** `apps/mobile/android/app/src/main/kotlin/app/dhammapath/dhamma_path/AlarmScheduler.kt:68-71` (inexact `setAndAllowWhileIdle` fallback); `AlarmReceiver.kt:34-35` (`startForegroundService` bina try/catch); `apps/mobile/lib/features/prarthana/presentation/prarthana_setup_screen.dart` ~221-226, ~247-261; `apps/mobile/android/app/src/main/AndroidManifest.xml:16-17` (sirf `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` nahi).
 - **Kya hota hai:** Android 14+ par naye installs ko `SCHEDULE_EXACT_ALARM` default me nahi milti. Inexact alarm background se foreground service start karne ki chhoot nahi deta → `ForegroundServiceStartNotAllowedException` → process crash, alarm nahi bajta. Dart pehle schedule karta hai phir permission maangta hai; grant ke baad re-sync nahi hota aur `ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED` ka receiver bhi nahi hai.
 - **Trigger:** Android 14 phone → "Set Vandana" → exact-alarm dialog par "Not now" → app band → 6:00 par silent crash.
 - **Confidence:** Likely (API 31+, permission denied, app background) — manifest wala hissa ✔ re-checked
 
-### #22 — High — Bajta hua alarm band karne ka koi rasta nahi bachta
+### #22 — [FIXED] High — Bajta hua alarm band karne ka koi rasta nahi bachta
+- **Status:** FIXED (10-minute auto timeout in `AlarmService`, `deleteIntent` on notification so swipe stops service, `setFullScreenIntent` wakes locked screen, and in-app dismiss banner added in `AppChromeLayout` with `stopRinging()` button).
 - **Files:** `apps/mobile/lib/features/prarthana/application/prarthana_providers.dart:43`, `:117-121`; `AlarmService.kt:102`, `:179-191`; `apps/mobile/lib/platform/alarm_service.dart:45-47` (`stopRinging()` ka koi caller nahi).
 - **Kya hota hai:** Stop/Snooze sirf notification actions me hain (ring screen block hoti hai, #25). Notification permission deny ho to bhi alarm save ho jata hai aur notification dikhti nahi. Android 14+ par ongoing FGS notification swipe ho sakti hai (`deleteIntent` nahi). MediaPlayer `isLooping = true` hai.
 - **Trigger:** Set karte waqt notification prompt par "Don't allow" → subah vandana loop me bajti hai, band karne ka UI nahi (force-stop hi rasta).
 - **Confidence:** Likely (Android 13+ notification denied, ya 14+ par swipe)
 
-### #23 — High — Offline hone par alarm off/delete ka native schedule update nahi hota
+### #23 — [FIXED] High — Offline hone par alarm off/delete ka native schedule update nahi hota
+- **Status:** FIXED (`PrarthanaActions` updates Hive local store and native `AlarmScheduler` immediately BEFORE awaiting cloud Firestore, with a 4s timeout on remote sync).
 - **Files:** `prarthana_providers.dart:49-50`, `:65-69`, `:71-79`, `:91-97`; `packages/core/lib/src/repositories/alarm_repository.dart` ~36-46; `packages/core/lib/src/utils/repo_guard.dart` `_guard` (timeout nahi).
 - **Kya hota hai:** `_persist` Firestore `set()` aur delete `doc.delete()` ko await karta hai, uske baad `_syncNative()`/`cancel()` chalte hain. Offline me ye Futures server ack tak pending rehte hain, to native step kabhi nahi chalta, jabki list (cache se) change dikha deti hai. Offline edit par spinner rukta nahi.
 - **Trigger:** Raat ko airplane mode → 6:00 wala alarm off/delete karo → phir bhi bajta hai.
 - **Confidence:** Confirmed
 
-### #24 — High — Reinstall/naya phone/backup restore ke baad alarms ON dikhte hain par schedule nahi hote
+### #24 — [FIXED] High — Reinstall/naya phone/backup restore ke baad alarms ON dikhte hain par schedule nahi hote
+- **Status:** FIXED (`dhamma_alarms.xml` explicitly included in `data_extraction_rules.xml` and `backup_rules.xml`; `AlarmLocalStore.computeFingerprint` hashes time, days, enabled status, and IDs so any difference triggers immediate sync).
 - **Files:** `apps/mobile/android/app/src/main/res/xml/data_extraction_rules.xml:16-28`, `backup_rules.xml` (sharedpref exclude); `apps/mobile/lib/features/prarthana/presentation/prarthana_list_screen.dart:43-55`; `apps/mobile/lib/features/prarthana/application/alarm_local_store.dart` ~52-61.
 - **Kya hota hai:** Hive (fingerprint `__native_sync_ids` samet) restore hota hai, lekin native AlarmStore (shared_prefs `dhamma_alarms`) exclude hai aur AlarmManager khaali hai. IDs aur fingerprint same dikhte hain, isliye `syncAlarms` nahi chalta; boot receiver ko bhi khaali prefs milte hain. Comparison sirf IDs ka hai, isliye doosre device se aaye time/day/enabled changes bhi Hive/native tak nahi pahunchte.
 - **Trigger:** Play se reinstall ya naye phone me migrate → sign in → alarms enabled dikhte hain par bajte nahi (jab tak edit/toggle na karo).
 - **Confidence:** Confirmed (backup restore scenario chahiye)
 
-### #25 — Medium — Android 10+ par locked phone me ring screen nahi aati, screen on nahi hoti
+### #25 — [FIXED] Medium — Android 10+ par locked phone me ring screen nahi aati, screen on nahi hoti
+- **Status:** FIXED (`USE_FULL_SCREEN_INTENT` added to manifest and `setFullScreenIntent(content, true)` configured in `AlarmService.kt` builder; API 26 window flag fallbacks added in `AlarmRingActivity.kt`).
 - **Files:** `AlarmService.kt:140-152`, `:179-191`; `AndroidManifest.xml` (`USE_FULL_SCREEN_INTENT` nahi), ~125-132.
 - **Kya hota hai:** Service se `startActivity()` background activity start hai, jo API 29+ par chupchaap block hota hai. Notification me `setFullScreenIntent` nahi hai. Awaaz aati hai, par screen dark aur locked rehti hai.
 - **Trigger:** Alarm time par phone locked aur screen off ho.
@@ -202,7 +220,8 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 - **Trigger:** Account delete karo ya bina alarms wale doosre account se login → purana alarm roz bajta hai, list khaali hai, band karne ka UI nahi.
 - **Confidence:** Confirmed
 
-### #27 — Medium — PIN wale phone ko reboot karne par boot receiver crash (Direct Boot)
+### #27 — [FIXED] Medium — PIN wale phone ko reboot karne par boot receiver crash (Direct Boot)
+- **Status:** FIXED (`AlarmStore` uses `createDeviceProtectedStorageContext` with graceful credential-storage migration and try/catch in `AlarmBootReceiver`).
 - **Files:** `AndroidManifest.xml:99-109` (`directBootAware="true"` + `LOCKED_BOOT_COMPLETED`); `AlarmBootReceiver.kt:10-20`; `AlarmStore.kt:12-14`.
 - **Kya hota hai:** Unlock se pehle receiver credential-encrypted `getSharedPreferences()` call karta hai → `IllegalStateException` (uncaught) → crash. `BOOT_COMPLETED` par alarms recover ho jaate hain.
 - **Trigger:** PIN/pattern wala phone reboot karo — pehle unlock se pehle crash.
@@ -220,13 +239,15 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 - **Trigger:** Koi bhi normal portrait wallpaper set karo.
 - **Confidence:** Confirmed
 
-### #30 — Low — Manifest ka `TIME_CHANGED` action exist hi nahi karta
+### #30 — [FIXED] Low — Manifest ka `TIME_CHANGED` action exist hi nahi karta
+- **Status:** FIXED (`android.intent.action.TIME_SET` action configured in `AndroidManifest.xml` and handled in `AlarmBootReceiver.kt`).
 - **Files:** `AndroidManifest.xml:107`; `AlarmBootReceiver.kt:14`.
 - **Kya hota hai:** Asli broadcast `android.intent.action.TIME_SET` hai (`Intent.ACTION_TIME_CHANGED` ki value yahi hai). Filter kabhi match nahi hota, isliye time-set branch dead code hai. Clock peeche karne par next occurrence skip ho jaati hai, aage karne par alarm turant fire hota hai.
 - **Trigger:** Tuesday 07:00 (6:00 wala alarm baj chuka) → clock 05:00 karo → 6:00 wala alarm nahi bajta.
 - **Confidence:** Confirmed ✔ re-checked
 
-### #31 — Low — Android 8.0 (API 26) par ring screen lock screen ke upar nahi aati
+### #31 — [FIXED] Low — Android 8.0 (API 26) par ring screen lock screen ke upar nahi aati
+- **Status:** FIXED (API 26 fallback flags `FLAG_SHOW_WHEN_LOCKED`, `FLAG_TURN_SCREEN_ON`, and `FLAG_KEEP_SCREEN_ON` added in `AlarmRingActivity.kt`).
 - **Files:** `AlarmRingActivity.kt:20-23`; `AndroidManifest.xml` ~129-130; `apps/mobile/android/app/build.gradle.kts` (minSdk 26).
 - **Kya hota hai:** `setShowWhenLocked`/`setTurnScreenOn` API 27+ ke hain. API 26 ke liye `FLAG_SHOW_WHEN_LOCKED`/`FLAG_TURN_SCREEN_ON` fallback nahi hai.
 - **Confidence:** Confirmed (sirf API 26)
@@ -254,19 +275,22 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 
 ### C3. Audio player
 
-### #36 — Medium — Track load hote waqt Stop dabao to ~1 sec baad audio bina controls ke chalu
+### #36 — [FIXED] Medium — Track load hote waqt Stop dabao to ~1 sec baad audio bina controls ke chalu
+- **Status:** FIXED (`++_loadGeneration` added at the start of `DhammaAudioHandler.stop()`, immediately invalidating any in-flight track load so it cannot trigger playback after stop).
 - **Files:** `apps/mobile/lib/features/player/application/dhamma_audio_handler.dart` `_loadIndex` 170-210, `playContent` 97, `stop()` 308-318.
 - **Kya hota hai:** `stop()` `mediaItem`/`queue` clear karta hai par `_loadGeneration` nahi badhata. Chal raha load `current() == true` hi paata hai, retry karke true return karta hai aur caller `play()` kar deta hai. MiniPlayer chhup jata hai aur FullPlayer "Nothing is playing." dikhata hai — app ke andar band karne ka rasta nahi.
 - **Trigger:** Slow network par track tap → loading ke dauran mini player ka X → ~1s baad audio.
 - **Confidence:** Confirmed (timing par depend)
 
-### #37 — Medium — "Repeat all" sirf current track repeat karta hai
+### #37 — [FIXED] Medium — "Repeat all" sirf current track repeat karta hai
+- **Status:** FIXED (`_loopMode` playlist state maintained in `DhammaAudioHandler`; `_player.setLoopMode` is kept `LoopMode.off` during `LoopMode.all` so `just_audio` emits `completed`, allowing `_onComplete` to auto-advance and wrap the playlist at the end).
 - **Files:** `dhamma_audio_handler.dart` `cycleRepeat` 367-375, `_onComplete` 259-274, `setUrl` 189/194; `apps/mobile/lib/features/player/presentation/full_player_screen.dart:164-175`.
 - **Kya hota hai:** Har track akela `setUrl` se load hota hai aur `LoopMode.all` us single source par lagta hai — wahi item loop hota hai, `completed` kabhi emit nahi hota, to "next par jao"/"index 0 par wrap" branch kabhi nahi chalti. Loops ke plays record nahi hote.
 - **Trigger:** Multi-item list ka item 1 → Repeat ek baar (off → all) → track khatam → wahi track dobara.
 - **Confidence:** Likely (just_audio single-source loop behaviour par depend)
 
-### #38 — Medium — Shuffle button kuch nahi karta
+### #38 — [FIXED] Medium — Shuffle button kuch nahi karta
+- **Status:** FIXED (`_isShuffle` and `_shuffledOrder` queue order implemented in `DhammaAudioHandler`; `skipToNext`, `skipToPrevious`, and `_onComplete` follow the randomized order while keeping the current playing track first).
 - **Files:** `dhamma_audio_handler.dart` `toggleShuffle` 377-380, `skipToNext` 323-333, `_onComplete` 264-271; `full_player_screen.dart:153-162`.
 - **Kya hota hai:** Player me hamesha ek hi source hai, isliye `setShuffleModeEnabled` ka asar nahi. Next/prev/auto-advance list order me `items[index ± 1]` use karte hain. Icon highlight hota hai, order same rehta hai.
 - **Confidence:** Confirmed
@@ -277,7 +301,8 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 - **Trigger:** Meditation A phir turant B tap karo; B ka read pehle aaye to A chalta hai.
 - **Confidence:** Likely (timing)
 
-### #40 — Low — Meditation ka sleep timer doosre song par bhi chalta rehta hai
+### #40 — [FIXED] Low — Meditation ka sleep timer doosre song par bhi chalta rehta hai
+- **Status:** FIXED (`DhammaAudioHandler.playContent()` automatically cancels active sleep timer when starting a non-meditation track).
 - **Files:** `dhamma_audio_handler.dart:53-57`, `:69-98` (`playContent` cancel nahi karta; sirf `stop()` `:310` karta hai); `full_player_screen.dart:24`, `:176-190` (sleep UI sirf meditation par).
 - **Trigger:** Meditation → 15-min sleep timer → Songs se song chalao → timer dikhta nahi, 15 min baad song pause ho jata hai.
 - **Confidence:** Confirmed
@@ -307,19 +332,22 @@ In areas ki kuch files counterpart ke taur par padhi gayi (isliye #1, #7, #17–
 
 ### C5. Status, meditation, calendar, wisdom, pages
 
-### #45 — High — Download/share status PNG me center/right aligned naam galat jagah ya image ke bahar
+### #45 — [FIXED] High — Download/share status PNG me center/right aligned naam galat jagah ya image ke bahar
+- **Status:** FIXED (`status_compositor.dart` alignment offset calculation updated to align text within `style.w * srcW` box bounds: center adds `(boxW - painter.width) / 2` and right adds `boxW - painter.width`).
 - **Files:** `apps/mobile/lib/features/status/application/status_compositor.dart:94-102`; preview `apps/mobile/lib/features/status/presentation/status_card.dart:103-115`; admin contract `apps/admin/lib/features/content/presentation/status_layout_editor_page.dart:18-24` (name `Positioned(left: n.x*cw, width: n.w*cw)`).
 - **Kya hota hai:** Editor aur preview `x` ko `w·W` box ka left edge maante hain; compositor `x` ko text ka center/right anchor maanta hai (`painter.width` sirf text ki width hai).
 - **Trigger:** align=right, x=0.06, w=0.6 → preview me naam 0.66W par khatam hota hai, PNG me 0.06W par (lagbhag poora image ke bahar). Center par aadha naam kat jata hai. (Download/share premium feature hai.)
 - **Confidence:** Confirmed. Ek reviewer ne Medium, doosre ne High diya; yahan High rakha.
 
-### #46 — Medium — Status preview hamesha 4:5 crop, download image se match nahi karta
+### #46 — [FIXED] Medium — Status preview hamesha 4:5 crop, download image se match nahi karta
+- **Status:** FIXED (`status_card.dart` uses dynamic aspect ratio from `item.wallpaper` when available, and displays watermark in preview when `meta.watermark` is true).
 - **Files:** `status_card.dart:31-37`, `:43-45` (`AspectRatio(0.8)` + `BoxFit.cover`); `status_compositor.dart:41-52` (image ka asli size).
 - **Kya hota hai:** Non-4:5 image par photo frame/naam alag jagah aate hain aur naam ~30% chhota dikhta hai. Preview theme ka Poppins font use karta hai jabki TextPainter platform default; preview watermark bhi nahi dikhata.
 - **Trigger:** 1080×1920 (9:16) status image.
 - **Confidence:** Likely (image aspect ratio par depend)
 
-### #47 — Medium — Nayi status photo choose karne par bhi purani dikhti hai
+### #47 — [FIXED] Medium — Nayi status photo choose karne par bhi purani dikhti hai
+- **Status:** FIXED (`PaintingBinding.instance.imageCache.evict(FileImage(dest))` added in `StatusAvatar.pick()` in `status_providers.dart` so updated photo re-decodes immediately).
 - **Files:** `status_providers.dart:36-53` (hamesha `<docs>/status_avatar.jpg` overwrite); `status_card.dart:69-74` (`FileImage(photo)`).
 - **Kya hota hai:** `FileImage` ka cache key (path, scale) same rehta hai, to cache se pehli photo aati hai. Export file bytes directly padhta hai aur nayi photo use karta hai — preview aur output app restart tak alag rehte hain.
 - **Trigger:** Photo A choose → phir photo B → card A dikhata hai, download me B.

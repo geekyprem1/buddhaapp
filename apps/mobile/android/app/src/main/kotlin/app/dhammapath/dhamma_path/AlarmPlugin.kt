@@ -92,6 +92,9 @@ class AlarmPlugin(private val activity: Activity) : MethodChannel.MethodCallHand
                 )
                 result.success(true)
             }
+            "isRinging" -> {
+                result.success(AlarmService.isRinging)
+            }
             else -> result.notImplemented()
         }
     }

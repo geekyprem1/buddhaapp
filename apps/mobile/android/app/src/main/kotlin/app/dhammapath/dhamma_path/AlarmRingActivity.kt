@@ -20,6 +20,13 @@ class AlarmRingActivity : Activity() {
         if (Build.VERSION.SDK_INT >= 27) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                android.view.WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            )
         }
         val label = intent.getStringExtra(AlarmScheduler.EXTRA_LABEL) ?: "Daily Prarthana"
         val cream = Color.parseColor("#FDF3E0")

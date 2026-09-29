@@ -48,9 +48,31 @@ class AlarmLocalStore {
 
   Future<void> delete(String id) => _box.delete(id);
 
-  /// Fingerprint (sorted JSON id list) of the remote set last confirmed to the
-  /// native scheduler, or null when never confirmed (B11 recovery).
+  /// Content fingerprint of the remote set last confirmed to the native
+  /// scheduler, including timing and enabled status.
+  static const _syncFingerprintKey = '__native_sync_fingerprint';
   static const _syncIdsKey = '__native_sync_ids';
+
+  static String computeFingerprint(Iterable<Alarm> alarms) {
+    final list = alarms.map((a) => {
+      'id': a.id,
+      'hour': a.timeHour,
+      'minute': a.timeMinute,
+      'days': [...a.repeatDays]..sort(),
+      'enabled': a.isEnabled,
+      'pId': a.prarthanaId ?? '',
+      'snooze': a.snoozeMinutes,
+    }).toList()
+      ..sort((a, b) => (a['id'] as String).compareTo(b['id'] as String));
+    return jsonEncode(list);
+  }
+
+  String? getNativeSyncedFingerprint() =>
+      _box.get(_syncFingerprintKey) ?? _box.get(_syncIdsKey);
+
+  Future<void> setNativeSyncedFingerprint(String fingerprint) {
+    return _box.put(_syncFingerprintKey, fingerprint);
+  }
 
   String? getNativeSyncedIds() => _box.get(_syncIdsKey);
 
